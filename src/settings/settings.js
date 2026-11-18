@@ -1,6 +1,6 @@
 function settingsPage(){
  let tab=S.settingsTab||'fields';
- return '<div class="top"><div><h1>Настройки</h1><div class="muted small">Версия 4.1.5</div></div></div>'+
+ return '<div class="top"><div><h1>Настройки</h1><div class="muted small">Версия 5.0</div></div></div>'+
   '<div class="tabs">'+[['fields','Поля'],['appearance','Внешний вид'],['schedule','Расписание / блокировки']].map(x=>'<button class="'+(tab===x[0]?'active':'')+'" onclick="S.settingsTab=\''+x[0]+'\';render()">'+x[1]+'</button>').join('')+'</div>'+
   (tab==='fields'?settingsFieldsTab():tab==='appearance'?settingsAppearanceTab():settingsScheduleTab());
 }

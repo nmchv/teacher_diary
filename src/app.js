@@ -4,7 +4,7 @@
  * =============================================================================
  * Этот файл объединяет все 28 модулей из src/ в правильном порядке загрузки:
  *
- *  1. core/00-constants.js   — константы, LESSON_TIMES, DAY_NAMES, THEMES, FIELD- defaults
+ *  1. core/00-constants.js   — константы, LESSON_TIMES, DAY_NAMES, тема интерфейса, поля по умолчанию
  *  2. core/01-utils.js       — утилиты (uid, e, C, L, P, M, timeToMin, toISO, mondayOf и др.)
  *  3. core/02-storage.js     — хранилище (D, loadData, save, repairMissingLessonTimes)
  *  4. core/03-files.js       — IndexedDB файловое хранилище
@@ -40,31 +40,13 @@ const LS_KEY='teacherDiaryV3';
 const LS_KEY_V2='teacherDiaryV2';
 const LESSON_TIMES=[{n:1,start:'08:30',end:'09:10'},{n:2,start:'09:20',end:'10:00'},{n:3,start:'10:20',end:'11:00'},{n:4,start:'11:20',end:'12:00'},{n:5,start:'12:10',end:'12:50'},{n:6,start:'13:00',end:'13:40'},{n:7,start:'13:50',end:'14:30'}];
 const DAY_NAMES=['Пн','Вт','Ср','Чт','Пт','Сб'];
-const THEMES=[{key:'default',c:'#007aff'},{key:'blue',c:'#0a66c2'},{key:'green',c:'#1e8e3e'},{key:'purple',c:'#6f42c1'},{key:'red',c:'#d93025'},{key:'orange',c:'#e8710a'},{key:'teal',c:'#009688'},{key:'pink',c:'#d6336c'},{key:'gray',c:'#5f6368'},
- {key:'maple',c:'#b5451b'},{key:'ice',c:'#3fa9d6'},{key:'mint',c:'#2fbf8f'},{key:'lavender',c:'#8e7ce0'},{key:'gold',c:'#c99a1e'},{key:'burgundy',c:'#7a2048'},{key:'lime',c:'#66a300'},{key:'navy',c:'#1b3a6b'},
- {key:'t-autumn',label:'Осень',c:'#e8710a',c2:'#c0392b',emoji:'🍂',group:'season'},
- {key:'t-winter',label:'Зима',c:'#2f7dd6',c2:'#8ecfff',emoji:'❄️',group:'season'},
- {key:'t-spring',label:'Весна',c:'#e0608c',c2:'#7bd389',emoji:'🌸',group:'season'},
- {key:'t-summer',label:'Лето',c:'#e0a800',c2:'#3fb6ff',emoji:'☀️',group:'season'},
- {key:'c-de',label:'Германия',c:'#cc0000',c2:'#f4c430',emoji:'🇩🇪',group:'country'},
- {key:'c-us',label:'США',c:'#3c3b6e',c2:'#b22234',emoji:'🇺🇸',group:'country'},
- {key:'c-fr',label:'Франция',c:'#0055a4',c2:'#ef4135',emoji:'🇫🇷',group:'subject'},
- {key:'sub-geo',label:'География',c:'#1976d2',c2:'#43a047',emoji:'🌍',group:'subject'},
- {key:'sub-phys',label:'Физика',c:'#3f51b5',c2:'#00bcd4',emoji:'⚛️',group:'subject'},
- {key:'sub-chem',label:'Химия',c:'#7b1fa2',c2:'#43a047',emoji:'🧪',group:'subject'},
- {key:'cool-neon',label:'Неон',c:'#d6008a',c2:'#00e5ff',emoji:'⚡',group:'cool'},
- {key:'cool-sunset',label:'Закат',c:'#e05a4e',c2:'#ffc371',emoji:'🌇',group:'cool'},
- {key:'cool-galaxy',label:'Галактика',c:'#6a11cb',c2:'#2575fc',emoji:'🌌',group:'cool'},
- {key:'cool-aurora',label:'Северное сияние',c:'#00b09b',c2:'#845ec2',emoji:'🌈',group:'cool'}];
-const THEME_GROUP_LABELS={season:'Сезонные',country:'Страны',subject:'Школьные предметы',cool:'Яркие темы'};
 const FONT_FAMILIES={
- system:'-apple-system,BlinkMacSystemFont,"SF Pro Text",Arial,sans-serif',
+ system:'"Manrope Variable","Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
  rounded:'"Trebuchet MS","Verdana",sans-serif',
  classic:'Georgia,"Times New Roman",serif',
  mono:'"SF Mono","Consolas","Courier New",monospace'
 };
-const FONT_LABELS={system:'Системный',rounded:'Скруглённый',classic:'Классический',mono:'Моноширинный'};
-const SEASON_LABELS={auto:'Авто (по месяцу)',none:'Выключено',autumn:'🍂 Осень',winter:'❄️ Зима',spring:'🌸 Весна',summer:'☀️ Лето'};
+const FONT_LABELS={system:'Manrope',rounded:'Скруглённый',classic:'Классический',mono:'Моноширинный'};
 const ASSISTANT_CHARACTERS={
  dog:{emoji:'🐶',name:'Пёс-Помощник'},
  wizard:{emoji:'🧙',name:'Волшебник'},
@@ -253,9 +235,9 @@ function customFieldView(f,val){
 function defaultData(){
  return {version:3,classes:[],students:[],lessons:[],materials:[],scheduleBlocks:[],lessonTemplates:[],announcements:[],
   meetings:[],workTasks:[],colleagues:[],
-  settings:{theme:'default',colorMode:'light',accentColor:'',academicYear:'2026–2027',
+  settings:{colorMode:'dark',academicYear:'2026–2027',
    lastBackupAt:null,backupReminder:{lastShown:null},
-   fontFamily:'system',radius:1,sidebarStyle:'solid',season:'auto',seasonEffects:true,particleDensity:'medium',bgDecorations:true,
+   fontFamily:'system',radius:1,sidebarStyle:'solid',
    assistant:{enabled:true,character:'dog',freq:20,lastTipAt:null,peeked:false,motivation:true},
    fields:{student:STUDENT_FIELDS_DEFAULT(),class:CLASS_FIELDS_DEFAULT(),lesson:LESSON_FIELDS_DEFAULT(),colleague:COLLEAGUE_FIELDS_DEFAULT()}}};
 }
@@ -267,7 +249,7 @@ function loadData(){
   D=defaultData();
   migrateFromV2();
  }
- if(!D.settings)D.settings={theme:'default',academicYear:'2026–2027',fields:{student:STUDENT_FIELDS_DEFAULT(),class:CLASS_FIELDS_DEFAULT(),lesson:LESSON_FIELDS_DEFAULT(),colleague:COLLEAGUE_FIELDS_DEFAULT()}};
+ if(!D.settings)D.settings={colorMode:'dark',academicYear:'2026–2027',fields:{student:STUDENT_FIELDS_DEFAULT(),class:CLASS_FIELDS_DEFAULT(),lesson:LESSON_FIELDS_DEFAULT(),colleague:COLLEAGUE_FIELDS_DEFAULT()}};
  if(!D.materials)D.materials=[];
  if(!D.scheduleBlocks)D.scheduleBlocks=[];
  if(!D.lessonTemplates)D.lessonTemplates=[];
@@ -281,8 +263,7 @@ function loadData(){
  if(!D.settings.gradeCommentTemplates)D.settings.gradeCommentTemplates=[...GRADE_COMMENT_TEMPLATES_DEFAULT];
  if(!D.settings.libraryGradeLevels)D.settings.libraryGradeLevels=[...LIBRARY_GRADE_LEVELS_DEFAULT];
  if(D.settings.showSaturday===undefined)D.settings.showSaturday=true;
- if(!D.settings.colorMode)D.settings.colorMode='light';
- if(D.settings.accentColor===undefined)D.settings.accentColor='';
+ if(!D.settings.colorMode)D.settings.colorMode='dark';
  if(D.settings.lastBackupAt===undefined)D.settings.lastBackupAt=null;
  if(!D.settings.backupReminder)D.settings.backupReminder={lastShown:null};
  D.students.forEach(s=>{if(!s.classIds){s.classIds=s.classId?[s.classId]:[];delete s.classId}});
@@ -316,10 +297,6 @@ function loadData(){
  if(D.settings.fontFamily===undefined)D.settings.fontFamily='system';
  if(D.settings.radius===undefined)D.settings.radius=1;
  if(D.settings.sidebarStyle===undefined)D.settings.sidebarStyle='solid';
- if(D.settings.season===undefined)D.settings.season='auto';
- if(D.settings.seasonEffects===undefined)D.settings.seasonEffects=true;
- if(D.settings.particleDensity===undefined)D.settings.particleDensity='medium';
- if(D.settings.bgDecorations===undefined)D.settings.bgDecorations=true;
  if(!D.settings.assistant)D.settings.assistant={enabled:true,character:'dog',freq:20,lastTipAt:null,peeked:false,motivation:true};
  if(D.settings.assistant.peeked===undefined)D.settings.assistant.peeked=false;
  if(D.settings.assistant.motivation===undefined)D.settings.assistant.motivation=true;
@@ -547,7 +524,7 @@ let S={view:'home',classId:null,studentId:null,tab:'lessons',q:'',weekStart:mond
  chartPeriods:{student:{period:'all',from:'',to:''},class:{period:'all',from:'',to:''}},
  recentFilter:{classId:'',status:'',sort:'date_desc',limit:10},
  workTab:'meetings',selectedStudentIds:new Set(),libraryClassFilter:'',
- reportsSelClasses:new Set(),reportsLessonDates:{},reportsPlanPeriod:'',reportsPlanFrom:'',reportsPlanTo:'',reportsPlanOpts:{num:true,topic:true,hw:true,plan:false,extra:false,cancelled:false},reportsComment:'',reportsIncludeHomeschool:true,classPrintIncludeHomeschool:true};
+ reportsSelClasses:new Set(),reportsLessonDates:{},reportsFullPeriod:'all',reportsFullFrom:'',reportsFullTo:'',reportsPlanPeriod:'',reportsPlanFrom:'',reportsPlanTo:'',reportsPlanOpts:{num:true,topic:true,hw:true,plan:false,extra:false,cancelled:false},reportsComment:'',reportsIncludeHomeschool:true,classPrintIncludeHomeschool:true};
 function resolvePeriodRange(periodKey,customFrom,customTo){
  let today=toISO(new Date());
  if(periodKey==='month')return{from:addDays(today,-30),to:today};
@@ -580,100 +557,31 @@ function periodPickerHtml(scope){
   (!(D.settings.quarters||[]).length?'<div class="muted small" style="width:100%;margin-top:4px">Настройте точные границы четвертей в Настройки → Расписание, чтобы фильтровать по ним точно.</div>':'')+
   '</div>';
 }
-const SEASON_EMOJI={autumn:['🍁','🍂','🍃','🎃','👻','🌰','☕'],winter:['❄️','❅','❆','⛄','🧊'],spring:['🌸','🌷','🌼','🐣','🦋','🌱'],summer:['☀️','🌻','✨','🍉','🦋']};
-const THEME_PARTICLES={
- 'c-de':['🇩🇪','🥨','🌰','⭐'],
- 'c-us':['🇺🇸','🌰','⭐','🦅'],
- 'c-fr':['🇫🇷','🥐','🗼','⭐'],
- 'sub-geo':['🌍','🌎','🌏','🚩','🏔️','🌲','🧭'],
- 'sub-phys':['⚛️','🔋','💡','🧲','⚡'],
- 'sub-chem':['🧪','⚗️','🧫','💥','🔬'],
- 'cool-neon':['⚡','✨','💎','🌟'],
- 'cool-sunset':['🌇','🌅','🦩','🌴'],
- 'cool-galaxy':['🌌','🪐','⭐','☄️','🚀'],
- 'cool-aurora':['🌈','✨','🦌','❄️']
-};
-const THEME_BG_ICON={autumn:'🎃',winter:'❄️',spring:'🌸',summer:'☀️',
- 'c-de':'🇩🇪','c-us':'🇺🇸','c-fr':'🇫🇷',
- 'sub-geo':'🌍','sub-phys':'⚛️','sub-chem':'🧪',
- 'cool-neon':'⚡','cool-sunset':'🌇','cool-galaxy':'🌌','cool-aurora':'🌈'};
-const PARTICLE_DENSITY_MULT={low:0.4,medium:1,high:2.4};
-const PARTICLE_DENSITY_LABELS={low:'Мало',medium:'Обычно',high:'Много'};
-let lastParticleKey=null;
+function accentInkFor(hex){
+ let h=String(hex||'').replace('#','');
+ if(h.length===3)h=h.split('').map(x=>x+x).join('');
+ if(h.length!==6||!/^[0-9a-f]{6}$/i.test(h))return '';
+ let r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+ let lum=(0.2126*r+0.7152*g+0.0722*b)/255;
+ return lum>0.5?'#06080c':'#ffffff';
+}
 function applyTheme(){
- let t=THEMES.find(x=>x.key===D.settings.theme)||THEMES[0];
- document.documentElement.style.setProperty('--accent',D.settings.accentColor||t.c);
- document.documentElement.style.setProperty('--accent2',D.settings.accentColor||t.c2||t.c);
- document.documentElement.classList.toggle('dark',D.settings.colorMode==='dark');
+ let isDark=D.settings.colorMode==='dark';
+ let accent=isDark?'#5b8def':'#2c5fd0';
+ document.documentElement.style.setProperty('--accent',accent);
+ document.documentElement.style.setProperty('--accent2',accent);
+ document.documentElement.style.setProperty('--accent-ink',accentInkFor(accent)||(isDark?'#06080c':'#ffffff'));
+ document.documentElement.classList.toggle('dark',isDark);
+ let themeMeta=document.querySelector('meta[name="theme-color"]');
+ if(themeMeta)themeMeta.setAttribute('content',isDark?'#08090b':'#f5f7fa');
  document.documentElement.classList.toggle('compact',!!D.settings.compact);
  document.documentElement.style.setProperty('--font-family',FONT_FAMILIES[D.settings.fontFamily]||FONT_FAMILIES.system);
  document.documentElement.style.setProperty('--r',D.settings.radius===undefined?1:D.settings.radius);
  document.documentElement.classList.toggle('sidebar-gradient',D.settings.sidebarStyle==='gradient');
- let bgIcon=D.settings.bgDecorations?(THEME_BG_ICON[currentDecorKey()]||''):'';
- document.documentElement.style.setProperty('--bg-pattern',bgIcon?buildBgPatternUrl(bgIcon):'none');
- applySeasonClass();
 }
-function currentSeasonKey(){
- let s=D.settings.season||'auto';
- if(s!=='auto')return s;
- let m=new Date().getMonth()+1;
- if([12,1,2].includes(m))return'winter';
- if([3,4,5].includes(m))return'spring';
- if([6,7,8].includes(m))return'summer';
- return'autumn';
-}
-const THEME_SEASON_ALIAS={'t-autumn':'autumn','t-winter':'winter','t-spring':'spring','t-summer':'summer'};
-function currentDecorKey(){
- let key=D.settings.theme;
- if(THEME_SEASON_ALIAS[key])return THEME_SEASON_ALIAS[key];
- if(THEME_PARTICLES[key])return key;
- return currentSeasonKey();
-}
-function buildBgPatternUrl(emoji){
- let svg='<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><text x="75" y="98" font-size="64" text-anchor="middle" opacity="0.11">'+emoji+'</text></svg>';
- return 'url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
-}
-function applySeasonClass(){
- let seasonKey=currentSeasonKey();
- let html=document.documentElement;
- ['season-autumn','season-winter','season-spring','season-summer'].forEach(c=>html.classList.remove(c));
- if(seasonKey!=='none')html.classList.add('season-'+seasonKey);
- let decorKey=currentDecorKey();
- let wantKey=D.settings.seasonEffects?(decorKey+'|'+(D.settings.particleDensity||'medium')):'none';
- if(wantKey!==lastParticleKey){lastParticleKey=wantKey;renderSeasonParticles(decorKey)}
-}
-function renderSeasonParticles(key){
- let wrap=document.getElementById('season-particles');
- if(!wrap)return;
- wrap.innerHTML='';
- if(!D.settings.seasonEffects||key==='none')return;
- let set=THEME_PARTICLES[key]||SEASON_EMOJI[key];if(!set)return;
- let mult=PARTICLE_DENSITY_MULT[D.settings.particleDensity]||1;
- let count=Math.max(3,Math.round((window.innerWidth<700?14:26)*mult));
- for(let i=0;i<count;i++){
-  let el=document.createElement('span');
-  el.className='season-particle';
-  el.textContent=set[i%set.length];
-  let left=Math.random()*100;
-  let dur=(9+Math.random()*10).toFixed(1);
-  let delay=(-Math.random()*18).toFixed(1);
-  let size=(14+Math.random()*14).toFixed(0);
-  let drift=(Math.random()*80-40).toFixed(0)+'px';
-  el.style.left=left+'vw';
-  el.style.fontSize=size+'px';
-  el.style.setProperty('--drift',drift);
-  el.style.animation='seasonfall '+dur+'s linear '+delay+'s infinite';
-  wrap.appendChild(el);
- }
-}
-function setSeason(v){D.settings.season=v;save();applySeasonClass()}
-function toggleSeasonEffects(v){D.settings.seasonEffects=v;save();applySeasonClass()}
-function setParticleDensity(v){D.settings.particleDensity=v;save();lastParticleKey=null;applySeasonClass()}
-function toggleBgDecorations(v){D.settings.bgDecorations=v;save();applyTheme()}
 function setFont(v){D.settings.fontFamily=v;save();applyTheme()}
 function setRadius(v){D.settings.radius=(+v);save();document.documentElement.style.setProperty('--r',D.settings.radius)}
 function setSidebarStyle(v){D.settings.sidebarStyle=v;save();applyTheme()}
-function seasonTip(){return 'Хотите другое оформление? В Настройках можно включить осеннюю листву, зимний снег или весенние лепестки ✨'}
 function assistantSettings(){if(!D.settings.assistant)D.settings.assistant={enabled:true,character:'dog',freq:20,lastTipAt:null,peeked:false,motivation:true};return D.settings.assistant}
 let assistantTimer=null,assistantPos=null;
 function initAssistant(){
@@ -775,19 +683,23 @@ function render(){
  applyTheme();
  document.getElementById('app').innerHTML=
   '<aside class="side'+(S.sidebarCollapsed?' collapsed':'')+'">'+
-   '<div class="brand"><span class="brand-text">Дневник учителя</span><button class="collapse-btn" onclick="toggleSidebar()" title="Свернуть/развернуть">'+(S.sidebarCollapsed?'»':'«')+'</button></div>'+
+   '<div class="brand"><span class="brand-text">Дневник учителя</span>'+
+    '<span style="display:flex;gap:4px">'+
+     '<button class="collapse-btn theme-btn" onclick="toggleColorMode()" title="Сменить тему" aria-label="Сменить тему"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.3"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.1 5.1l1.6 1.6M17.3 17.3l1.6 1.6M18.9 5.1l-1.6 1.6M6.7 17.3l-1.6 1.6"/></svg></button>'+
+     '<button class="collapse-btn" onclick="toggleSidebar()" title="Свернуть/развернуть">'+(S.sidebarCollapsed?'»':'«')+'</button>'+
+    '</span></div>'+
    navBtn('home','⌂','Главная')+
    /* navBtn('fullschedule','📅','Расписание')+ — временно скрыто по просьбе пользователя, страница fullSchedulePage() и логика сохранены в коде */
-   navBtn('students','☺','Ученики')+
+   navBtn('students','◎','Ученики')+
    navBtn('search','⌕','Поиск')+
    navBtn('stats','▤','Статистика')+
-   navBtn('reports','🖨','Ведомости')+
-   navBtn('materials','📎','Материалы')+
-   navBtn('library','📚','Библиотека уроков')+
-   navBtn('announcements','📣','Объявления')+
-   navBtn('work','💼','Работа')+
+   navBtn('reports','⎙','Ведомости')+
+   navBtn('materials','⊞','Материалы')+
+   navBtn('library','▦','Библиотека уроков')+
+   navBtn('announcements','◇','Объявления')+
+   navBtn('work','▣','Работа')+
    navBtn('settings','⚙','Настройки')+
-   navBtn('backup','⇩','Резервная копия')+
+   navBtn('backup','↓','Резервная копия')+
    '<div class="classes"><div class="classes-head"><span class="label">Классы</span><button onclick="openNewClass(\'class\')">＋</button></div>'+
    '<div class="classlist">'+sortedClasses(D.classes.filter(c=>c.type!=='club')).map(c=>'<div class="classrow"><button class="label" onclick="openClass(\''+c.id+'\')">'+e(c.name)+'</button><button class="label" onclick="event.stopPropagation();openEditClass(\''+c.id+'\')">⋯</button></div>').join('')+
    (D.classes.filter(c=>c.type!=='club').length?'':'<div class="small muted label" style="padding:6px 8px">Классов пока нет</div>')+
@@ -801,7 +713,8 @@ function render(){
  else if(window._clockInterval){clearInterval(window._clockInterval);window._clockInterval=null}
  if(S.view==='work'&&S.workTab==='colleagues')initColumnResize('colleagues-table','colleagueColWidths');
 }
-function navBtn(view,icon,label){return '<button class="nav'+(S.view===view?' active':'')+'" onclick="goto(\''+view+'\')">'+icon+' <span class="label">'+label+'</span></button>'}
+function navBtn(view,icon,label){return '<button class="nav'+(S.view===view?' active':'')+'" onclick="goto(\''+view+'\')"><span class="nav-ico" aria-hidden="true">'+icon+'</span> <span class="label">'+label+'</span></button>'}
+function toggleColorMode(){setColorMode(D.settings.colorMode==='dark'?'light':'dark')}
 function toggleSidebar(){S.sidebarCollapsed=!S.sidebarCollapsed;render()}
 function goto(v){S.view=v;render()}
 function page(){
@@ -3659,6 +3572,70 @@ function printBehaviorSection(ps,ls){
  return '<h3 style="font-size:13px;margin-top:12px">Замечания о поведении</h3><table><tr><th>Ученик</th><th>Дата</th><th>Замечание</th></tr>'+
   rows.map(r=>'<tr><td>'+studentFio(r.s)+'</td><td>'+fmtDate(r.l.date)+'</td><td>'+e(r.bn)+'</td></tr>').join('')+'</table>';
 }
+function reportsPeriodChoices(){
+ let qs=(D.settings.quarters||[]).filter(q=>q.startDate&&q.endDate).slice().sort((a,b)=>a.startDate.localeCompare(b.startDate));
+ let quarters=qs.map(q=>({id:q.id,name:q.name,startDate:q.startDate,endDate:q.endDate}));
+ let halves=[];
+ if(qs.length>=2){
+  let mid=Math.ceil(qs.length/2);
+  [qs.slice(0,mid),qs.slice(mid)].forEach((g,i)=>{
+   if(!g.length)return;
+   halves.push({id:'half-'+(i+1),name:(i+1)+' полугодие',startDate:g[0].startDate,endDate:g[g.length-1].endDate});
+  });
+ } else {
+  let m=(D.settings.academicYear||'').match(/(\d{4})/);
+  if(m){let y=+m[1];halves=[
+   {id:'half-1',name:'1 полугодие',startDate:y+'-09-01',endDate:y+'-12-31'},
+   {id:'half-2',name:'2 полугодие',startDate:(y+1)+'-01-01',endDate:(y+1)+'-05-31'}
+  ]}
+ }
+ return {quarters,halves};
+}
+function reportsFullPeriodResolve(){
+ let c=reportsPeriodChoices(),all=[...c.quarters,...c.halves];
+ let per=S.reportsFullPeriod||'all';
+ if(per!=='all'&&per!=='custom'&&!all.find(x=>x.id===per))per='all';
+ S.reportsFullPeriod=per;
+ return {per,choices:all};
+}
+function reportsFullPeriodInfo(){
+ let {per,choices}=reportsFullPeriodResolve();
+ if(per==='all')return{per,from:'',to:'',label:'Весь период'};
+ if(per==='custom')return{per,from:S.reportsFullFrom||'',to:S.reportsFullTo||'',label:'Свой период'};
+ let p=choices.find(x=>x.id===per)||{name:'Весь период',startDate:'',endDate:''};
+ return{per,from:p.startDate,to:p.endDate,label:p.name};
+}
+function reportsFullRangeLabel(info){
+ info=info||reportsFullPeriodInfo();
+ if(!info.from&&!info.to)return info.label;
+ return info.label+' · '+(info.from?fmtDate(info.from):'начало')+' – '+(info.to?fmtDate(info.to):'сегодня');
+}
+function setReportsFullPeriod(v){
+ S.reportsFullPeriod=v;
+ if(v==='custom'){
+  let today=toISO(new Date());
+  if(!S.reportsFullFrom)S.reportsFullFrom=addDays(today,-63);
+  if(!S.reportsFullTo)S.reportsFullTo=today;
+ }
+ render();
+}
+function setReportsFullDate(which,v){
+ if(which==='from')S.reportsFullFrom=v;else S.reportsFullTo=v;
+ render();
+}
+function reportsFullPeriodControlsHtml(){
+ let info=reportsFullPeriodInfo(),c=reportsPeriodChoices();
+ let btn=(id,label)=>'<button class="'+(info.per===id?'active':'')+'" onclick="setReportsFullPeriod(\''+id+'\')">'+e(label)+'</button>';
+ let rangeBtn=[['all','Весь период'],...c.quarters.map(q=>[q.id,q.name]),...c.halves.map(h=>[h.id,h.name]),['custom','Свой период…']]
+  .map(x=>btn(x[0],x[1])).join('');
+ let lessons=0;
+ reportsDedupe(reportsSelectedClasses()).forEach(cl=>{
+  lessons+=groupLessons(cl.id).filter(l=>!l.cancelled&&(!info.from||l.date>=info.from)&&(!info.to||l.date<=info.to)).length;
+ });
+ return '<div class="tabs">'+rangeBtn+'</div>'+
+  (info.per==='custom'?'<div class="rp-dates" style="margin-bottom:10px"><div class="rp-date"><b>С какой даты</b><input type="date" value="'+e(S.reportsFullFrom||'')+'" onchange="setReportsFullDate(\'from\',this.value)"></div><div class="rp-date"><b>По какую дату</b><input type="date" value="'+e(S.reportsFullTo||'')+'" onchange="setReportsFullDate(\'to\',this.value)"></div></div>':'')+
+  '<div class="toolbar" style="margin-bottom:12px"><span class="badge blue">'+e(reportsFullRangeLabel(info))+'</span><span class="muted small">уроков в выбранных классах: '+lessons+'</span></div>';
+}
 function reportsPage(){
  let classes=reportsClassList();
  if(!classes.length)return '<div class="top"><div><h1>Ведомости</h1></div></div><div class="card empty">Классов пока нет.</div>';
@@ -3669,7 +3646,8 @@ function reportsPage(){
   '<div class="muted small" style="margin-bottom:8px">Нажмите на класс или кружок, чтобы отметить его. Кнопка с цифрой слева выбирает всю параллель сразу, «Кр.» — все кружки.</div>'+reportClassPicker(classes)+
   '<label class="attrow" style="cursor:pointer;margin-top:12px"><span>🏠 Включать учеников на домашнем/семейном обучении в печать</span><input type="checkbox" '+(S.reportsIncludeHomeschool?'checked':'')+' onchange="S.reportsIncludeHomeschool=this.checked" style="width:auto"></label>'+
   '</div>'+
-  '<div class="card"><h2>Общая ведомость (оценки + посещаемость)</h2><p class="muted small">Один файл на все выбранные классы и кружки: по каждому — своя таблица со всеми уроками за всё время, ученики внутри — по алфавиту, классы — по возрастанию (5 → 11). Замечания о поведении печатаются отдельным списком под таблицей каждого класса.</p>'+
+  '<div class="card"><h2>Общая ведомость (оценки + посещаемость)</h2><p class="muted small">Один файл на все выбранные классы и кружки: по каждому — своя таблица с уроками за выбранный период, ученики внутри — по алфавиту, классы — по возрастанию (5 → 11). Замечания о поведении печатаются отдельным списком под таблицей каждого класса.</p>'+
+  reportsFullPeriodControlsHtml()+
   '<div class="toolbar"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintFullReport()">🖨 Напечатать общую ведомость'+(n?' ('+n+')':'')+'</button></div></div>'+
   '<div class="card"><h2>План уроков на четверть</h2><p class="muted small">Один файл на все выбранные классы и кружки: для каждого — своя таблица с датами, темами и домашними заданиями за выбранный период. Список колонок можно настроить ниже.</p>'+reportsPlanControlsHtml()+
   '<div class="toolbar" style="margin-top:10px"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintQuarterPlanReport()">🖨 Напечатать план на четверть'+(n?' ('+n+')':'')+'</button></div></div>'+
@@ -3685,10 +3663,11 @@ function openPrintFullReport(){
  let classes=reportsDedupe(reportsSelectedClasses());
  if(!classes.length){alert('Выберите хотя бы один класс или кружок.');return}
  let includeHS=S.reportsIncludeHomeschool!==false;
- let body='<h1>Общая ведомость оценок и посещаемости</h1>';
+ let info=reportsFullPeriodInfo();
+ let body='<h1>Общая ведомость оценок и посещаемости</h1><p class="muted">Период: '+e(reportsFullRangeLabel(info))+'</p>';
  classes.forEach(c=>{
   let ps=sortStudentsList(peopleGroup(c.id),S.studentSort).filter(s=>includeHS||!s.homeschool);
-  let ls=groupLessons(c.id).filter(l=>!l.cancelled).sort((a,b)=>a.date.localeCompare(b.date));
+  let ls=groupLessons(c.id).filter(l=>!l.cancelled&&(!info.from||l.date>=info.from)&&(!info.to||l.date<=info.to)).sort((a,b)=>a.date.localeCompare(b.date));
   let multi=ls.some(l=>l.classId!==c.id);
   body+='<h3>'+e(c.name)+(c.type==='club'?' (кружок)':'')+(c.subject?' · '+e(c.subject):'')+'</h3>';
   if(!ls.length){body+='<p class="muted">Занятий пока нет.</p>';return}
@@ -3834,7 +3813,7 @@ function fallbackCopy(text){
 }
 function settingsPage(){
  let tab=S.settingsTab||'fields';
- return '<div class="top"><div><h1>Настройки</h1><div class="muted small">Версия 4.1.5</div></div></div>'+
+ return '<div class="top"><div><h1>Настройки</h1><div class="muted small">Версия 5.0</div></div></div>'+
   '<div class="tabs">'+[['fields','Поля'],['appearance','Внешний вид'],['schedule','Расписание / блокировки']].map(x=>'<button class="'+(tab===x[0]?'active':'')+'" onclick="S.settingsTab=\''+x[0]+'\';render()">'+x[1]+'</button>').join('')+'</div>'+
   (tab==='fields'?settingsFieldsTab():tab==='appearance'?settingsAppearanceTab():settingsScheduleTab());
 }
@@ -3899,23 +3878,14 @@ function settingsAppearanceTab(){
   '<div class="checks" style="max-height:none">'+(D.settings.gradeCommentTemplates||[]).map((g,i)=>'<div class="attrow"><span class="toolbar" style="flex:0"><button '+(i===0?'disabled':'')+' onclick="moveCommentTemplate('+i+',-1)">↑</button><button '+(i===(D.settings.gradeCommentTemplates.length-1)?'disabled':'')+' onclick="moveCommentTemplate('+i+',1)">↓</button></span><span>'+e(g)+'</span><button class="danger" onclick="removeCommentTemplate('+i+')">✕</button></div>').join('')+'</div>'+
   '<div class="toolbar" style="margin-top:10px"><input id="new-comment-template" placeholder="например, Не сдал(а) работу" style="max-width:260px"><button onclick="addCommentTemplate()">＋ Добавить вариант</button></div>')+
   sCard('Накопительная система баллов','<label>Порог обмена баллов на оценку</label><input type="number" min="1" value="'+(D.settings.pointsThreshold||5)+'" style="max-width:120px" onchange="setPointsThreshold(this.value)"><p class="muted small">Используется в режиме «Начать урок» — баллы можно ставить за короткие ответы, а по достижении порога обменять на полноценную оценку.</p>')+
-  sCard('Режим оформления','<div class="toolbar">'+
-   '<button class="'+(D.settings.colorMode!=='dark'?'primary':'')+'" onclick="setColorMode(\'light\')">☀ Светлая</button>'+
-   '<button class="'+(D.settings.colorMode==='dark'?'primary':'')+'" onclick="setColorMode(\'dark\')">🌙 Тёмная</button>'+
+  sCard('Тема','<p class="muted small">Интерфейс использует две темы — тёмную и светлую. Переключить их можно также кнопкой ☀ в шапке бокового меню.</p><div class="toolbar">'+
+   '<button data-color-mode="light" class="'+(D.settings.colorMode!=='dark'?'primary':'')+'" onclick="setColorMode(\'light\')">☀ Светлая</button>'+
+   '<button data-color-mode="dark" class="'+(D.settings.colorMode==='dark'?'primary':'')+'" onclick="setColorMode(\'dark\')">🌙 Тёмная</button>'+
    '</div>')+
-  sCard('Акцентный цвет и темы',themeSwatchesHtml('','Обычные')+
-  Object.keys(THEME_GROUP_LABELS).map(g=>themeSwatchesHtml(g,THEME_GROUP_LABELS[g])).join('')+
-  '<div style="margin-top:14px"><label>Свой цвет (любой из палитры)</label><div class="row" style="align-items:center"><input type="color" style="width:60px;height:38px;padding:2px;flex:0" value="'+e(D.settings.accentColor||'#007aff')+'" onchange="setCustomAccent(this.value)"><button onclick="clearCustomAccent()">Сбросить до темы</button></div></div>')+
   sCard('Плотность интерфейса','<div class="toolbar">'+
    '<button class="'+(D.settings.compact?'':'primary')+'" onclick="setCompact(false)">Обычная</button>'+
    '<button class="'+(D.settings.compact?'primary':'')+'" onclick="setCompact(true)">Компактная</button>'+
    '</div>')+
-  sCard('🍂 Частицы и фон по теме','<p class="muted small">Лёгкий фоновый узор и анимированные летящие иконки (листья, снег, тыквы, флаги, глобусы и т.д.) — подбираются автоматически по выбранной теме оформления выше (страна/предмет/яркая тема) или, если выбран обычный цвет, по времени года.</p><div class="toolbar">'+
-   Object.keys(SEASON_LABELS).map(k=>'<button class="'+(D.settings.season===k?'primary':'')+'" onclick="setSeason(\''+k+'\')">'+SEASON_LABELS[k]+'</button>').join('')+
-   '</div><label class="attrow" style="cursor:pointer;margin-top:10px"><span>Анимированные летящие частицы</span><input type="checkbox" '+(D.settings.seasonEffects?'checked':'')+' style="width:auto" onchange="toggleSeasonEffects(this.checked)"></label>'+
-   '<div class="toolbar" style="margin-top:8px">'+Object.keys(PARTICLE_DENSITY_LABELS).map(k=>'<button class="'+((D.settings.particleDensity||'medium')===k?'primary':'')+'" onclick="setParticleDensity(\''+k+'\')">'+PARTICLE_DENSITY_LABELS[k]+'</button>').join('')+'</div>'+
-   '<label class="attrow" style="cursor:pointer;margin-top:10px"><span>Фоновые тематические картинки (узор за карточками и часами)</span><input type="checkbox" '+(D.settings.bgDecorations?'checked':'')+' style="width:auto" onchange="toggleBgDecorations(this.checked)"></label>'+
-   '<p class="muted small">Сейчас действует: '+SEASON_LABELS[currentSeasonKey()]+(D.settings.season==='auto'?' (подобрано автоматически по месяцу)':'')+'</p>')+
   sCard('Шрифт интерфейса','<div class="toolbar">'+
    Object.keys(FONT_LABELS).map(k=>'<button class="'+((D.settings.fontFamily||'system')===k?'primary':'')+'" style="font-family:'+FONT_FAMILIES[k]+'" onclick="setFont(\''+k+'\')">'+FONT_LABELS[k]+'</button>').join('')+
    '</div>')+
@@ -3972,15 +3942,16 @@ function addGradeLevel(){
 }
 function removeGradeLevel(i){D.settings.libraryGradeLevels.splice(i,1);save();render()}
 function moveGradeLevel(i,dir){let arr=D.settings.libraryGradeLevels;let j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];save();render()}
-function themeSwatchesHtml(group,groupLabel){
- let list=THEMES.filter(t=>(t.group||'')===group);
- if(!list.length)return'';
- return '<div class="small muted" style="margin:'+(group?'14px':'0')+' 0 6px">'+e(groupLabel)+'</div><div class="themeswatches">'+list.map(t=>'<div class="swatch'+(D.settings.theme===t.key&&!D.settings.accentColor?' active':'')+'" style="background:'+(t.c2?'linear-gradient(135deg,'+t.c+','+t.c2+')':t.c)+'" onclick="setTheme(\''+t.key+'\')" title="'+e(t.label||t.key)+'">'+(t.emoji?'<span class="swatch-emoji">'+t.emoji+'</span>':'')+'</div>').join('')+'</div>';
+function setColorMode(m){
+ if(D.settings.colorMode===m)return;
+ D.settings.colorMode=m;save();
+ let root=document.documentElement;
+ root.classList.add('theme-anim');
+ clearTimeout(window._themeAnimTimer);
+ applyTheme();
+ document.querySelectorAll('[data-color-mode]').forEach(b=>b.classList.toggle('primary',b.dataset.colorMode===m));
+ window._themeAnimTimer=setTimeout(()=>root.classList.remove('theme-anim'),500);
 }
-function setTheme(key){D.settings.theme=key;D.settings.accentColor='';save();render()}
-function setCustomAccent(v){D.settings.accentColor=v;save();render()}
-function clearCustomAccent(){D.settings.accentColor='';save();render()}
-function setColorMode(m){D.settings.colorMode=m;save();render()}
 function setTeacherName(v){D.settings.teacherName=v.trim();save()}
 function setPointsThreshold(v){D.settings.pointsThreshold=Math.max(1,+v||5);save()}
 function setCompact(v){D.settings.compact=v;save();render()}
@@ -4118,9 +4089,7 @@ function boot(){
  purgeOldArchivedLessons();
  repairMissingLessonTimes();
  render();
- applySeasonClass();
  initAssistant();
- window.addEventListener('resize',()=>{lastParticleKey=null;applySeasonClass()});
 }
 
 boot();
