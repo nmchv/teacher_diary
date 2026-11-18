@@ -1259,6 +1259,9 @@ html.compact .top h1::before { margin-bottom: 12px; }
   .card { break-inside: avoid; border-color: #ccc; box-shadow: none; }
 }
 
+.danger-zone { border-color: color-mix(in srgb, var(--bad) 34%, var(--border)); }
+.danger-zone h2 { color: var(--bad); }
+
 /* ---------- Графические акценты и анимации ---------- */
 body::after {
   content: '';

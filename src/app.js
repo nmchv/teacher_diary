@@ -241,13 +241,209 @@ function defaultData(){
    assistant:{enabled:true,character:'dog',freq:20,lastTipAt:null,peeked:false,motivation:true},
    fields:{student:STUDENT_FIELDS_DEFAULT(),class:CLASS_FIELDS_DEFAULT(),lesson:LESSON_FIELDS_DEFAULT(),colleague:COLLEAGUE_FIELDS_DEFAULT()}}};
 }
+
+function seedDemoData(){
+ let initials=(D.classes||[]).some(c=>c.demo)||(D.students||[]).some(x=>x.demo);
+ if(initials)return false;
+ let today=toISO(new Date());
+ let nowDate=new Date();
+ let y=nowDate.getMonth()+1>=8?nowDate.getFullYear():nowDate.getFullYear()-1;
+ let upcomingBd=addDays(today,3).slice(5);
+
+ let c6={id:'demo-class-6a',type:'class',name:'6А',gradeNumber:6,gradeLetter:'А',parentClubId:null,subject:'География',academicYear:D.settings.academicYear,customFields:{},demo:true};
+ let c7={id:'demo-class-7b',type:'class',name:'7Б',gradeNumber:7,gradeLetter:'Б',parentClubId:null,subject:'География',academicYear:D.settings.academicYear,customFields:{},demo:true};
+ let c8={id:'demo-class-8a',type:'class',name:'8А',gradeNumber:8,gradeLetter:'А',parentClubId:null,subject:'География',academicYear:D.settings.academicYear,customFields:{},demo:true};
+ let club={id:'demo-class-club',type:'club',name:'Юный географ',gradeNumber:null,gradeLetter:'',parentClubId:null,subject:'География',academicYear:D.settings.academicYear,customFields:{},demo:true};
+ let demoClasses=[c6,c7,c8,club];
+
+ let col1={id:'demo-col-1',lastName:'Сидорова',firstName:'Елена',middleName:'Викторовна',customFields:{position:'Заместитель директора по УВР',phone:'+7 900 111-22-33',email:'sidorova@school.ru',notes:'Курирует предметы естественно-научного цикла.'},demo:true};
+ let col2={id:'demo-col-2',lastName:'Орлова',firstName:'Ирина',middleName:'Сергеевна',customFields:{position:'Классный руководитель 6А, учитель русского языка',phone:'+7 900 222-33-44',email:'orlova@school.ru',notes:''},demo:true};
+ let col3={id:'demo-col-3',lastName:'Громов',firstName:'Павел',middleName:'Андреевич',customFields:{position:'Учитель физики',phone:'',email:'gromov@school.ru',notes:'Проводит совместные уроки по теме «Атмосфера».'},demo:true};
+ c6.customFields.headTeacher=col2.id;
+
+ function st(id,last,first,middle,classIds,birth,nick,notes){
+  return {id,lastName:last,firstName:first,middleName:middle||'',classIds,customFields:{birthDate:birth,nickname:nick||'',notes:notes||''},status:'active',demo:true};
+ }
+ let students=[
+  st('demo-s-1','Иванова','Мария','Алексеевна',[c6.id],'2013-'+upcomingBd,'Маша','Активно отвечает, любит карты.'),
+  st('demo-s-2','Петров','Артём','Игоревич',[c6.id],'2013-03-14','Артём','Нужно напоминать про домашнее задание.'),
+  st('demo-s-3','Соколова','Дарья','Викторовна',[c6.id],'2013-07-22','Даша','Сильная в работе с контурными картами.'),
+  st('demo-s-4','Кузнецов','Максим','Олегович',[c6.id],'2013-11-05','Макс',''),
+  st('demo-s-5','Лебедева','Анна','Павловна',[c6.id],'2013-09-30','Аня',''),
+  st('demo-s-6','Смирнов','Илья','Дмитриевич',[c7.id],'2012-02-18','Илья',''),
+  st('demo-s-7','Волкова','Софья','Андреевна',[c7.id],'2012-06-11','Соня','Хорошо работает в группе.'),
+  st('demo-s-8','Морозов','Даниил','Сергеевич',[c7.id],'2012-12-03','Даня',''),
+  st('demo-s-9','Павлова','Екатерина','Максимовна',[c7.id],'2012-04-27','Катя',''),
+  st('demo-s-10','Новиков','Кирилл','Евгеньевич',[c8.id],'2011-05-19','Кирилл',''),
+  st('demo-s-11','Фёдорова','Полина','Артёмовна',[c8.id],'2011-08-08','Поля','Интересуется климатологией.'),
+  st('demo-s-12','Егоров','Матвей','Романович',[c8.id],'2011-10-25','Матвей',''),
+  st('demo-s-13','Захарова','Алиса','Ильинична',[c8.id],'2011-01-16','Алиса','')
+ ];
+ students[10].classIds.push(club.id);
+ students[5].classIds.push(club.id);
+ students[0].classIds.push(club.id);
+
+ let topics=[
+  {topic:'Географическая оболочка и её свойства',plan:'Повторить строение географической оболочки, разобрать примеры взаимосвязей.',hw:'§4, вопросы 1–3'},
+  {topic:'Литосферные плиты и рельеф',plan:'Работа с картой строения земной коры, обозначить крупные плиты.',hw:'Контурная карта: подписать плиты'},
+  {topic:'Климатообразующие факторы',plan:'Обсудить широту, рельеф и океанические течения.',hw:'§7, составить схему факторов'},
+  {topic:'Атмосферные фронты и циклоны',plan:'Разобрать синоптическую карту, найти циклон и антициклон.',hw:'§9, выписать определения'},
+  {topic:'Воды суши: реки и озёра',plan:'Сравнить режимы рек разных климатических поясов.',hw:'Нанести на карту 5 крупных рек'},
+  {topic:'Природные зоны мира',plan:'Групповая работа: описать одну природную зону по плану.',hw:'Подготовить мини-сообщение'},
+  {topic:'Население и урбанизация',plan:'Обсудить динамику численности населения и крупнейшие города.',hw:'§12, таблица «Города-миллионеры»'},
+  {topic:'Практикум: работа с климатограммами',plan:'Научиться читать климатограммы и определять тип климата.',hw:'Достроить 2 климатограммы'},
+  {topic:'Контрольная работа по разделу',plan:'Проверить знания по изученному разделу.',hw:'Повторить записи в тетради'}
+ ];
+ let counters={};
+ function nextTopic(cid){
+  let i=counters[cid]||0;counters[cid]=i+1;return topics[i%topics.length];
+ }
+ function lessonStudents(cid){
+  if(cid===c6.id)return students.slice(0,5);
+  if(cid===c7.id)return students.slice(5,9);
+  if(cid===c8.id)return students.slice(9,13);
+  return students.filter(s=>s.classIds.includes(club.id));
+ }
+ let lessonSeq=0;
+ let lessons=[];
+ function addLesson(cfg,num,date,isPast,lessonIndex){
+  let t=nextTopic(cfg.id);
+  let lesson={id:'demo-lesson-'+(++lessonSeq),demo:true,date,lessonNumber:num===null?null:num,
+   startTime:num===null?'15:00':timeFor(num).start,endTime:num===null?'16:00':timeFor(num).end,
+   classId:cfg.id,topic:t.topic,customFields:{planText:t.plan,homework:t.hw},attendance:{},grades:{},materialIds:[]};
+  if(isPast){
+   let ps=lessonStudents(cfg.id);
+   ps.forEach((s,i)=>{
+    let absent=(lessonIndex+i)%11===0;
+    lesson.attendance[s.id]=absent?'н':'п';
+    if(!absent&&(lessonIndex+i)%3!==0){
+     let vals=['5','4','5','4/5','4','3/4'];
+     lesson.grades[s.id]={value:vals[(lessonIndex+i)%vals.length],comment:(lessonIndex+i)%7===0?'Активная работа на уроке':''};
+    }
+   });
+   if(lessonIndex%4===0)lesson.customFields.doneWhat='Успели разобрать теорию и выполнить тренировочное задание.';
+   if(lessonIndex%5===0)lesson.customFields.notes='Обратить внимание на темп работы класса.';
+   if(lessonIndex%7===0&&ps.length)lesson.behaviorNotes={[ps[0].id]:'Отвлекался(ась) в начале урока, затем включился(ась) в работу.'};
+   if(lessonIndex%3===0)lesson.manuallyCompleted=true;
+   if(lessonIndex===2)lesson.manualStatus='yellow';
+  }
+  lessons.push(lesson);
+ }
+ let configs=[
+  {id:c6.id,slots:[[1,1],[3,2],[5,3]]},
+  {id:c7.id,slots:[[2,2],[4,3]]},
+  {id:c8.id,slots:[[1,3],[4,1]]},
+  {id:club.id,slots:[[3,null]]}
+ ];
+ let idx=0;
+ for(let off=-42;off<=14;off++){
+  let date=addDays(today,off);
+  let dow=new Date(date+'T12:00:00').getDay();
+  configs.forEach(cfg=>{
+   cfg.slots.forEach(slot=>{
+    if(dow===slot[0]){
+     addLesson(cfg,slot[1],date,off<0,idx++);
+    }
+   });
+  });
+ }
+ let cancelledLesson=lessons.find(l=>l.classId===c8.id&&l.date<today);
+ if(cancelledLesson){cancelledLesson.cancelled=true;cancelledLesson.topic='Урок отменён: школьная олимпиада';}
+
+ let meetings=[
+  {id:'demo-meeting-1',demo:true,title:'Педсовет: итоги первой четверти',date:addDays(today,3),time:'15:30',location:'Актовый зал',participants:'Педагогический коллектив',agenda:'Успеваемость, посещаемость, план работы на следующую четверть.'},
+  {id:'demo-meeting-2',demo:true,title:'Родительское собрание 6А',date:addDays(today,8),time:'18:00',location:'Каб. 204',participants:'Родители учеников 6А, классный руководитель',agenda:'Итоги четверти, подготовка к контрольной работе.'}
+ ];
+ let tasks=[
+  {id:'demo-task-1',demo:true,title:'Подготовить контрольную для 7Б',dueDate:addDays(today,2),priority:'high',status:'todo',notes:'Включить задания по климатограммам.'},
+  {id:'demo-task-2',demo:true,title:'Проверить рабочие тетради 6А',dueDate:addDays(today,1),priority:'med',status:'todo',notes:''},
+  {id:'demo-task-3',demo:true,title:'Сдать отчёт по успеваемости завучу',dueDate:addDays(today,5),priority:'high',status:'todo',notes:'Форма лежит в общем диске.'},
+  {id:'demo-task-4',demo:true,title:'Обновить КТП по географии',dueDate:'',priority:'low',status:'done',notes:''}
+ ];
+ let announcements=[
+  {id:'demo-ann-1',demo:true,text:'Принести контурные карты и цветные карандаши к практической работе.'},
+  {id:'demo-ann-2',demo:true,text:'Повторить определения по теме «Атмосфера» перед контрольной.'}
+ ];
+ let templates=[
+  {id:'demo-tpl-1',demo:true,name:'Стандартный комбинированный урок',gradeNumber:6,topic:'Новая тема',fields:{planText:'Организационный момент → проверка домашнего задания → объяснение нового материала → закрепление → итоги.',homework:'§, вопросы устно'}},
+  {id:'demo-tpl-2',demo:true,name:'Урок-практикум с картами',gradeNumber:7,topic:'Практическая работа',fields:{planText:'Инструктаж → работа в парах с атласом → оформление результатов → защита выводов.',homework:'Дооформить работу'}}
+ ];
+ let materials=[
+  {id:'demo-mat-1',demo:true,filename:'Презентация «Климат Африки»',category:'6А',gradeNumber:6,isLink:true,url:'https://ru.wikipedia.org/wiki/Климат',mimeType:'',size:0,createdAt:new Date().toISOString()},
+  {id:'demo-mat-2',demo:true,filename:'Справочник «Природные зоны мира»',category:'7Б',gradeNumber:7,isLink:true,url:'https://ru.wikipedia.org/wiki/Природная_зона',mimeType:'',size:0,createdAt:new Date().toISOString()}
+ ];
+ let quarters=[
+  {id:'demo-q-1',demo:true,name:'1 четверть',startDate:y+'-09-01',endDate:y+'-10-25'},
+  {id:'demo-q-2',demo:true,name:'2 четверть',startDate:y+'-11-05',endDate:y+'-12-28'},
+  {id:'demo-q-3',demo:true,name:'3 четверть',startDate:(y+1)+'-01-12',endDate:(y+1)+'-03-20'},
+  {id:'demo-q-4',demo:true,name:'4 четверть',startDate:(y+1)+'-04-01',endDate:(y+1)+'-05-25'}
+ ];
+
+ D.classes=(D.classes||[]).concat(demoClasses);
+ D.students=(D.students||[]).concat(students);
+ D.lessons=(D.lessons||[]).concat(lessons);
+ D.meetings=(D.meetings||[]).concat(meetings);
+ D.workTasks=(D.workTasks||[]).concat(tasks);
+ D.colleagues=(D.colleagues||[]).concat([col1,col2,col3]);
+ D.announcements=(D.announcements||[]).concat(announcements);
+ D.lessonTemplates=(D.lessonTemplates||[]).concat(templates);
+ D.materials=(D.materials||[]).concat(materials);
+ D.settings.quarters=(D.settings.quarters||[]).concat(quarters);
+ D.demoSeed=true;
+ save();
+ return true;
+}
+function hasDemoData(){
+ return ['classes','students','lessons','meetings','workTasks','colleagues','announcements','lessonTemplates','materials'].some(k=>(D[k]||[]).some(x=>x.demo))||(D.settings.quarters||[]).some(q=>q.demo);
+}
+function demoSettingsCardHtml(){
+ if(hasDemoData()){
+  let counts=[['classes','класс'],['students','ученик'],['lessons','урок']].map(x=>{
+   let n=(D[x[0]]||[]).filter(v=>v.demo).length;
+   let word=x[1];
+   if(x[0]==='classes')word=n===1?'класс':(n<5?'класса':'классов');
+   if(x[0]==='students')word=n===1?'ученик':(n<5?'ученика':'учеников');
+   if(x[0]==='lessons')word=n===1?'урок':(n<5?'урока':'уроков');
+   return n+' '+word;
+  }).join(', ');
+  return sCard('Демонстрационные данные','<p class="muted small">В дневнике сейчас есть тестовые записи: '+counts+'. Они показывают, как выглядят расписание, оценки, посещаемость, отчёты и библиотека. Ваши собственные записи при удалении тестовых данных останутся.</p><div class="toolbar"><button class="danger" onclick="removeDemoData()">Удалить тестовые данные</button></div>');
+ }
+ return sCard('Демонстрационные данные','<p class="muted small">Можно добавить примеры — классы, учеников, уроки, оценки и отчёты, чтобы посмотреть, как всё работает. Примеры добавляются к текущим записям, а удалить их можно одной кнопкой.</p><div class="toolbar"><button class="primary" onclick="loadDemoData()">Заполнить тестовыми данными</button></div>');
+}
+function loadDemoData(){
+ if(seedDemoData())render();
+}
+function removeDemoData(){
+ if(!confirm('Удалить все демонстрационные данные? Ваши собственные записи, классы и уроки останутся.'))return;
+ let keepClassIds=new Set();
+ (D.students||[]).filter(x=>!x.demo).forEach(s=>(s.classIds||[]).forEach(id=>keepClassIds.add(id)));
+ (D.lessons||[]).filter(x=>!x.demo).forEach(l=>{if(l.classId)keepClassIds.add(l.classId)});
+ (D.classes||[]).forEach(c=>{if(c.demo&&keepClassIds.has(c.id))delete c.demo});
+ let demoColIds=new Set((D.colleagues||[]).filter(x=>x.demo).map(x=>x.id));
+ (D.classes||[]).filter(c=>!c.demo).forEach(c=>{
+  if(c.customFields&&demoColIds.has(c.customFields.headTeacher))delete c.customFields.headTeacher;
+ });
+ ['students','lessons','meetings','workTasks','colleagues','announcements','lessonTemplates','materials'].forEach(k=>{
+  D[k]=(D[k]||[]).filter(x=>!x.demo);
+ });
+ D.classes=(D.classes||[]).filter(x=>!x.demo);
+ D.settings.quarters=(D.settings.quarters||[]).filter(q=>!q.demo);
+ D.demoSeed=false;
+ save();
+ if(S.classId&&!C(S.classId)){S.classId=null;S.view='home'}
+ if(S.studentId&&!P(S.studentId)){S.studentId=null;S.view='home'}
+ render();
+}
+
 let D=null;
+let skipDemoSeed=false;
 function loadData(){
  let raw=localStorage.getItem(LS_KEY);
  if(raw){try{D=JSON.parse(raw)}catch(e){D=defaultData()}}
  else{
   D=defaultData();
   migrateFromV2();
+  if(!skipDemoSeed&&!(D.classes||[]).length&&!(D.students||[]).length&&!(D.lessons||[]).length)seedDemoData();
  }
  if(!D.settings)D.settings={colorMode:'dark',academicYear:'2026–2027',fields:{student:STUDENT_FIELDS_DEFAULT(),class:CLASS_FIELDS_DEFAULT(),lesson:LESSON_FIELDS_DEFAULT(),colleague:COLLEAGUE_FIELDS_DEFAULT()}};
  if(!D.materials)D.materials=[];
@@ -4019,7 +4215,28 @@ function backupPage(){
   '<div class="card"><h2>Экспорт</h2><p class="muted">Создаёт файл со всеми классами, учениками (включая архив), уроками, оценками, посещаемостью, пользовательскими полями, настройками, расписанием/блокировками, шаблонами и библиотекой материалов.</p>'+
    '<p class="small muted">'+(D.settings.lastBackupAt?'Последняя копия: '+fmtDate(D.settings.lastBackupAt):'Резервная копия ещё не создавалась.')+'</p>'+
    '<button class="primary" onclick="doBackup()">⇩ Скачать резервную копию</button></div>'+
-  '<div class="card"><h2>Импорт</h2><div class="notice">Импорт полностью заменит текущие данные приложения.</div><button onclick="document.getElementById(\'restore-input\').click()">⇧ Восстановить из файла</button><input id="restore-input" type="file" accept=".json" hidden onchange="doRestore(this)"></div>';
+  '<div class="card"><h2>Импорт</h2><div class="notice">Импорт полностью заменит текущие данные приложения.</div><button onclick="document.getElementById(\'restore-input\').click()">⇧ Восстановить из файла</button><input id="restore-input" type="file" accept=".json" hidden onchange="doRestore(this)"></div>'+
+  demoSettingsCardHtml()+
+  '<div class="card danger-zone"><h2>Удаление данных</h2><p class="muted">Полностью удаляет все записи дневника: классы, учеников, уроки, оценки, посещаемость, материалы, задачи, совещания, объявления, настройки и загруженные файлы. Действие необратимо — при необходимости сначала скачайте резервную копию.</p>'+
+  '<div class="toolbar"><button class="danger" onclick="deleteAllData()">Удалить все данные</button></div></div>';
+}
+async function deleteAllData(){
+ if(!confirm('Удалить ВСЕ данные дневника? Классы, ученики, уроки, оценки, материалы, настройки и файлы будут удалены безвозвратно.'))return;
+ let typed=prompt('Это действие нельзя отменить. Введите слово УДАЛИТЬ, чтобы продолжить:');
+ if((typed||'').trim().toUpperCase()!=='УДАЛИТЬ')return;
+ try{
+  await fileStoreClear();
+ }catch(err){console.error(err)}
+ [LS_KEY,LS_KEY_V2,LS_KEY_V2+'_files'].forEach(k=>{try{localStorage.removeItem(k)}catch(err){}});
+ skipDemoSeed=true;
+ D=null;
+ loadData();
+ skipDemoSeed=false;
+ S.view='home';S.classId=null;S.studentId=null;S.lessonModal=null;S.tab='lessons';
+ S.selectedStudentIds=new Set();S.reportsSelClasses=new Set();
+ save();
+ render();
+ alert('Все данные дневника удалены.');
 }
 async function doBackup(){
  let files=await fileStoreAll();
