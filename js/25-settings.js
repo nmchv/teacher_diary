@@ -71,6 +71,9 @@ function settingsAppearanceTab(){
    (D.settings.colorMode==='dark'?'🌙 К светлой':'☀ К тёмной')+'</button>'+
    '<span class="muted small" style="margin-left:10px">Текущая: '+(D.settings.colorMode==='dark'?'тёмная':'светлая')+'</span>'+
   '</div>')+
+  sCard('Город для погоды','<label>Город, по которому показывать погоду на главной</label><select id="weather-city" style="width:100%;padding:9px;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-surface);color:var(--color-text-primary)" onchange="setWeatherCity(this.value)">'+
+   Object.keys(WEATHER_CITY_COORDS).map(c=>'<option value="'+e(c)+'"'+(D.settings.weatherCity===c?' selected':'')+'>'+e(c)+'</option>').join('')+
+  '</select><p class="muted small">Погода обновляется каждые 10 минут через сервис Open-Meteo.</p>')+
   sCard('🐾 Ассистент','<p class="muted small">Помощник, как в старых версиях Windows — время от времени подскажет полезную мелочь или скажет пару тёплых слов. Можно перетаскивать по экрану, кликнуть — новый совет.</p>'+
   '<label class="attrow" style="cursor:pointer"><span>Показывать ассистента</span><input type="checkbox" '+(assistantSettings().enabled?'checked':'')+' style="width:auto" onchange="setAssistantEnabled(this.checked)"></label>'+
   '<label class="attrow" style="cursor:pointer"><span>Поддерживающие и мотивационные сообщения</span><input type="checkbox" '+(assistantSettings().motivation!==false?'checked':'')+' style="width:auto" onchange="setAssistantMotivation(this.checked)"></label>'+
@@ -119,6 +122,7 @@ function removeGradeLevel(i){D.settings.libraryGradeLevels.splice(i,1);save();re
 function moveGradeLevel(i,dir){let arr=D.settings.libraryGradeLevels;let j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];save();render()}
 function setTeacherName(v){D.settings.teacherName=v.trim();save()}
 function setPointsThreshold(v){D.settings.pointsThreshold=Math.max(1,+v||5);save()}
+function setWeatherCity(v){D.settings.weatherCity=v;save();initWeather();render()}
 function settingsScheduleTab(){
  return sCard('Дни недели в расписании',
   '<label class="attrow" style="cursor:pointer"><span>Показывать субботу как учебный день</span><input type="checkbox" '+(D.settings.showSaturday?'checked':'')+' style="width:auto" onchange="toggleShowSaturday(this.checked)"></label>'+

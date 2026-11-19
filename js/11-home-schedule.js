@@ -16,15 +16,52 @@ function classHasBirthdayToday(classId){
 function fmtClockTime(d){return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
 function fmtClockDate(d){let s=d.toLocaleDateString('ru-RU',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});return s.charAt(0).toUpperCase()+s.slice(1)}
 function widgetClock(){
- return '<div class="card home-clock-card" style="text-align:center;padding:22px"><div id="live-clock" style="font-size:44px;font-weight:700;letter-spacing:1px;font-variant-numeric:tabular-nums">'+fmtClockTime(new Date())+'</div><div class="muted" style="margin-top:4px">'+fmtClockDate(new Date())+'</div></div>';
+  let city=D.settings.weatherCity||WEATHER_DEFAULT_CITY;
+  let coords=WEATHER_CITY_COORDS[city]||WEATHER_CITY_COORDS[WEATHER_DEFAULT_CITY];
+  let w=S.weather&&S.weather.city===city?S.weather.data:null;
+  let temp=w?Math.round(w.temperature_2m):'–';
+  let condition=w?weatherCondition(w.weather_code):'cloudy';
+  let emoji=WEATHER_EMOJI[condition];
+  let label=WEATHER_LABELS[condition];
+  let tipIndex=new Date().getDate()%DAILY_TIPS.length;
+  return '<div class="card home-header-card" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;flex-wrap:wrap">'+
+   '<div class="home-tip" style="flex:1;min-width:200px;text-align:left">'+
+    '<div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-hover);margin-bottom:6px">Совет дня</div>'+
+    '<div style="font-size:14px;color:var(--color-text-secondary);line-height:1.5">'+e(DAILY_TIPS[tipIndex])+'</div>'+
+   '</div>'+
+   '<div class="home-clock" style="text-align:center;flex:0 0 auto">'+
+    '<div id="live-clock" style="font-size:44px;font-weight:700;letter-spacing:1px;font-variant-numeric:tabular-nums">'+fmtClockTime(new Date())+'</div>'+
+    '<div class="muted" style="margin-top:4px">'+fmtClockDate(new Date())+'</div>'+
+   '</div>'+
+   '<div class="home-weather" style="flex:0 0 auto;text-align:right">'+
+    '<div class="weather-anim weather-'+condition+'" style="font-size:34px;line-height:1">'+emoji+'</div>'+
+    '<div style="font-size:18px;font-weight:700;color:var(--color-text-primary)">'+temp+'°</div>'+
+    '<div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">'+e(label)+' · '+e(city)+'</div>'+
+   '</div>'+
+  '</div>';
 }
 function startClockTicker(){
- if(window._clockInterval){clearInterval(window._clockInterval);window._clockInterval=null}
- window._clockInterval=setInterval(()=>{
-  let el=document.getElementById('live-clock');
-  if(!el){clearInterval(window._clockInterval);window._clockInterval=null;return}
-  el.textContent=fmtClockTime(new Date());
- },30000);
+  if(window._clockInterval){clearInterval(window._clockInterval);window._clockInterval=null}
+  window._clockInterval=setInterval(()=>{
+   let el=document.getElementById('live-clock');
+   if(!el){clearInterval(window._clockInterval);window._clockInterval=null;return}
+   el.textContent=fmtClockTime(new Date());
+  },30000);
+}
+function fetchWeather(){
+  let city=D.settings.weatherCity||WEATHER_DEFAULT_CITY;
+  let coords=WEATHER_CITY_COORDS[city]||WEATHER_CITY_COORDS[WEATHER_DEFAULT_CITY];
+  let url='https://api.open-meteo.com/v1/forecast?latitude='+coords.lat+'&longitude='+coords.lon+'&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto';
+  fetch(url).then(r=>r.json()).then(data=>{
+   if(data&&data.current){
+    S.weather={city:city,data:data.current};
+    render();
+   }
+  }).catch(e=>{console.warn('Weather fetch failed:',e)});
+}
+function initWeather(){
+  fetchWeather();
+  setInterval(fetchWeather,10*60*1000);
 }
 function widgetSchedule(){
  let dates=weekDates(S.weekStart);

@@ -2,7 +2,7 @@
 function defaultData(){
  return {version:3,classes:[],students:[],lessons:[],materials:[],scheduleBlocks:[],lessonTemplates:[],announcements:[],
   meetings:[],workTasks:[],colleagues:[],
-  settings:{colorMode:'light',academicYear:'2026–2027',
+  settings:{colorMode:'light',weatherCity:'Ростов-на-Дону',academicYear:'2026–2027',
    lastBackupAt:null,backupReminder:{lastShown:null},
    assistant:{enabled:true,character:'dog',freq:20,lastTipAt:null,peeked:false,motivation:true},
    fields:{student:STUDENT_FIELDS_DEFAULT(),class:CLASS_FIELDS_DEFAULT(),lesson:LESSON_FIELDS_DEFAULT(),colleague:COLLEAGUE_FIELDS_DEFAULT()}}};
@@ -30,6 +30,7 @@ function loadData(){
  if(!D.settings.libraryGradeLevels)D.settings.libraryGradeLevels=[...LIBRARY_GRADE_LEVELS_DEFAULT];
  if(D.settings.showSaturday===undefined)D.settings.showSaturday=true;
 if(!D.settings.colorMode)D.settings.colorMode='light';
+if(D.settings.weatherCity===undefined)D.settings.weatherCity=WEATHER_DEFAULT_CITY;
 if(D.settings.lastBackupAt===undefined)D.settings.lastBackupAt=null;
  if(!D.settings.backupReminder)D.settings.backupReminder={lastShown:null};
  D.students.forEach(s=>{if(!s.classIds){s.classIds=s.classId?[s.classId]:[];delete s.classId}});
