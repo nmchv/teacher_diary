@@ -34,17 +34,17 @@ function widgetClock(){
   let w=S.weather&&S.weather.city===city?S.weather.data:null;
   let temp=w?Math.round(w.temperature_2m):'–';
   let progress=schoolYearProgress();
-  return '<div class="card home-header-card" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;flex-wrap:wrap">'+
+  return '<div class="card home-header-card" style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;flex-wrap:wrap">'+
    '<div class="home-progress" style="flex:1;min-width:160px;text-align:left">'+
     '<div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-hover);margin-bottom:6px">Учебный год</div>'+
     '<div style="font-size:20px;font-weight:700;color:var(--color-text-primary);margin-bottom:6px">'+progress+'%</div>'+
     '<div class="progress-track"><div class="progress-fill" style="width:'+progress+'%"></div></div>'+
    '</div>'+
-   '<div class="home-clock" style="text-align:center;flex:0 0 auto">'+
+   '<div class="home-clock" style="position:absolute;left:50%;transform:translateX(-50%);text-align:center">'+
     '<div id="live-clock" style="font-size:44px;font-weight:700;letter-spacing:1px;font-variant-numeric:tabular-nums">'+fmtClockTime(new Date())+'</div>'+
     '<div class="muted" style="margin-top:4px">'+fmtClockDate(new Date())+'</div>'+
    '</div>'+
-   '<div class="home-weather click" onclick="openWeatherDetail()" style="flex:0 0 auto;text-align:right">'+
+   '<div class="home-weather click" onclick="openWeatherDetail()" style="text-align:right">'+
     '<div style="font-size:20px;font-weight:700;color:var(--color-text-primary)">'+temp+'°</div>'+
     '<div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">'+e(city)+'</div>'+
    '</div>'+
