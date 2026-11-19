@@ -1,0 +1,11 @@
+.mobile-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--card);border-bottom:1px solid var(--border)}
+.mobile-header .brand{font-weight:700;font-size:16px}
+.mobile-header .actions{display:flex;align-items:center;gap:8px}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;color:var(--ink)}
+.hamburger{display:flex;flex-direction:column;gap:4px;width:22px}
+.hamburger span{display:block;height:2px;background:var(--ink);border-radius:2px}
+.mobile-menu{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;padding:16px;overflow:auto}
+.mobile-menu .menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sched{table-layout:fixed;width:100%}
+.sched td,.sched th{white-space:normal;word-break:break-word;vertical-align:top}
+.sched .numcol{white-space:nowrap;width:56px;font-size:12px}

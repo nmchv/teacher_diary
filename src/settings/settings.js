@@ -54,7 +54,21 @@ function saveNewField(entity){
  save();closeModal();render();
 }
 function settingsAppearanceTab(){
- return sCard('Профиль','<label>Ваше ФИО (используется в заголовках печатных отчётов)</label><input id="teacher-name" value="'+e(D.settings.teacherName||'')+'" placeholder="Иванова Мария Петровна" onchange="setTeacherName(this.value)">')+
+  let forcedVersion = null;
+  try { forcedVersion = localStorage.getItem('teacherDiaryV3.forcedVersion'); } catch(e) {}
+  let detected = (typeof window.currentVersion === 'function') ? window.currentVersion() : (forcedVersion || 'desktop');
+  let versionLabel = detected === 'mobile' ? 'Мобильная версия' : 'Десктопная версия';
+  return sCard('Версия интерфейса',
+    '<p class="muted small">Сайт автоматически определяет тип устройства и показывает подходящую версию. Вы можете вручную зафиксировать одну из них — тогда при открытии будет использоваться именно она, независимо от экрана.</p>'+
+    '<div class="toolbar">'+
+    '<button class="'+(forcedVersion === null ? 'primary' : '')+'" onclick="setForcedVersion(null)">Auto (по устройству)</button>'+
+    '<button class="'+(forcedVersion === 'mobile' ? 'primary' : '')+'" onclick="setForcedVersion(\'mobile\')">Мобильная</button>'+
+    '<button class="'+(forcedVersion === 'desktop' ? 'primary' : '')+'" onclick="setForcedVersion(\'desktop\')">Десктопная</button>'+
+    '</div>'+
+    '<p class="muted small" style="margin-top:8px">Сейчас определено: <strong>'+versionLabel+'</strong></p>'+
+    (forcedVersion ? '<p class="muted small">Принудительно: '+forcedVersion+'</p>' : '')
+  )+
+  sCard('Профиль','<label>Ваше ФИО (используется в заголовках печатных отчётов)</label><input id="teacher-name" value="'+e(D.settings.teacherName||'')+'" placeholder="Иванова Мария Петровна" onchange="setTeacherName(this.value)">')+
   sCard('Параллели в библиотеке уроков и материалах','<p class="muted small">Список папок-параллелей для группировки и фильтра в разделах «Библиотека уроков» и «Материалы». Уберите лишние или добавьте свои — например «10А спецкласс».</p>'+
   '<div class="checks" style="max-height:none">'+(D.settings.libraryGradeLevels||[]).map((g,i)=>'<div class="attrow"><span class="toolbar" style="flex:0"><button '+(i===0?'disabled':'')+' onclick="moveGradeLevel('+i+',-1)">↑</button><button '+(i===(D.settings.libraryGradeLevels.length-1)?'disabled':'')+' onclick="moveGradeLevel('+i+',1)">↓</button></span><span>'+e(g)+'</span><button class="danger" onclick="removeGradeLevel('+i+')">✕</button></div>').join('')+'</div>'+
   '<div class="toolbar" style="margin-top:10px"><input id="new-grade-level" placeholder="например, 10" style="max-width:200px"><button onclick="addGradeLevel()">＋ Добавить параллель</button></div>')+
@@ -192,6 +206,13 @@ function saveEditQuarter(id){
  save();closeModal();render();
 }
 function deleteQuarter(id){if(!confirm('Удалить четверть?'))return;D.settings.quarters=D.settings.quarters.filter(x=>x.id!==id);save();closeModal();render()}
+function setForcedVersion(v){
+  try {
+    if (v === null) localStorage.removeItem('teacherDiaryV3.forcedVersion');
+    else localStorage.setItem('teacherDiaryV3.forcedVersion', v);
+  } catch(e) {}
+  window.location.reload();
+}
 function openAddBlock(){
  setModalHtml('Новая блокировка расписания',
   '<label>Название/причина</label><input id="b-reason" placeholder="Каникулы">'+
