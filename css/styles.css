@@ -289,8 +289,9 @@ button.primary:active::after{width:220%;height:220%}
 /* ---- Home header: clock + weather + progress ---- */
 .home-header-card{border-radius:var(--radius);background:var(--color-surface);border:1px solid var(--color-border);box-shadow:var(--shadow-card)}
 .home-progress{opacity:.9;animation:fadeIn .6s var(--ease) both}
-.home-weather{opacity:.95;animation:fadeIn .6s var(--ease) both}
-.home-weather:hover{transform:translateY(-1px)}
+.home-weather{position:relative;opacity:.95;animation:fadeIn .6s var(--ease) both}
+.home-weather:hover{background:var(--color-surface-elevated);border-radius:var(--radius);padding:8px 12px;transform:translateY(-2px);box-shadow:var(--shadow-card);transition:all .25s var(--ease)}
+.home-weather:hover::after{content:'узнать подробнее';position:absolute;bottom:-26px;right:0;background:var(--color-surface);color:var(--color-text-primary);border:1px solid var(--color-border);border-radius:6px;padding:4px 8px;font-size:11px;white-space:nowrap;z-index:10;box-shadow:var(--shadow-card)}
 .progress-track{width:100%;height:6px;background:rgba(0,0,0,.06);border-radius:3px;overflow:hidden}
 html.dark .progress-track{background:rgba(255,255,255,.06)}
 .progress-fill{height:100%;background:var(--color-accent);border-radius:3px;transition:width .5s var(--ease)}

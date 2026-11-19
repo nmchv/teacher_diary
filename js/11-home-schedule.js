@@ -33,8 +33,6 @@ function widgetClock(){
   let coords=WEATHER_CITY_COORDS[city]||WEATHER_CITY_COORDS[WEATHER_DEFAULT_CITY];
   let w=S.weather&&S.weather.city===city?S.weather.data:null;
   let temp=w?Math.round(w.temperature_2m):'–';
-  let condition=w?weatherCondition(w.weather_code):'cloudy';
-  let emoji=WEATHER_EMOJI[condition];
   let progress=schoolYearProgress();
   return '<div class="card home-header-card" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;flex-wrap:wrap">'+
    '<div class="home-progress" style="flex:1;min-width:160px;text-align:left">'+
@@ -46,9 +44,8 @@ function widgetClock(){
     '<div id="live-clock" style="font-size:44px;font-weight:700;letter-spacing:1px;font-variant-numeric:tabular-nums">'+fmtClockTime(new Date())+'</div>'+
     '<div class="muted" style="margin-top:4px">'+fmtClockDate(new Date())+'</div>'+
    '</div>'+
-   '<div class="home-weather click" onclick="openWeatherDetail()" style="flex:0 0 auto;text-align:right;cursor:pointer">'+
-    '<div class="weather-anim weather-'+condition+'" style="font-size:34px;line-height:1">'+emoji+'</div>'+
-    '<div style="font-size:18px;font-weight:700;color:var(--color-text-primary)">'+temp+'°</div>'+
+   '<div class="home-weather click" onclick="openWeatherDetail()" style="flex:0 0 auto;text-align:right">'+
+    '<div style="font-size:20px;font-weight:700;color:var(--color-text-primary)">'+temp+'°</div>'+
     '<div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">'+e(city)+'</div>'+
    '</div>'+
   '</div>';
