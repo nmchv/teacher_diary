@@ -66,32 +66,10 @@ function settingsAppearanceTab(){
   '<div class="checks" style="max-height:none">'+(D.settings.gradeCommentTemplates||[]).map((g,i)=>'<div class="attrow"><span class="toolbar" style="flex:0"><button '+(i===0?'disabled':'')+' onclick="moveCommentTemplate('+i+',-1)">↑</button><button '+(i===(D.settings.gradeCommentTemplates.length-1)?'disabled':'')+' onclick="moveCommentTemplate('+i+',1)">↓</button></span><span>'+e(g)+'</span><button class="danger" onclick="removeCommentTemplate('+i+')">✕</button></div>').join('')+'</div>'+
   '<div class="toolbar" style="margin-top:10px"><input id="new-comment-template" placeholder="например, Не сдал(а) работу" style="max-width:260px"><button onclick="addCommentTemplate()">＋ Добавить вариант</button></div>')+
   sCard('Накопительная система баллов','<label>Порог обмена баллов на оценку</label><input type="number" min="1" value="'+(D.settings.pointsThreshold||5)+'" style="max-width:120px" onchange="setPointsThreshold(this.value)"><p class="muted small">Используется в режиме «Начать урок» — баллы можно ставить за короткие ответы, а по достижении порога обменять на полноценную оценку.</p>')+
-  sCard('Режим оформления','<div class="toolbar">'+
-   '<button class="'+(D.settings.colorMode!=='dark'?'primary':'')+'" onclick="setColorMode(\'light\')">☀ Светлая</button>'+
-   '<button class="'+(D.settings.colorMode==='dark'?'primary':'')+'" onclick="setColorMode(\'dark\')">🌙 Тёмная</button>'+
-  '</div>')+
-  sCard('Акцентный цвет и темы',themeSwatchesHtml('','Обычные')+
-  Object.keys(THEME_GROUP_LABELS).map(g=>themeSwatchesHtml(g,THEME_GROUP_LABELS[g])).join('')+
-  '<div style="margin-top:14px"><label>Свой цвет (любой из палитры)</label><div class="row" style="align-items:center"><input type="color" style="width:60px;height:38px;padding:2px;flex:0" value="'+e(D.settings.accentColor||'#007aff')+'" onchange="setCustomAccent(this.value)"><button onclick="clearCustomAccent()">Сбросить до темы</button></div></div>')+
-  sCard('Плотность интерфейса','<div class="toolbar">'+
-   '<button class="'+(D.settings.compact?'':'primary')+'" onclick="setCompact(false)">Обычная</button>'+
-   '<button class="'+(D.settings.compact?'primary':'')+'" onclick="setCompact(true)">Компактная</button>'+
-  '</div>')+
-  sCard('🍂 Частицы и фон по теме','<p class="muted small">Лёгкий фоновый узор и анимированные летящие иконки (листья, снег, тыквы, флаги, глобусы и т.д.) — подбираются автоматически по выбранной теме оформления выше (страна/предмет/яркая тема) или, если выбран обычный цвет, по времени года.</p><div class="toolbar">'+
-   Object.keys(SEASON_LABELS).map(k=>'<button class="'+(D.settings.season===k?'primary':'')+'" onclick="setSeason(\''+k+'\')">'+SEASON_LABELS[k]+'</button>').join('')+
-  '</div><label class="attrow" style="cursor:pointer;margin-top:10px"><span>Анимированные летящие частицы</span><input type="checkbox" '+(D.settings.seasonEffects?'checked':'')+' style="width:auto" onchange="toggleSeasonEffects(this.checked)"></label>'+
-  '<div class="toolbar" style="margin-top:8px">'+Object.keys(PARTICLE_DENSITY_LABELS).map(k=>'<button class="'+((D.settings.particleDensity||'medium')===k?'primary':'')+'" onclick="setParticleDensity(\''+k+'\')">'+PARTICLE_DENSITY_LABELS[k]+'</button>').join('')+'</div>'+
-  '<label class="attrow" style="cursor:pointer;margin-top:10px"><span>Фоновые тематические картинки (узор за карточками и часами)</span><input type="checkbox" '+(D.settings.bgDecorations?'checked':'')+' style="width:auto" onchange="toggleBgDecorations(this.checked)"></label>'+
-  '<p class="muted small">Сейчас действует: '+SEASON_LABELS[currentSeasonKey()]+(D.settings.season==='auto'?' (подобрано автоматически по месяцу)':'')+'</p>')+
-  sCard('Шрифт интерфейса','<div class="toolbar">'+
-   Object.keys(FONT_LABELS).map(k=>'<button class="'+((D.settings.fontFamily||'system')===k?'primary':'')+'" style="font-family:'+FONT_FAMILIES[k]+'" onclick="setFont(\''+k+'\')">'+FONT_LABELS[k]+'</button>').join('')+
-  '</div>')+
-  sCard('Скругление углов','<div class="toolbar">'+
-   [['0','Острые'],['0.6','Слегка'],['1','Обычные'],['1.6','Скруглённые'],['2.2','Максимум']].map(o=>'<button class="'+((String(D.settings.radius===undefined?1:D.settings.radius))===o[0]?'primary':'')+'" onclick="setRadius('+o[0]+')">'+o[1]+'</button>').join('')+
-  '</div>')+
-  sCard('Стиль боковой панели','<div class="toolbar">'+
-   '<button class="'+(D.settings.sidebarStyle!=='gradient'?'primary':'')+'" onclick="setSidebarStyle(\'solid\')">Сплошная</button>'+
-   '<button class="'+(D.settings.sidebarStyle==='gradient'?'primary':'')+'" onclick="setSidebarStyle(\'gradient\')">Градиент (в акцентный цвет)</button>'+
+  sCard('Тёмная / светлая тема','<div class="toolbar">'+
+   '<button class="theme-toggle" data-theme-toggle type="button" onclick="TeacherDiaryTheme.toggle()" aria-label="Переключить тему">'+
+   (D.settings.colorMode==='dark'?'🌙 К светлой':'☀ К тёмной')+'</button>'+
+   '<span class="muted small" style="margin-left:10px">Текущая: '+(D.settings.colorMode==='dark'?'тёмная':'светлая')+'</span>'+
   '</div>')+
   sCard('🐾 Ассистент','<p class="muted small">Помощник, как в старых версиях Windows — время от времени подскажет полезную мелочь или скажет пару тёплых слов. Можно перетаскивать по экрану, кликнуть — новый совет.</p>'+
   '<label class="attrow" style="cursor:pointer"><span>Показывать ассистента</span><input type="checkbox" '+(assistantSettings().enabled?'checked':'')+' style="width:auto" onchange="setAssistantEnabled(this.checked)"></label>'+
@@ -139,18 +117,8 @@ function addGradeLevel(){
 }
 function removeGradeLevel(i){D.settings.libraryGradeLevels.splice(i,1);save();render()}
 function moveGradeLevel(i,dir){let arr=D.settings.libraryGradeLevels;let j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];save();render()}
-function themeSwatchesHtml(group,groupLabel){
- let list=THEMES.filter(t=>(t.group||'')===group);
- if(!list.length)return'';
- return '<div class="small muted" style="margin:'+(group?'14px':'0')+' 0 6px">'+e(groupLabel)+'</div><div class="themeswatches">'+list.map(t=>'<div class="swatch'+(D.settings.theme===t.key&&!D.settings.accentColor?' active':'')+'" style="background:'+(t.c2?'linear-gradient(135deg,'+t.c+','+t.c2+')':t.c)+'" onclick="setTheme(\''+t.key+'\')" title="'+e(t.label||t.key)+'">'+(t.emoji?'<span class="swatch-emoji">'+t.emoji+'</span>':'')+'</div>').join('')+'</div>';
-}
-function setTheme(key){D.settings.theme=key;D.settings.accentColor='';save();render()}
-function setCustomAccent(v){D.settings.accentColor=v;save();render()}
-function clearCustomAccent(){D.settings.accentColor='';save();render()}
-function setColorMode(m){D.settings.colorMode=m;save();render()}
 function setTeacherName(v){D.settings.teacherName=v.trim();save()}
 function setPointsThreshold(v){D.settings.pointsThreshold=Math.max(1,+v||5);save()}
-function setCompact(v){D.settings.compact=v;save();render()}
 function settingsScheduleTab(){
  return sCard('Дни недели в расписании',
   '<label class="attrow" style="cursor:pointer"><span>Показывать субботу как учебный день</span><input type="checkbox" '+(D.settings.showSaturday?'checked':'')+' style="width:auto" onchange="toggleShowSaturday(this.checked)"></label>'+

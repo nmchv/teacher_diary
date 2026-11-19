@@ -1,7 +1,6 @@
 /* ===================== ОБОЛОЧКА / НАВИГАЦИЯ ===================== */
 function render(){
- applyTheme();
- document.getElementById('app').innerHTML=
+  document.getElementById('app').innerHTML=
   '<aside class="side'+(S.sidebarCollapsed?' collapsed':'')+'">'+
    '<div class="brand"><span class="brand-text">Дневник учителя</span><button class="collapse-btn" onclick="toggleSidebar()" title="Свернуть/развернуть">'+(S.sidebarCollapsed?'»':'«')+'</button></div>'+
    navBtn('home','⌂','Главная')+
