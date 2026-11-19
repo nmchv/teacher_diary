@@ -882,6 +882,7 @@ function render(){
    '<div class="brand"><span class="brand-text">Дневник учителя</span>'+
     '<span style="display:flex;gap:4px">'+
      '<button class="collapse-btn theme-btn" onclick="toggleColorMode()" title="Сменить тему" aria-label="Сменить тему"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.3"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.1 5.1l1.6 1.6M17.3 17.3l1.6 1.6M18.9 5.1l-1.6 1.6M6.7 17.3l-1.6 1.6"/></svg></button>'+
+     '<button class="collapse-btn" onclick="setMobileVersion()" title="Перейти на мобильную версию" aria-label="Перейти на мобильную версию">📱</button>'+
      '<button class="collapse-btn" onclick="toggleSidebar()" title="Свернуть/развернуть">'+(S.sidebarCollapsed?'»':'«')+'</button>'+
     '</span></div>'+
    navBtn('home','⌂','Главная')+

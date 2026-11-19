@@ -62,6 +62,14 @@ function forceVersion(v) {
   window.location.reload();
 }
 
+function setMobileVersion(){
+  if (location.pathname.indexOf('/mobile/') !== -1) {
+    window.location.reload();
+    return;
+  }
+  window.location.href = 'mobile/index.html?forced=mobile';
+}
+
 function currentVersion() {
   return detectDevice();
 }

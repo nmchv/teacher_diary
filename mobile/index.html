@@ -25,7 +25,13 @@ try {
 <script src="../src/device-detector.js"></script>
 <script>
 (function(){
-  var v = window.currentVersion ? window.currentVersion() : 'mobile';
+  var params = new URLSearchParams(location.search);
+  var v;
+  if (params.get('forced') === 'mobile') {
+    v = 'mobile';
+  } else {
+    v = window.currentVersion ? window.currentVersion() : 'mobile';
+  }
   if (v === 'desktop') {
     window.location.replace('../index.html');
   }

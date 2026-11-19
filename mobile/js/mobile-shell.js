@@ -31,8 +31,12 @@ function mobileNavItems(){
  return ['home','students','search','stats','reports','materials','library','announcements','work','settings','backup'];
 }
 function mobileNavLabel(v){
- const map={home:'Главная',students:'Ученики',search:'Поиск',stats:'Статистика',reports:'Ведомости',materials:'Материалы',library:'Библиотека уроков',announcements:'Объявления',work:'Работа',settings:'Настройки',backup:'Резервная копия'};
- return map[v]||v;
+  const map={home:'Главная',students:'Ученики',search:'Поиск',stats:'Статистика',reports:'Ведомости',materials:'Материалы',library:'Библиотека уроков',announcements:'Объявления',work:'Работа',settings:'Настройки',backup:'Резервная копия'};
+  return map[v]||v;
+}
+function toggleMobileMenu(){
+  window.mobileMenuOpen=!window.mobileMenuOpen;
+  render();
 }
 window.mobileScheduleDate=toISO(new Date());
 function changeMobileScheduleDate(v){window.mobileScheduleDate=v||toISO(new Date());render()}
@@ -123,10 +127,8 @@ function homePage(){
   let widgets=(D.settings.homeWidgets||[]).filter(w=>w.visible&&HOME_WIDGETS[w.key]&&w.key!=='stats'&&w.key!=='schedule'&&w.key!=='todo'&&w.key!=='recent');
   let clock=widgets.find(w=>w.key==='clock');
   let rest=widgets.filter(w=>w.key!=='clock');
-  let html='<div class="top"><div><h1>Главная</h1><div class="muted">Личный рабочий кабинет учителя</div></div>'+
-   backupReminderBanner();
+  let html='<div class="top"><div><h1>Главная</h1><div class="muted">Личный рабочий кабинет учителя</div></div></div>';
   if(clock) html+=HOME_WIDGETS.clock.render();
-  html+=widgetSchedule();
   html+=widgetTasks();
   rest.forEach(w=>html+=HOME_WIDGETS[w.key].render());
   return html;
