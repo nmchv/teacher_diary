@@ -1,10 +1,12 @@
 /* ===================== РЕЗЕРВНАЯ КОПИЯ ===================== */
 function backupPage(){
- return '<div class="top"><div><h1>Резервная копия</h1><div class="muted">Полный экспорт и импорт всех данных, включая файлы материалов</div></div></div>'+
+ return '<div class="top"><div><h1>Резервное копирование</h1><div class="muted">Полный экспорт и импорт всех данных, включая файлы материалов</div></div></div>'+
   '<div class="card"><h2>Экспорт</h2><p class="muted">Создаёт файл со всеми классами, учениками (включая архив), уроками, оценками, посещаемостью, пользовательскими полями, настройками, расписанием/блокировками, шаблонами и библиотекой материалов.</p>'+
    '<p class="small muted">'+(D.settings.lastBackupAt?'Последняя копия: '+fmtDate(D.settings.lastBackupAt):'Резервная копия ещё не создавалась.')+'</p>'+
    '<button class="primary" onclick="doBackup()">⇩ Скачать резервную копию</button></div>'+
-  '<div class="card"><h2>Импорт</h2><div class="notice">Импорт полностью заменит текущие данные приложения.</div><button onclick="document.getElementById(\'restore-input\').click()">⇧ Восстановить из файла</button><input id="restore-input" type="file" accept=".json" hidden onchange="doRestore(this)"></div>';
+  '<div class="card"><h2>Импорт</h2><div class="notice">Импорт полностью заменит текущие данные приложения.</div><button onclick="document.getElementById(\'restore-input\').click()">⇧ Восстановить из файла</button><input id="restore-input" type="file" accept=".json" hidden onchange="doRestore(this)"></div>'+
+   '<div class="card"><h2>Демонстрационные данные</h2><p class="muted">Загружает демонстрационный набор данных (классы, ученики, уроки, материалы) из файла <code>demo-data.json</code> в корне приложения.</p><button onclick="loadDemoData()">⇄ Загрузить демонстрационные данные</button></div>'+
+   '<div class="card"><h2>Очистка данных</h2><p class="muted">Полностью удаляет все данные пользователя: классы, ученики, уроки, оценки, посещаемость, материалы, настройки и всё прочее. Действие необратимо.</p><div class="notice">Это удалит все данные. Рекомендуется вручную сделать резервную копию перед очисткой.</div><button class="danger" onclick="clearAllData()">☠ Очистить все данные</button></div>';
 }
 async function doBackup(){
  let files=await fileStoreAll();
@@ -19,13 +21,42 @@ async function doBackup(){
  render();
 }
 function doRestore(input){
- let f=input.files[0];if(!f)return;
- if(!confirm('Импорт заменит все текущие данные приложения. Продолжить?'))return;
- let r=new FileReader();
- r.onload=async()=>{
+  let f=input.files[0];if(!f)return;
+  if(!confirm('Импорт заменит все текущие данные приложения. Продолжить?'))return;
+  let r=new FileReader();
+  r.onload=async()=>{
+   try{
+    let payload=JSON.parse(r.result);
+    await restoreFromPayload(payload);
+    alert('Данные успешно восстановлены.');
+    S.view='home';render();
+   }catch(err){alert('Не удалось прочитать файл резервной копии.');console.error(err)}
+  };
+  r.readAsText(f);
+}
+async function loadDemoData(){
+  if(!confirm('Загрузка демонстрационных данных заменит все текущие данные приложения. Продолжить?'))return;
   try{
-   let payload=JSON.parse(r.result);
-   D=payload.D;
+   let resp=await fetch('demo-data.json?'+new Date().getTime());
+   if(!resp.ok)throw new Error('HTTP '+resp.status);
+   let payload=await resp.json();
+   await restoreFromPayload(payload);
+   alert('Демонстрационные данные успешно загружены.');
+   S.view='home';render();
+   }catch(err){alert('Не удалось загрузить демонстрационные данные.');console.error(err)}
+}
+async function clearAllData(){
+  if(!confirm('Это полностью удалит все ваши данные: классы, учеников, уроки, оценки, посещаемость, материалы, настройки и всё остальное. Действие необратимо. Рекомендуется вручную сделать резервную копию перед очисткой. Продолжить?'))return;
+  try{
+    await fileStoreClear();
+    D=defaultData();
+    save();
+    alert('Все данные удалены.');
+    S.view='home';render();
+  }catch(err){alert('Не удалось очистить данные.');console.error(err)}
+}
+async function restoreFromPayload(payload){
+  D=payload.D;
    if(!D.materials)D.materials=[];
    if(!D.scheduleBlocks)D.scheduleBlocks=[];
    if(!D.lessonTemplates)D.lessonTemplates=[];
@@ -57,18 +88,15 @@ function doRestore(input){
  D.classes.forEach(c=>{if(c.gradeNumber===undefined){let p=parseClassName(c.name);c.gradeNumber=p.number;c.gradeLetter=p.letter}});
    if(!D.documents)D.documents=[];
    if(!D.settings.quarters)D.settings.quarters=[];
-   save();
-   await fileStoreClear();
-   for(let fe of (payload.files||[])){
-    let blob=await base64ToBlob(fe.data);
-    await fileStorePut(fe.id,blob);
-   }
-   alert('Данные успешно восстановлены.');
-   S.view='home';render();
-  }catch(err){alert('Не удалось прочитать файл резервной копии.');console.error(err)}
- };
- r.readAsText(f);
-}
+   try{
+     save();
+     await fileStoreClear();
+     for(let fe of (payload.files||[])){
+       let blob=await base64ToBlob(fe.data);
+       await fileStorePut(fe.id,blob);
+     }
+   }catch(err){alert('Не удалось прочитать файл резервной копии.');console.error(err)}
+ }
 
 function repairMissingLessonTimes(){
  let fixed=0;
