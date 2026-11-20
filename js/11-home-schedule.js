@@ -164,7 +164,7 @@ function widgetTasks(){
   });
   return '<div class="card"><div class="top" style="justify-content:space-between;align-items:center">'+
    '<h2 style="margin-top:0">Задачи</h2>'+
-   '<button class="primary" onclick="openNewWorkTask()" style="flex:0">＋</button>'+
+   '<button class="primary" onclick="openNewWorkTask()" style="flex:0;height:32px;width:32px;display:grid;place-items:center;font-size:16px;padding:0;border-radius:8px">＋</button>'+
    '</div>'+
    (items.length?'<div class="checks">'+items.map(t=>{
     let overdue=t.dueDate&&t.dueDate<toISO(new Date())&&t.status!=='done';
@@ -176,7 +176,7 @@ function widgetTasks(){
      '<div style="display:flex;align-items:center;gap:6px">'+
       (t.dueDate?'<span class="small '+(overdue?'danger':'muted')+'">'+fmtDate(t.dueDate)+(overdue?' ⚠':'')+'</span>':'')+
       '<span class="badge '+priorityBadgeClass(t.priority)+'">'+priorityLabel(t.priority)+'</span>'+
-      '<button onclick="event.stopPropagation();openEditWorkTask(\''+t.id+'\')" style="background:none;border:none;padding:4px;font-size:14px;cursor:pointer;color:var(--color-text-secondary)">⋮</button>'+
+      '<button onclick="event.stopPropagation();openEditWorkTask(\''+t.id+'\')" style="background:none;border:none;padding:4px;font-size:14px;cursor:pointer;color:var(--color-text-secondary)">✎</button>'+
      '</div>'+
     '</div>';
    }).join('')+'</div>':'<div class="muted small">Задач пока нет.</div>')+
@@ -189,25 +189,26 @@ function addQuickTask(){
  save();render();
 }
 function widgetBirthdays(){
- let items=[];
- D.students.filter(s=>s.status!=='archived'&&s.customFields.birthDate).forEach(s=>{
-  let days=bdayDiff(s.customFields.birthDate);
-  if(days>=-3&&days<=14)items.push({days,html:'<span class="click" onclick="openStudentPage(\''+s.id+'\')">'+studentFio(s)+' <span class="muted small">· '+e(studentClassNames(s))+'</span></span>'});
- });
- (D.colleagues||[]).filter(c=>colleagueField(c,'birthDate')).forEach(c=>{
-  let days=bdayDiff(colleagueField(c,'birthDate'));
-  if(days>=-3&&days<=14)items.push({days,html:'<span class="click" onclick="openColleagueCard(\''+c.id+'\')">'+colleagueFio(c)+' <span class="muted small">· коллега'+(colleagueField(c,'position')?', '+e(colleagueField(c,'position')):'')+'</span></span>'});
- });
- items.sort((a,b)=>a.days-b.days);
- function badgeFor(days){
-  if(days===0)return'сегодня! 🎂';
-  if(days===1)return'завтра';
-  if(days>1)return'через '+days+' дн.';
-  if(days===-1)return'вчера';
-  return days+' дн. назад';
- }
- return '<div class="card"><h2 style="margin-top:0">🎂 Дни рождения</h2>'+
-  (items.length?items.map(x=>'<div class="attrow">'+x.html+'<span class="badge'+(x.days<0?' muted':'')+'">'+badgeFor(x.days)+'</span></div>').join(''):'<div class="muted small">Ни сегодня, ни в ближайшие 2 недели, ни за последние 3 дня дней рождения нет (ни у учеников, ни у коллег).</div>')+
+  let items=[];
+  D.students.filter(s=>s.status!=='archived'&&s.customFields.birthDate).forEach(s=>{
+    let days=bdayDiff(s.customFields.birthDate);
+    if(days>=-1&&days<=14)items.push({days,type:'student',html:'<span class="click" onclick="openStudentPage(\''+s.id+'\')">'+studentFio(s)+' <span class="muted small">· '+e(studentClassNames(s))+'</span></span>'});
+  });
+  (D.colleagues||[]).filter(c=>colleagueField(c,'birthDate')).forEach(c=>{
+    let days=bdayDiff(colleagueField(c,'birthDate'));
+    if(days>=-1&&days<=14)items.push({days,type:'colleague',html:'<span class="click" onclick="openColleagueCard(\''+c.id+'\')">'+colleagueFio(c)+' <span class="muted small">· коллега'+(colleagueField(c,'position')?', '+e(colleagueField(c,'position')):'')+'</span></span>'});
+  });
+  items.sort((a,b)=>a.days-b.days);
+  if(items.length>7)items=items.slice(0,7);
+  function badgeFor(days){
+    if(days===0)return'сегодня! 🎂';
+    if(days===1)return'завтра';
+    if(days>1)return'через '+days+' дн.';
+    if(days===-1)return'вчера';
+    return days+' дн. назад';
+  }
+  return '<div class="card"><h2 style="margin-top:0">🎂 Дни рождения</h2>'+
+   (items.length?items.map(x=>'<div class="attrow">'+x.html+'<span class="badge'+(x.days<0?' muted':'')+'">'+badgeFor(x.days)+'</span></div>').join(''):'<div class="muted small">Ближайшие 2 недели, сегодня и вчера — дней рождений нет.</div>')+
   '</div>';
 }
 const HOME_WIDGETS={
