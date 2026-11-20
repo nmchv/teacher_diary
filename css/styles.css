@@ -124,7 +124,7 @@ html.dark .attrow{border-bottom-color:rgba(255,255,255,.06)}
 .gbulk{border:1px dashed var(--color-border);border-radius:var(--radius);padding:10px 12px;margin:4px 0 12px}
 .modalbg{position:fixed;inset:0;background:rgb(8 9 11 / .35);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20;overflow:auto}
 html.dark .modalbg{background:rgb(8 9 11 / .45)}
-.modal{background:var(--color-surface);border-radius:calc(var(--radius)*1.6);padding:22px;max-width:820px;width:100%;max-height:92vh;overflow:auto;animation:modalIn .35s var(--ease) both;align-self:center}
+.modal{background:var(--color-surface);border-radius:calc(var(--radius)*1.6);padding:22px;max-width:820px;width:100%;max-height:92vh;overflow:auto;margin:auto;animation:modalIn .35s var(--ease) both}
 .modal.wide{max-width:1000px}
 .badge{padding:3px 9px;background:rgba(0,0,0,.06);border-radius:20px;font-size:11.5px;font-weight:600;color:var(--color-text-secondary)}
 html.dark .badge{background:rgba(255,255,255,.06)}

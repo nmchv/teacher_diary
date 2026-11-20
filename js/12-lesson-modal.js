@@ -74,7 +74,7 @@ function createLessonFull(){
  D.lessons.push(l);save();closeModal();openLessonModal(l.id);
 }
 function setModalHtml(title,body,wide){
- document.getElementById('modal').innerHTML='<div class="modalbg" onclick="if(event.target===this)closeModal()"><div class="modal'+(wide?' wide':'')+'"><div class="top"><h2>'+title+'</h2><button class="closebtn" onclick="closeModal()">×</button></div>'+body+'</div></div>';
+ document.getElementById('modal').innerHTML='<div class="modalbg" onclick="if(event.target===this){save();closeModal()}"><div class="modal'+(wide?' wide':'')+'"><div class="top"><h2>'+title+'</h2><button class="closebtn" onclick="closeModal()">×</button></div>'+body+'</div></div>';
 }
 function closeModal(){S.lessonModal=null;document.getElementById('modal').innerHTML=''}
 function renderModalOnly(){
