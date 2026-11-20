@@ -235,9 +235,13 @@ function leaderboardCardHtml(title,rows,type,wide){
  let wc=wide?' lb-card-wide':'';
  let items=rows.map((r,i)=>{
   let val=type==='att'?(r.attendancePct===null?'—':r.attendancePct+'%'):round2(r.avgGrade);
-  return '<div class="lb-row"><div class="lb-pos">'+(i+1)+'</div><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+e(studentClassNames(r.s))+'</div><div class="lb-val">'+val+'</div></div>'
+  let cls=e(studentClassNames(r.s));
+  if(wide){
+   return '<div class="lb-row"><div class="lb-pos">'+(i+1)+'</div><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+cls+'</div><div class="lb-val">'+val+'</div></div>'
+  }
+  return '<div class="lb-row small"><div class="lb-pos">'+(i+1)+'</div><div class="lb-info"><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+cls+'</div></div><div class="lb-val">'+val+'</div></div>'
  }).join('');
-  return '<div class="lb-card'+wc+'"><div class="lb-title">'+title+'</div><div class="lb-list">'+items+'</div></div>';
+ return '<div class="lb-card'+wc+'"><div class="lb-title">'+title+'</div><div class="lb-list">'+items+'</div></div>';
 }
 function openClass(id){S.view='class';S.classId=id;S.tab='lessons';render()}
 function studentInitials(s){return ((s.lastName||'')[0]||'')+((s.firstName||'')[0]||'')}
