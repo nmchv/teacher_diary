@@ -331,3 +331,27 @@ html.dark .progress-track{background:rgba(255,255,255,.06)}
 @keyframes boltFlash{0%,90%,100%{opacity:.15}95%{opacity:.8}}
 @keyframes fogMove{0%,100%{transform:translateX(0)}50%{transform:translateX(20%)}}
 @keyframes bgPulse{0%,100%{transform:scale(1);opacity:.25}50%{transform:scale(1.05);opacity:.4}}
+
+/* ---- Ведомости: виджет выбора классов и кружков (карточки по параллелям) ---- */
+.rp-picker .rp-toolbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.rp-picker .rp-toolbar button{font-size:12px;padding:6px 10px}
+.rp-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.rp-head{padding:8px 12px;background:var(--color-surface-elevated);border:1px solid var(--color-border);border-radius:var(--radius-sm);font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;flex:0 0 auto;min-width:64px}
+.rp-head:hover{background:rgb(91 141 239 / .1)}
+.rp-head.on{background:rgb(91 141 239 / .12);color:var(--color-accent-hover);border-color:var(--color-accent)}
+.rp-cells{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 auto;min-width:0}
+.rp-card{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);cursor:pointer;font-size:12.5px;min-width:120px;flex:0 0 auto}
+.rp-card input{width:auto;flex:0 0;margin-top:1px}
+.rp-card:hover{border-color:rgb(91 141 239 / .45)}
+.rp-card.on{border-color:var(--color-accent);background:rgb(91 141 239 / .08)}
+.rp-card-body{flex:1;min-width:0}
+.rp-card-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp-card-sub{font-size:11px;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp-badge{font-size:10px;padding:1px 6px;border-radius:10px;background:rgb(229 169 33 / .15);color:var(--color-warn);font-weight:600;margin-left:auto}
+
+/* ---- Ведомости: виджет периода ---- */
+.rp-period select{width:auto;max-width:360px}
+.rp-dates{display:flex;gap:10px;flex-wrap:wrap}
+.rp-date{display:flex;flex-direction:column;gap:4px}
+.rp-date b{font-size:12.5px;color:var(--color-text-secondary)}
+.rp-date input{width:auto;max-width:170px}

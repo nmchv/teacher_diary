@@ -10,9 +10,9 @@ function toggleReportClass(id){if(S.reportsSelClasses.has(id))S.reportsSelClasse
 function selectAllReportClasses(){S.reportsSelClasses=new Set(reportsClassList().map(c=>c.id));render()}
 function clearReportClasses(){S.reportsSelClasses=new Set();render()}
 function setReportLessonDate(id,v){S.reportsLessonDates[id]=v}
-function reportClassChip(c){
+function reportClassCard(c){
  let on=S.reportsSelClasses.has(c.id);
- return '<label class="rp-chip'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleReportClass(\''+c.id+'\')"><span class="rp-name">'+e(c.name)+'</span>'+(c.subject?'<span class="rp-sub">'+e(c.subject)+'</span>':'')+'</label>';
+ return '<label class="rp-card'+(on?' on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleReportClass(\''+c.id+'\')"><div class="rp-card-body"><div class="rp-card-name">'+e(c.name)+'</div>'+(c.subject?'<div class="rp-card-sub">'+e(c.subject)+'</div>':'')+'</div></label>';
 }
 function reportGradeKey(c){return c.type==='club'?'club':(c.gradeNumber==null?'other':String(c.gradeNumber))}
 function toggleReportGrade(k){
@@ -21,13 +21,54 @@ function toggleReportGrade(k){
  list.forEach(c=>{if(all)S.reportsSelClasses.delete(c.id);else S.reportsSelClasses.add(c.id)});
  render();
 }
-function reportClassPicker(classes){
+function reportsClassesWidgetHtml(){
+ let classes=reportsClassList();
  let groups={},order=[];
  classes.forEach(c=>{let k=reportGradeKey(c);if(!groups[k]){groups[k]=[];order.push(k)}groups[k].push(c)});
- return '<div class="rp-table">'+order.map(k=>{
-  let list=groups[k],all=list.every(c=>S.reportsSelClasses.has(c.id));
-  return '<div class="rp-row"><button class="rp-head'+(all?' on':'')+'" onclick="toggleReportGrade(\''+k+'\')" title="'+(k==='club'?'Выбрать / снять все кружки':'Выбрать / снять всю параллель')+'">'+(k==='other'?'…':k==='club'?'Кр.':k)+'</button><div class="rp-cells">'+list.map(reportClassChip).join('')+'</div></div>';
- }).join('')+'</div>';
+ let sel=S.reportsSelClasses;
+ let clubs=groups['club']||[];
+ let html='<div class="card rp-picker"><h2>1. Классы и кружки</h2>'+
+  '<div class="rp-toolbar">'+
+   '<button onclick="selectAllReportClasses()">Выбрать всё</button>'+
+   '<button onclick="selectOnlyParallels()">Все параллели</button>'+
+   '<button onclick="addAllReportClubs()">Все кружки</button>'+
+   '<button onclick="selectOnlyClubs()">Только кружки</button>'+
+   '<button onclick="clearReportClasses()">Снять выбор</button>'+
+  '</div>';
+ order.filter(k=>k!=='club').forEach(k=>{
+  let list=groups[k];
+  let all=list.every(c=>sel.has(c.id));
+  html+='<div class="rp-row"><button class="rp-head'+(all?' on':'')+'" onclick="toggleReportGrade(\''+k+'\')" title="Выбрать / снять всю параллель">'+e(k)+'</button><div class="rp-cells">'+list.map(reportClassCard).join('')+'</div></div>';
+ });
+ if(clubs.length){
+  let all=clubs.every(c=>sel.has(c.id));
+  html+='<div class="rp-row"><button class="rp-head'+(all?' on':'')+'" onclick="toggleReportGrade(\'club\')" title="Выбрать / снять все кружки">Кружки</button><div class="rp-cells">'+clubs.map(reportClassCard).join('')+'</div></div>';
+ }
+ html+='<label class="attrow" style="cursor:pointer;margin-top:12px"><span>🏠 Включать учеников на домашнем/семейном обучении в печать</span><input type="checkbox" '+(S.reportsIncludeHomeschool?'checked':'')+' onchange="S.reportsIncludeHomeschool=this.checked" style="width:auto"></label>'+
+  '</div>';
+ return html;
+}
+function reportsPeriodWidgetHtml(){
+ let quarters=D.settings.quarters||[],today=toISO(new Date());
+ let per=reportsPlanResolvePeriod();
+ return '<div class="card rp-period"><h2>2. Период</h2><label>Период</label>'+
+  '<select onchange="setReportsPlanPeriod(this.value)">'+
+   quarters.map(q=>'<option value="'+q.id+'"'+(per===q.id?' selected':'')+'>'+e(q.name)+' ('+fmtDate(q.startDate)+' – '+fmtDate(q.endDate)+')</option>').join('')+
+   '<option value="custom"'+(per==='custom'?' selected':'')+'>Свой период по датам…</option>'+
+  '</select>'+
+  (per==='custom'?'<div class="rp-dates" style="margin-top:8px"><div class="rp-date"><b>С какой даты</b><input type="date" value="'+e(S.reportsPlanFrom||today)+'" onchange="S.reportsPlanFrom=this.value"></div><div class="rp-date"><b>По какую дату</b><input type="date" value="'+e(S.reportsPlanTo||today)+'" onchange="S.reportsPlanTo=this.value"></div></div>':'')+
+  '</div>';
+}
+function selectOnlyParallels(){
+ let list=reportsClassList().filter(c=>c.type!=='club');
+ S.reportsSelClasses=new Set(list.map(c=>c.id));render();
+}
+function addAllReportClubs(){
+ reportsClassList().filter(c=>c.type==='club').forEach(c=>S.reportsSelClasses.add(c.id));render();
+}
+function selectOnlyClubs(){
+ let list=reportsClassList().filter(c=>c.type==='club');
+ S.reportsSelClasses=new Set(list.map(c=>c.id));render();
 }
 function commentMatches(comment,query){
  let norm=x=>String(x||'').toLowerCase().replace(/ё/g,'е');
@@ -73,21 +114,18 @@ function reportsPage(){
  let selected=reportsSelectedClasses();
  let n=selected.length;
  return '<div class="top"><div><h1>Ведомости</h1><div class="muted">Сводная печать оценок, посещаемости и планов уроков сразу по нескольким классам и кружкам.</div></div></div>'+
-  '<div class="card"><h2>1. Выберите классы и кружки</h2><div class="toolbar" style="margin-bottom:10px"><button onclick="selectAllReportClasses()">Выбрать все</button><button onclick="clearReportClasses()">Снять выбор</button></div>'+
-  '<div class="muted small" style="margin-bottom:8px">Нажмите на класс или кружок, чтобы отметить его. Кнопка с цифрой слева выбирает всю параллель сразу, «Кр.» — все кружки.</div>'+reportClassPicker(classes)+
-  '<label class="attrow" style="cursor:pointer;margin-top:12px"><span>🏠 Включать учеников на домашнем/семейном обучении в печать</span><input type="checkbox" '+(S.reportsIncludeHomeschool?'checked':'')+' onchange="S.reportsIncludeHomeschool=this.checked" style="width:auto"></label>'+
-  '</div>'+
-  '<div class="card"><h2>Общая ведомость (оценки + посещаемость)</h2><p class="muted small">Один файл на все выбранные классы и кружки: по каждому — своя таблица со всеми уроками за всё время, ученики внутри — по алфавиту, классы — по возрастанию (5 → 11). Замечания о поведении печатаются отдельным списком под таблицей каждого класса.</p>'+
-  '<div class="toolbar"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintFullReport()">🖨 Напечатать общую ведомость'+(n?' ('+n+')':'')+'</button></div></div>'+
-  '<div class="card"><h2>План уроков на четверть</h2><p class="muted small">Один файл на все выбранные классы и кружки: для каждого — своя таблица с датами, темами и домашними заданиями за выбранный период. Список колонок можно настроить ниже.</p>'+reportsPlanControlsHtml()+
-  '<div class="toolbar" style="margin-top:10px"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintQuarterPlanReport()">🖨 Напечатать план на четверть'+(n?' ('+n+')':'')+'</button></div></div>'+
-  '<div class="card"><h2>Ведомость по одному уроку во всех классах</h2><p class="muted small">Например, входная контрольная прошла во всех классах, но в разные дни — укажите дату для каждого класса, и получите одну сводную ведомость с оценками, посещаемостью и замечаниями о поведении.</p>'+
-  (n?'<div class="rp-dates">'+selected.map(c=>'<div class="rp-date"><b>'+e(c.name)+'</b><input type="date" value="'+e(S.reportsLessonDates[c.id]||'')+'" onchange="setReportLessonDate(\''+c.id+'\',this.value)"></div>').join('')+'</div>':'<div class="muted small">Сначала выберите классы выше.</div>')+
-  '<div class="toolbar" style="margin-top:10px"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintLessonReport()">🖨 Напечатать ведомость по дате</button></div></div>'+
-  '<div class="card"><h2>Ведомость по комментарию</h2><p class="muted small">Ищет по фрагменту текста, регистр не важен: можно ввести часть слова, несколько слов (найдутся комментарии, где есть все они) или число баллов. Ниже сразу видно, что найдётся.</p>'+
-  '<label>Комментарий (или его часть)</label>'+commentInputHtml('report-comment',S.reportsComment||'',' style="max-width:320px" oninput="S.reportsComment=this.value;updateCommentReportPreview()"')+
-  '<div id="report-comment-preview" style="margin-top:10px">'+commentReportPreviewHtml()+'</div>'+
-  '<div class="toolbar" style="margin-top:10px"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintCommentReport()">🖨 Напечатать ведомость по комментарию</button></div></div>';
+   reportsClassesWidgetHtml()+reportsPeriodWidgetHtml()+
+   '<div class="card"><h2>Общая ведомость (оценки + посещаемость)</h2><p class="muted small">Один файл на все выбранные классы и кружки: по каждому — своя таблица со всеми уроками за всё время, ученики внутри — по алфавиту, классы — по возрастанию (5 → 11). Замечания о поведении печатаются отдельным списком под таблицей каждого класса.</p>'+
+   '<div class="toolbar"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintFullReport()">🖨 Напечатать общую ведомость'+(n?' ('+n+')':'')+'</button></div></div>'+
+   '<div class="card"><h2>План уроков на четверть</h2><p class="muted small">Один файл на все выбранные классы и кружки: для каждого — своя таблица с датами, темами и домашними заданиями за период, выбранный в виджете выше. Список колонок можно настроить ниже.</p>'+reportsPlanControlsHtml()+
+   '<div class="toolbar" style="margin-top:10px"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintQuarterPlanReport()">🖨 Напечатать план на четверть'+(n?' ('+n+')':'')+'</button></div></div>'+
+   '<div class="card"><h2>Ведомость по одному уроку во всех классах</h2><p class="muted small">Например, входная контрольная прошла во всех классах, но в разные дни — укажите дату для каждого класса, и получите одну сводную ведомость с оценками, посещаемостью и замечаниями о поведении.</p>'+
+   (n?'<div class="rp-dates">'+selected.map(c=>'<div class="rp-date"><b>'+e(c.name)+'</b><input type="date" value="'+e(S.reportsLessonDates[c.id]||'')+'" onchange="setReportLessonDate(\''+c.id+'\',this.value)"></div>').join('')+'</div>':'<div class="muted small">Сначала выберите классы выше.</div>')+
+   '<div class="toolbar" style="margin-top:10px"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintLessonReport()">🖨 Напечатать ведомость по дате</button></div></div>'+
+   '<div class="card"><h2>Ведомость по комментарию</h2><p class="muted small">Ищет по фрагменту текста, регистр не важен: можно ввести часть слова, несколько слов (найдутся комментарии, где есть все они) или число баллов. Ниже сразу видно, что найдётся.</p>'+
+   '<label>Комментарий (или его часть)</label>'+commentInputHtml('report-comment',S.reportsComment||'',' style="max-width:320px" oninput="S.reportsComment=this.value;updateCommentReportPreview()"')+
+   '<div id="report-comment-preview" style="margin-top:10px">'+commentReportPreviewHtml()+'</div>'+
+   '<div class="toolbar" style="margin-top:10px"><button class="primary" '+(n?'':'disabled')+' onclick="openPrintCommentReport()">🖨 Напечатать ведомость по комментарию</button></div></div>';
 }
 function openPrintFullReport(){
  let classes=reportsDedupe(reportsSelectedClasses());
@@ -117,39 +155,49 @@ function reportsPlanResolvePeriod(){
 function setReportsPlanPeriod(v){S.reportsPlanPeriod=v;render()}
 function setReportsPlanOpt(k,v){S.reportsPlanOpts[k]=v}
 function reportsPlanControlsHtml(){
- let quarters=D.settings.quarters||[],today=toISO(new Date());
- let per=reportsPlanResolvePeriod(),o=S.reportsPlanOpts;
- let chk=(k,label)=>'<label class="attrow" style="cursor:pointer"><span>'+label+'</span><input type="checkbox" '+(o[k]?'checked':'')+' onchange="setReportsPlanOpt(\''+k+'\',this.checked)" style="width:auto"></label>';
- return (quarters.length?
-   '<label>Период</label><select onchange="setReportsPlanPeriod(this.value)">'+quarters.map(q=>'<option value="'+q.id+'"'+(per===q.id?' selected':'')+'>'+e(q.name)+' ('+fmtDate(q.startDate)+' – '+fmtDate(q.endDate)+')</option>').join('')+'<option value="custom"'+(per==='custom'?' selected':'')+'>Свой период…</option></select>'
-   :'<div class="notice">Четверти пока не настроены (Настройки → Расписание/блокировки → «Четверти учебного года») — укажите даты вручную.</div>')+
-  (per==='custom'?'<div class="rp-dates" style="margin-top:8px"><div class="rp-date"><b>С какой даты</b><input type="date" value="'+e(S.reportsPlanFrom||today)+'" onchange="S.reportsPlanFrom=this.value"></div><div class="rp-date"><b>По какую дату</b><input type="date" value="'+e(S.reportsPlanTo||today)+'" onchange="S.reportsPlanTo=this.value"></div></div>':'')+
-  '<div class="notice" style="margin-top:12px">Что включить в таблицу:</div>'+
-  chk('num','№ урока по расписанию')+chk('topic','Тема урока')+chk('hw','Домашнее задание')+chk('plan','План урока')+chk('extra','Остальные заполненные поля урока')+chk('cancelled','Включать отменённые уроки');
+  let o=S.reportsPlanOpts;
+  let visibleFields=D.settings.fields.lesson.filter(f=>f.visible);
+  let std=[
+    {k:'num',label:'№ урока по расписанию'},
+    {k:'topic',label:'Тема урока'},
+    {k:'hw',label:'Домашнее задание'},
+    {k:'plan',label:'План урока'},
+    {k:'cancelled',label:'Включать отменённые уроки'}
+  ];
+  let html='<div class="muted small" style="margin-bottom:8px">Период берётся из виджета «Период» выше — выберите четверть или укажите свои даты.</div>'+
+    '<div class="notice" style="margin-top:12px">Что включить в таблицу:</div>'+
+    std.map(x=>
+      '<label class="attrow" style="cursor:pointer;margin:0"><span>'+x.label+'</span><input type="checkbox" '+(o[x.k]?'checked':'')+' onchange="setReportsPlanOpt(\''+x.k+'\',this.checked)" style="width:auto"></label>').join('')+
+    visibleFields.map(f=>{
+      let k='f_'+f.key;
+      return '<label class="attrow" style="cursor:pointer;margin:0"><span>'+e(f.label)+'</span><input type="checkbox" '+(o[k]?'checked':'')+' onchange="setReportsPlanOpt(\''+k+'\',this.checked)" style="width:auto"></label>';
+    }).join('');
+  return html;
 }
 function quarterPlanTableHtml(c,from,to,opts){
- let ls=groupLessons(c.id).filter(l=>l.date>=from&&l.date<=to&&(opts.cancelled||!l.cancelled)).sort((a,b)=>a.date.localeCompare(b.date)||(a.lessonNumber||0)-(b.lessonNumber||0));
- if(!ls.length)return '<p class="muted">Уроков за выбранный период нет.</p>';
- let multi=ls.some(l=>l.classId!==c.id);
- let extraFields=opts.extra?D.settings.fields.lesson.filter(f=>f.visible&&!LESSON_KNOWN_KEYS.includes(f.key)&&!['ktpNumber','ktpDate','planText','homework'].includes(f.key)):[];
- let colLabels=['Дата'];
- if(multi)colLabels.push('Группа');
- if(opts.num)colLabels.push('№ урока');
- if(opts.topic)colLabels.push('Тема');
- if(opts.hw)colLabels.push('Домашнее задание');
- if(opts.plan)colLabels.push('План урока');
- extraFields.forEach(f=>colLabels.push(f.label));
- return '<table><tr>'+colLabels.map(cl=>'<th>'+e(cl)+'</th>').join('')+'</tr>'+
-  ls.map(l=>{
-   let cells=[fmtDate(l.date)+(l.cancelled?' <span class="muted">(отменён)</span>':'')];
-   if(multi)cells.push(e(C(l.classId)?C(l.classId).name:'—'));
-   if(opts.num)cells.push(l.lessonNumber||'—');
-   if(opts.topic)cells.push(e(l.topic||'—'));
-   if(opts.hw)cells.push(richTextView(lessonField(l,'homework'))||'—');
-   if(opts.plan)cells.push(richTextView(lessonField(l,'planText'))||'—');
-   extraFields.forEach(f=>{let v=lessonField(l,f.key);cells.push(v?richTextView(v):'—')});
-   return '<tr>'+cells.map(v=>'<td>'+v+'</td>').join('')+'</tr>';
-  }).join('')+'</table>';
+  let ls=groupLessons(c.id).filter(l=>l.date>=from&&l.date<=to&&(opts.cancelled||!l.cancelled)).sort((a,b)=>a.date.localeCompare(b.date)||(a.lessonNumber||0)-(b.lessonNumber||0));
+  if(!ls.length)return '<p class="muted">Уроков за выбранный период нет.</p>';
+  let multi=ls.some(l=>l.classId!==c.id);
+  let visibleFields=D.settings.fields.lesson.filter(f=>f.visible);
+  let extraFields=visibleFields.filter(f=>opts['f_'+f.key]);
+  let colLabels=['Дата'];
+  if(multi)colLabels.push('Группа');
+  if(opts.num)colLabels.push('№ урока');
+  if(opts.topic)colLabels.push('Тема');
+  if(opts.hw)colLabels.push('Домашнее задание');
+  if(opts.plan)colLabels.push('План урока');
+  extraFields.forEach(f=>colLabels.push(f.label));
+  return '<table><tr>'+colLabels.map(cl=>'<th>'+e(cl)+'</th>').join('')+'</tr>'+
+   ls.map(l=>{
+    let cells=[fmtDate(l.date)+(l.cancelled?' <span class="muted">(отменён)</span>':'')];
+    if(multi)cells.push(e(C(l.classId)?C(l.classId).name:'—'));
+    if(opts.num)cells.push(l.lessonNumber||'—');
+    if(opts.topic)cells.push(e(l.topic||'—'));
+    if(opts.hw)cells.push(richTextView(lessonField(l,'homework'))||'—');
+    if(opts.plan)cells.push(richTextView(lessonField(l,'planText'))||'—');
+    extraFields.forEach(f=>{let v=lessonField(l,f.key);cells.push(v?richTextView(v):'—')});
+    return '<tr>'+cells.map(v=>'<td>'+v+'</td>').join('')+'</tr>';
+   }).join('')+'</table>';
 }
 function openPrintQuarterPlanReport(){
  let classes=reportsDedupe(reportsSelectedClasses());

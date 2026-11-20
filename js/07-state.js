@@ -5,7 +5,7 @@ let S={view:'home',classId:null,studentId:null,tab:'lessons',q:'',weekStart:mond
  chartPeriods:{student:{period:'all',from:'',to:''},class:{period:'all',from:'',to:''}},
  recentFilter:{classId:'',status:'',sort:'date_desc',limit:10},
  workTab:'meetings',selectedStudentIds:new Set(),libraryClassFilter:'',
- reportsSelClasses:new Set(),reportsLessonDates:{},reportsPlanPeriod:'',reportsPlanFrom:'',reportsPlanTo:'',reportsPlanOpts:{num:true,topic:true,hw:true,plan:false,extra:false,cancelled:false},reportsComment:'',reportsIncludeHomeschool:true,classPrintIncludeHomeschool:true};
+ reportsSelClasses:new Set(),reportsLessonDates:{},reportsPlanPeriod:'',reportsPlanFrom:'',reportsPlanTo:'',reportsPlanOpts:{num:false,topic:true,hw:true,plan:false,cancelled:false},reportsComment:'',reportsIncludeHomeschool:true,classPrintIncludeHomeschool:true};
 
 function resolvePeriodRange(periodKey,customFrom,customTo){
  let today=toISO(new Date());
