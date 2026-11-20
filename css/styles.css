@@ -14,6 +14,8 @@
   --shadow-card:0 18px 48px rgb(20 33 61 / .12);
   --radius:10px;
   --radius-sm:6px;
+  --muted:var(--color-text-secondary);
+  --ink:var(--color-text-primary);
   --gutter:clamp(20px,5vw,56px);
   --max:1200px;
   --header-h:60px;
@@ -37,6 +39,8 @@ html.dark{
   --color-warn:#e5a921;
   --header-bg:rgb(8 9 11 / .82);
   --shadow-card:0 18px 48px rgb(0 0 0 / .24);
+  --muted:var(--color-text-secondary);
+  --ink:var(--color-text-primary);
   color-scheme:dark
 }
 *,::before,::after{box-sizing:border-box}

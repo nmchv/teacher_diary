@@ -100,7 +100,7 @@ function statsPage(){
    mstat(behaviorCount,'Заметок о поведении')+
   '</div></div>'+
   statsAssistantCard()+
-  '<div class="card"><h2 style="margin-top:0">Распределение оценок <span class="muted small">(нажмите на столбец, чтобы увидеть кому и когда)</span></h2>'+svgBarChart(gradeDistData(distVals,scope,scopeId,r.from,r.to),{width:900,height:260})+'</div>'+
+  '<div class="card"><h2 style="margin-top:0">Распределение оценок <span class="muted small">нажмите на столбец, чтобы увидеть кому и когда</span></h2>'+svgBarChart(gradeDistData(distVals,scope,scopeId,r.from,r.to),{width:900,height:260})+'</div>'+
   '<div class="card"><h2 style="margin-top:0">Посещаемость <span class="muted small">(нажмите, чтобы увидеть кто и когда пропускал)</span></h2>'+donutChartPct(attPct,140,"showAttendanceBreakdown('"+scope+"','"+scopeId+"','"+r.from+"','"+r.to+"')")+'</div>'+
   behaviorLeaderboardCard()+
   statsClassesCard()+statsStudentsCard();
