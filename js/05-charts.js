@@ -8,13 +8,13 @@ function svgBarChart(data,opts){
  let bars=data.map((d,i)=>{
   let bh=max?Math.round((d.value/max)*(h-pad*2)):0;
   let bwid=bw*0.62,x=pad+i*bw+(bw-bwid)/2,y=h-pad-bh;
-  let clickable=d.onclick&&d.value>0;
-  return (clickable?'<g onclick="'+d.onclick+'" style="cursor:pointer">':'<g>')+
-   (clickable?'<rect x="'+x.toFixed(1)+'" y="'+pad+'" width="'+bwid.toFixed(1)+'" height="'+(h-pad*2)+'" fill="transparent"><title>Показать подробности</title></rect>':'')+
-   '<rect x="'+x.toFixed(1)+'" y="'+y+'" width="'+bwid.toFixed(1)+'" height="'+bh+'" fill="'+(d.color||'var(--accent)')+'" rx="4"></rect>'+
-   '<text x="'+(x+bwid/2).toFixed(1)+'" y="'+(h-pad+16)+'" text-anchor="middle" font-size="11" fill="var(--muted)">'+e(d.label)+'</text>'+
-   (d.value?'<text x="'+(x+bwid/2).toFixed(1)+'" y="'+(y-5)+'" text-anchor="middle" font-size="11" fill="var(--ink)">'+d.value+'</text>':'')+
-   '</g>';
+let clickable=d.onclick&&d.value>0;
+   return (clickable?'<g onclick="'+d.onclick+'" style="cursor:pointer">':'<g>')+
+    (clickable?'<rect x="'+x.toFixed(1)+'" y="'+pad+'" width="'+bwid.toFixed(1)+'" height="'+(h-pad*2)+'" fill="transparent"><title>Показать подробности</title></rect>':'')+
+    '<rect class="bar" x="'+x.toFixed(1)+'" y="'+y+'" width="'+bwid.toFixed(1)+'" height="'+bh+'" fill="'+(d.color||'var(--accent)')+'" rx="4"><animate attributeName="height" from="0" to="'+bh+'" dur="0.5s" begin="'+(i*0.06)+'s" calcMode="spline" keyTimes="0;1" keySplines="0.42 0 0.58 1"/><animate attributeName="y" from="'+(h-pad)+'" to="'+y+'" dur="0.5s" begin="'+(i*0.06)+'s" calcMode="spline" keyTimes="0;1" keySplines="0.42 0 0.58 1"/></rect>'+
+    '<text x="'+(x+bwid/2).toFixed(1)+'" y="'+(h-pad+16)+'" text-anchor="middle" font-size="11" fill="var(--muted)">'+e(d.label)+'</text>'+
+    (d.value?'<text x="'+(x+bwid/2).toFixed(1)+'" y="'+(y-5)+'" text-anchor="middle" font-size="11" fill="var(--ink)">'+d.value+'</text>':'')+
+    '</g>';
  }).join('');
  return '<svg viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'" style="width:100%;max-width:'+w+'px;height:auto"><line x1="'+pad+'" y1="'+(h-pad)+'" x2="'+(w-pad)+'" y2="'+(h-pad)+'" stroke="var(--border)"/>'+bars+'</svg>';
 }
