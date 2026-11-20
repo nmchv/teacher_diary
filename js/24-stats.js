@@ -239,9 +239,13 @@ function leaderboardCardHtml(title,rows,type,wide){
   if(wide){
    return '<div class="lb-row"><div class="lb-pos">'+(i+1)+'</div><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+cls+'</div><div class="lb-val">'+val+'</div></div>'
   }
-  return '<div class="lb-row small"><div class="lb-pos">'+(i+1)+'</div><div class="lb-info"><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+cls+'</div></div><div class="lb-val">'+val+'</div></div>'
+  return '<div class="lb-row small"><div class="lb-info"><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+studentRegularClasses(r.s)+'</div></div><div class="lb-val">'+val+'</div></div>'
  }).join('');
  return '<div class="lb-card'+wc+'"><div class="lb-title">'+title+'</div><div class="lb-list">'+items+'</div></div>';
+}
+function studentRegularClasses(s){
+ let cs=(s.classIds||[]).map(id=>C(id)).filter(Boolean).filter(c=>c.type!=='club');
+ return cs.length?cs.map(c=>c.name).join(', '):'—';
 }
 function openClass(id){S.view='class';S.classId=id;S.tab='lessons';render()}
 function studentInitials(s){return ((s.lastName||'')[0]||'')+((s.firstName||'')[0]||'')}
