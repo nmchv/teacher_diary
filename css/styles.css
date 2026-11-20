@@ -229,6 +229,17 @@ html.dark .fieldrow{border-bottom-color:rgba(255,255,255,.06)}
 .wta-save{padding:6px 14px;font-size:14px;min-width:110px}
 .wta-ask{padding:6px 14px;font-size:14px}
 .wta-reroll{padding:6px 14px;font-size:14px;flex:0 0 auto}
+
+.pga-card{padding:10px 14px}
+.pga-card h3{font-size:14px;margin-bottom:8px}
+.pga-row{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.pga-label{font-size:13px;font-weight:600;color:var(--color-text-secondary)}
+.pga-row select,.pga-row input{font-size:14px;padding:6px 8px;min-height:auto;width:auto;max-width:none}
+.pga-points{display:flex;gap:6px;align-items:center}
+.pga-points input{width:80px;flex:0 0 80px}
+.pga-points span{font-size:13px;color:var(--color-text-secondary)}
+.pga-toolbar{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+.pga-save{padding:6px 14px;font-size:14px;min-width:110px}
 .meeting-chip{font-size:11px;background:rgb(229 169 33 / .15);border-radius:var(--radius);padding:3px 5px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--color-warn)}
 .meeting-chip:hover{filter:brightness(.95)}
 th.today-col,td.today-col{background:rgb(91 141 239 / .1)}
