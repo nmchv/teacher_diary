@@ -224,19 +224,20 @@ function studentsLeaderboardCard(){
   parallelCards.push(leaderboardCardHtml('Параллель '+g+' — лучшие',top,'avg'));
  });
  return '<div class="card"><div class="top"><h2 style="margin:0 0 10px">Рейтинг учеников</h2></div>'+
-  leaderboardCardHtml('Высокие средние баллы (все классы)',topAll,'avg')+
-  leaderboardCardHtml('Низкие средние баллы',lowAll,'avg')+
-  leaderboardCardHtml('Низкая посещаемость',lowAtt,'att')+
-  '<div class="lb-row-wrap">'+parallelCards.join('')+'</div>'+
+   leaderboardCardHtml('Высокие средние баллы (все классы)',topAll,'avg',true)+
+   leaderboardCardHtml('Низкие средние баллы',lowAll,'avg',true)+
+   leaderboardCardHtml('Низкая посещаемость',lowAtt,'att',true)+
+   '<div class="lb-row-wrap">'+parallelCards.join('')+'</div>'+
   '</div>';
 }
-function leaderboardCardHtml(title,rows,type){
+function leaderboardCardHtml(title,rows,type,wide){
  if(!rows.length)return '';
+ let wc=wide?' lb-card-wide':'';
  let items=rows.map((r,i)=>{
   let val=type==='att'?(r.attendancePct===null?'—':r.attendancePct+'%'):round2(r.avgGrade);
   return '<div class="lb-row"><div class="lb-pos">'+(i+1)+'</div><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+e(studentClassNames(r.s))+'</div><div class="lb-val">'+val+'</div></div>'
  }).join('');
- return '<div class="lb-card"><div class="lb-title">'+title+'</div><div class="lb-list">'+items+'</div></div>';
+  return '<div class="lb-card'+wc+'"><div class="lb-title">'+title+'</div><div class="lb-list">'+items+'</div></div>';
 }
 function openClass(id){S.view='class';S.classId=id;S.tab='lessons';render()}
 function studentInitials(s){return ((s.lastName||'')[0]||'')+((s.firstName||'')[0]||'')}

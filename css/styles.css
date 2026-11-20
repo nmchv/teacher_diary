@@ -524,6 +524,7 @@ html.dark .att-dark{display:block}
 
 /* ---- Статистика: рейтинг учеников (карточки) ---- */
 .lb-card{border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);margin-bottom:10px;overflow:hidden;max-width:260px}
+.lb-card-wide{max-width:none;width:100%}
 .lb-title{padding:10px 14px;font-weight:600;font-size:14px;border-bottom:1px solid var(--color-border);background:var(--color-surface-elevated)}
 .lb-list{display:flex;flex-direction:column;gap:6px;padding:8px 12px}
 .lb-row{display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px solid rgba(0,0,0,.03)}
