@@ -235,6 +235,8 @@ html.dark .fieldrow{border-bottom-color:rgba(255,255,255,.06)}
 .pga-row{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
 .pga-label{font-size:13px;font-weight:600;color:var(--color-text-secondary)}
 .pga-row select,.pga-row input{font-size:14px;padding:6px 8px;min-height:auto;width:auto;max-width:none}
+.pga-grade-wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pga-grade-wrap input#pg-grade{width:80px;flex:0 0 80px}
 .pga-points{display:flex;gap:6px;align-items:center}
 .pga-points input{width:80px;flex:0 0 80px}
 .pga-points span{font-size:13px;color:var(--color-text-secondary)}

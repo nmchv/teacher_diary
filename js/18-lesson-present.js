@@ -129,8 +129,7 @@ function presentGradeForm(l){
  if(!ps.length)return'';
  return '<div class="card pga-card"><h3 style="margin-top:0">Выставить оценку</h3>'+
   '<div class="pga-row"><label class="pga-label">Ученик</label><select id="pg-student">'+ps.map(s=>'<option value="'+s.id+'">'+e(presentNamePlain(s))+((l.grades||{})[s.id]?' — уже: '+gradeText(l.grades[s.id]):'')+'</option>').join('')+'</select></div>'+
-  '<div class="pga-row"><label class="pga-label">Оценка</label>'+gradeInputHtml('pg-grade','')+'</div>'+
-  '<div class="pga-row"><label class="pga-label">Баллы (необязательно)</label><div class="pga-points"><input id="pg-points" inputmode="decimal" placeholder="баллы" style="width:80px"><span>из</span><input id="pg-max" inputmode="decimal" placeholder="макс." value="'+e(l.gradeMax?fmtPts(l.gradeMax):'')+'" style="width:80px"></div></div>'+
+  '<div class="pga-row"><label class="pga-label">Оценка</label><div class="pga-grade-wrap">'+gradeInputHtml('pg-grade','')+'<div class="pga-points"><input id="pg-points" inputmode="decimal" placeholder="баллы" style="width:80px"><span>из</span><input id="pg-max" inputmode="decimal" placeholder="макс." value="'+e(l.gradeMax?fmtPts(l.gradeMax):'')+'" style="width:80px"></div></div></div>'+
   '<div class="pga-row"><label class="pga-label">Комментарий</label><input id="pg-comment" placeholder="Необязательно"></div>'+
   '<div class="pga-toolbar"><button class="pga-save" onclick="savePresentGrade(\''+l.id+'\')">Сохранить оценку</button></div>'+
   '</div>';
