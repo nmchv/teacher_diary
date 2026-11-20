@@ -523,7 +523,7 @@ html.dark .att-dark{display:block}
 .stats-classes-table td:nth-child(n+2){text-align:center}
 
 /* ---- Статистика: рейтинг учеников (карточки) ---- */
-.lb-card{border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);margin-bottom:10px;overflow:hidden}
+.lb-card{border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);margin-bottom:10px;overflow:hidden;max-width:260px}
 .lb-title{padding:10px 14px;font-weight:600;font-size:14px;border-bottom:1px solid var(--color-border);background:var(--color-surface-elevated)}
 .lb-list{display:flex;flex-direction:column;gap:6px;padding:8px 12px}
 .lb-row{display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px solid rgba(0,0,0,.03)}
@@ -533,3 +533,4 @@ html.dark .lb-row{border-bottom-color:rgba(255,255,255,.03)}
 .lb-name{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lb-cls{font-size:12px;color:var(--color-text-secondary);white-space:nowrap;flex-shrink:0}
 .lb-val{font-weight:700;color:var(--color-accent);flex-shrink:0;min-width:40px;text-align:right}
+.lb-row-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:10px 12px;max-height:340px;overflow-y:auto}

@@ -206,18 +206,28 @@ function studentsLeaderboardCard(){
  let topAll=[...rows].filter(x=>x.avgGrade!==null).sort((a,b)=>(b.avgGrade||0)-(a.avgGrade||0)).slice(0,3);
  let lowAll=[...rows].filter(x=>x.avgGrade!==null).sort((a,b)=>(a.avgGrade||0)-(b.avgGrade||0)).slice(0,3);
  let lowAtt=[...rows].filter(x=>x.attendancePct!==null).sort((a,b)=>(a.attendancePct||0)-(b.attendancePct||0)).slice(0,3);
- let classes=D.classes.filter(c=>!f.classId||c.id===f.classId);
- let classCards=classes.map(c=>{
-  let crows=rows.filter(x=>(x.s.classIds||[]).includes(c.id)&&x.avgGrade!==null);
-  if(!crows.length)return null;
-  let top=[...crows].sort((a,b)=>(b.avgGrade||0)-(a.avgGrade||0)).slice(0,3);
-  return leaderboardCardHtml('«'+e(c.name)+'» — лучшие по среднему',top,'avg');
- }).filter(Boolean).join('');
+ let parallels={};
+ D.classes.filter(c=>c.type!=='club').forEach(c=>{
+  let m=c.name.match(/^(\d+)/);
+  if(!m)return;
+  let g=m[1];
+  if(!parallels[g])parallels[g]=[];
+  parallels[g].push(c);
+ });
+ let parallelCards=[];
+ Object.keys(parallels).sort((a,b)=>+a-+b).forEach(g=>{
+  let cls=parallels[g];
+  let clsIds=cls.map(c=>c.id);
+  let brows=rows.filter(x=>(x.s.classIds||[]).some(i=>clsIds.includes(i))&&x.avgGrade!==null);
+  if(!brows.length)return;
+  let top=[...brows].sort((a,b)=>(b.avgGrade||0)-(a.avgGrade||0)).slice(0,3);
+  parallelCards.push(leaderboardCardHtml('Параллель '+g+' — лучшие',top,'avg'));
+ });
  return '<div class="card"><div class="top"><h2 style="margin:0 0 10px">Рейтинг учеников</h2></div>'+
   leaderboardCardHtml('Высокие средние баллы (все классы)',topAll,'avg')+
   leaderboardCardHtml('Низкие средние баллы',lowAll,'avg')+
   leaderboardCardHtml('Низкая посещаемость',lowAtt,'att')+
-  classCards+
+  '<div class="lb-row-wrap">'+parallelCards.join('')+'</div>'+
   '</div>';
 }
 function leaderboardCardHtml(title,rows,type){
