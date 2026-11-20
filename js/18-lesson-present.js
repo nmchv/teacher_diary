@@ -26,7 +26,7 @@ function widgetWhoToAsk(cls,lessonId){
  let done=x=>l0&&(((l0.grades||{})[x.id])||((l0.asked||{})[x.id]));
  let ps=all.filter(x=>!done(x));
  if(!ps.length)return '<div class="card"><h3 style="margin-top:0">Кого спросить сегодня</h3><div class="muted small">Все присутствующие уже спрошены на этом уроке ✓</div></div>';
- let withData=ps.map(x=>({s:x,gradesCount:studentGradesCountForClass(x.id,cls.id),lastAsked:x.lastAskedAt||'0000-01-01'}));
+ let withData=ps.map(s=>{let g=studentGradedLessonsForClass(s.id,cls.id);let last=g.length?g[g.length-1]:null;return {s:s,gradesCount:g.length,lastAsked:last?last.date:'0000-01-01'}});
  let byGrades=[...withData].sort((a,b)=>a.gradesCount-b.gradesCount||a.lastAsked.localeCompare(b.lastAsked));
  let reqA=byGrades[0];
  let byAsked=[...withData].filter(x=>x.s.id!==reqA.s.id).sort((a,b)=>a.lastAsked.localeCompare(b.lastAsked)||a.gradesCount-b.gradesCount);
@@ -36,25 +36,27 @@ function widgetWhoToAsk(cls,lessonId){
  let randomPick=rest.find(x=>x.s.id===S.askRandom[lessonId])||null;
  if(!randomPick&&rest.length){randomPick=rest[Math.floor(Math.random()*rest.length)];S.askRandom[lessonId]=randomPick.s.id}
  if(!randomPick)delete S.askRandom[lessonId];
- function row(item,label,reroll){
+ function statsHtml(sid){
+  let qs=D.settings.quarters||[],today=toISO(new Date());
+  let q=qs.find(x=>x.startDate<=today&&today<=x.endDate);
+  let lessons=studentGradedLessonsForClass(sid,cls.id);
+  if(q)lessons=lessons.filter(l=>l.date>=q.startDate&&l.date<=q.endDate);
+  let vals=lessons.map(l=>gradeNumericValue((l.grades||{})[sid].value)).filter(v=>v!==null);
+  let avg=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2).replace('.',','):'—';
+  let last=lessons.slice(-3).map(x=>{let v=(x.grades||{})[sid];return e(v&&v.value!==''&&v.value!=null?v.value:gradePointsText(v));}).join(', ');
+  return'<span class="wta-count muted small">Оценок: '+lessons.length+'</span>'+(avg!=='—'?'<span class="wta-avg muted small">· Ср. балл: '+avg+'</span>':'')+(last?'<span class="wta-recent muted small">· Последние: '+last+'</span>':'');
+ }
+ function studentRow(item,label,canReroll){
   if(!item)return'';
   let sid=item.s.id;
-  let graded=studentGradedLessonsForClass(sid,cls.id);
-  let recent=graded.slice(-4).map(x=>e(x.grades[sid].value!==''&&x.grades[sid].value!=null?x.grades[sid].value:gradePointsText(x.grades[sid]))).join(', ');
   let args='\''+sid+'\',\''+lessonId+'\'';
-  return '<div style="padding:9px 0;border-bottom:1px solid var(--border)">'+
-   '<div style="display:flex;justify-content:space-between;gap:6px"><span title="'+e(studentFioPlain(item.s))+'"><b>'+presentName(item.s)+'</b> <span class="muted small">· '+label+'</span></span>'+(reroll?'<button title="Выбрать другого" onclick="S.askRandom[\''+lessonId+'\']=null;renderPresentMode()">🔄</button>':'')+'</div>'+
-   '<div class="muted small">Оценок по предмету: '+graded.length+(recent?' · последние: '+recent:'')+'</div>'+
-   '<div class="row" style="margin-top:6px;gap:6px;flex-wrap:wrap">'+gradeInputHtml('wa-g-'+sid,'')+
-   '<input id="wa-c-'+sid+'" placeholder="Комментарий" style="flex:1;min-width:110px" onkeydown="if(event.key===\'Enter\')saveWhoGrade('+args+')">'+
-   '<button class="primary" onclick="saveWhoGrade('+args+')">Поставить</button>'+
-   '<button title="Спросил(а), без оценки" onclick="markWhoAsked('+args+')">без оценки</button>'+
-   '<button title="Оценка с баллами" onclick="openQuickGradePopup('+args+')">⋯</button></div></div>';
+  let rerollBtn=canReroll?'<button class="wta-reroll" title="Сменить ученика" onclick="S.askRandom[\''+lessonId+'\']=null;renderPresentMode()">↻ сменить</button>':'';
+  return '<div class="wta-student"><div class="wta-head"><span class="wta-name" title="'+e(studentFioShort(item.s))+'">'+e(studentFioShort(item.s))+'</span><span class="wta-label muted small">· '+label+'</span></div><div class="wta-stats">'+statsHtml(sid)+'</div><div class="wta-form">'+gradeInputHtml('wa-g-'+sid,'')+'<input id="wa-c-'+sid+'" placeholder="Комментарий…" style="flex:1;min-width:160px" onkeydown="if(event.key===\'Enter\')saveWhoGrade('+args+')"></div><div class="wta-actions"><button class="wta-save" onclick="saveWhoGrade('+args+')">✓ Выставить</button><button class="wta-ask" title="Спросил(а), без оценки" onclick="markWhoAsked('+args+')">Без оценки</button>'+rerollBtn+'</div></div>';
  }
  return '<div class="card"><h3 style="margin-top:0">Кого спросить сегодня</h3>'+
-  row(reqA,'меньше всего оценок')+
-  (reqB?row(reqB,reqB.lastAsked!=='0000-01-01'?'давно не спрашивали (с '+fmtDate(reqB.lastAsked)+')':'ни разу не отмечен(а) как спрошен(а)'):'')+
-  (randomPick?row(randomPick,'случайный вариант',true):'')+
+  studentRow(reqA,'меньше всего оценок')+
+  (reqB?studentRow(reqB,reqB.lastAsked!=='0000-01-01'?'давно не спрашивали ('+fmtDate(reqB.lastAsked)+')':'давно не спрашивали (без оценок)'):'')+
+  (randomPick?studentRow(randomPick,'случайный вариант',true):'')+
   '</div>';
 }
 function saveWhoGrade(sid,lessonId){
@@ -155,7 +157,7 @@ function togglePresentAttendance(lessonId,sid,btn){
  }
  l.attendance[sid]=nv;
  save();
- renderPresentMode();
+ if(btn){btn.textContent=nv;btn.className='attbtn '+(nv==='н'?'absent':'present');}
 }
 function getStudentPoints(sid,classId){let s=P(sid);return (s&&s.pointsByClass&&s.pointsByClass[classId])||0}
 function addStudentPoint(sid,classId,delta){

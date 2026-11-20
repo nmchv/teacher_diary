@@ -120,7 +120,7 @@ function renderPresentMode(){
  let extra=extraLessonFieldsView(l);
  let reminderText=presentReminderHtml(l);
  let kind=(cls&&cls.type==='club')?'club':'lesson';
- let layout=D.settings[presentLayoutKey(kind)]||{left:['plan','extra','homework'],right:['whoToAsk','grade','attendance','points','behavior','seating']};
+ let layout=D.settings[presentLayoutKey(kind)]||{left:['plan','extra','homework'],right:['attendance','whoToAsk','grade','points','behavior','seating']};
  box.innerHTML='<div class="present-overlay"><div class="present-top">'+
    '<div><h1 style="margin-bottom:2px">'+e(l.topic||'Урок без темы')+'</h1><div class="muted">'+e(cls?cls.name:'—')+' · '+fmtDate(l.date)+(l.lessonNumber?' · '+l.lessonNumber+'-й урок':'')+'</div></div>'+
    '<div style="display:flex;align-items:center;gap:16px"><div><div id="present-clock" class="present-clock">'+fmtPresentClock(new Date())+'</div><div class="muted small present-time-info">'+fmtClockDate(new Date())+'</div><div id="present-time-info" class="muted small present-time-info">'+presentTimeInfoText(l)+'</div></div><button onclick="openPresentLayoutConfig()" title="Настроить расположение блоков">⚙</button><button class="danger" onclick="closeLessonPresent()">Завершить</button></div>'+
