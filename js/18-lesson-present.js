@@ -50,12 +50,12 @@ function widgetWhoToAsk(cls,lessonId){
   if(!item)return'';
   let sid=item.s.id;
   let args='\''+sid+'\',\''+lessonId+'\'';
-  let rerollBtn=canReroll?'<button class="wta-reroll" title="Сменить ученика" onclick="S.askRandom[\''+lessonId+'\']=null;renderPresentMode()">↻ сменить</button>':'';
+  let rerollBtn=canReroll?'<button class="wta-reroll" title="Сменить ученика" onclick="S.askRandom[\''+lessonId+'\']=null;renderPresentMode()">↻ Сменить</button>':'';
   return '<div class="wta-student"><div class="wta-head"><span class="wta-name" title="'+e(studentFioShort(item.s))+'">'+e(studentFioShort(item.s))+'</span><span class="wta-label muted small">· '+label+'</span></div><div class="wta-stats">'+statsHtml(sid)+'</div><div class="wta-form">'+gradeInputHtml('wa-g-'+sid,'')+'<input id="wa-c-'+sid+'" placeholder="Комментарий…" style="flex:1;min-width:160px" onkeydown="if(event.key===\'Enter\')saveWhoGrade('+args+')"></div><div class="wta-actions"><button class="wta-save" onclick="saveWhoGrade('+args+')">✓ Выставить</button><button class="wta-ask" title="Спросил(а), без оценки" onclick="markWhoAsked('+args+')">Без оценки</button>'+rerollBtn+'</div></div>';
  }
  return '<div class="card"><h3 style="margin-top:0">Кого спросить сегодня</h3>'+
   studentRow(reqA,'меньше всего оценок')+
-  (reqB?studentRow(reqB,reqB.lastAsked!=='0000-01-01'?'давно не спрашивали ('+fmtDate(reqB.lastAsked)+')':'давно не спрашивали (без оценок)'):'')+
+  (reqB?studentRow(reqB,reqB.lastAsked!=='0000-01-01'?'давно не спрашивали ('+fmtDate(reqB.lastAsked).slice(0,5)+')':'давно не спрашивали (без оценок)'):'')+
   (randomPick?studentRow(randomPick,'случайный вариант',true):'')+
   '</div>';
 }

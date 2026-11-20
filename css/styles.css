@@ -219,15 +219,17 @@ html.dark .fieldrow{border-bottom-color:rgba(255,255,255,.06)}
 .wta-student:last-child{border-bottom:none}
 .wta-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
 .wta-name{font-weight:600;font-size:14px}
-.wta-label{font-size:13px}
-.wta-stats{font-size:13px;color:var(--color-text-secondary);margin-bottom:6px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.wta-count,.wta-avg,.wta-recent{white-space:nowrap}
+.wta-label{font-size:13px;text-align:right;flex:1}
+.wta-stats{font-size:13px;color:var(--color-text-secondary);margin-bottom:6px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;width:100%}
+.wta-count{flex:1;text-align:left}
+.wta-avg{flex:1;text-align:center}
+.wta-recent{flex:1;text-align:right}
 .wta-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
 .wta-form input{font-size:14px;padding:6px 8px;min-height:auto}
 .wta-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .wta-save{padding:6px 14px;font-size:14px;min-width:110px}
 .wta-ask{padding:6px 14px;font-size:14px}
-.wta-reroll{padding:4px 10px;font-size:12px;flex:0 0 auto}
+.wta-reroll{padding:6px 14px;font-size:14px;flex:0 0 auto}
 .meeting-chip{font-size:11px;background:rgb(229 169 33 / .15);border-radius:var(--radius);padding:3px 5px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--color-warn)}
 .meeting-chip:hover{filter:brightness(.95)}
 th.today-col,td.today-col{background:rgb(91 141 239 / .1)}
