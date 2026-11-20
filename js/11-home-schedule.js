@@ -110,11 +110,46 @@ function openWeatherDetail(){
 }
 function widgetSchedule(){
  let dates=weekDates(S.weekStart);
- let title=fmtDateShort(dates[0])+' – '+fmtDateShort(dates[dates.length-1])+' '+new Date(dates[dates.length-1]+'T12:00:00').getFullYear();
- return '<div class="card">'+
-   '<div class="weeknav"><button onclick="shiftWeek(-1)">‹ Предыдущая неделя</button><span class="wk-title">'+title+'</span><button onclick="shiftWeek(1)">Следующая неделя ›</button><button onclick="curWeek()">Текущая неделя</button></div>'+
-   scheduleTable(dates)+
-  '</div>';
+ let todayStr=toISO(new Date());
+ let now=new Date();
+ let nowMinutes=now.getHours()*60+now.getMinutes();
+ let todayIndex=dates.indexOf(todayStr);
+ let head='';
+ dates.forEach((d,i)=>{
+  let isToday=i===todayIndex;
+  head+='<div class="ws-dayhead'+(isToday?' ws-today':'')+'">'+DAY_NAMES[i]+' '+fmtDateShort(d)+(isToday?'<span class="ws-badge">СЕГОДНЯ</span>':'')+'</div>';
+ });
+ let body='';
+ LESSON_TIMES.forEach(t=>{
+  let endMin=timeToMin(t.end);
+  body+='<div class="ws-time"><div class="ws-num">'+t.n+'</div><div class="ws-times"><span class="ws-start">'+t.start+'</span><span class="ws-end">'+t.end+'</span></div></div>';
+  dates.forEach((d,i)=>{
+   let isToday=i===todayIndex;
+   let isPast=(d<todayStr)||(isToday&&nowMinutes>=endMin);
+   let blk=findBlock(d,t.n);
+   if(blk){body+='<div class="ws-cell ws-blocked" title="'+e(blk.reason)+'">'+e(blk.reason).toUpperCase()+'</div>';return}
+   let l=activeLessons().find(x=>x.date===d&&+x.lessonNumber===t.n);
+   if(l){
+    let st=lessonStatus(l);let cls=C(l.classId);
+    let flags=(l.flagPractice?'🧪':'')+(l.flagTest?'📝':'');
+    let cake=(isToday&&d===todayStr&&classHasBirthdayToday(l.classId))?' 🎂':'';
+    body+='<div class="ws-cell ws-st-'+st+(isToday?' ws-today-cell':'')+' click" onclick="openLessonModal(\''+l.id+'\')">'+
+     '<div class="ws-cls">'+e(cls?cls.name:'—')+(flags?' '+flags:'')+cake+'</div>'+
+     '<div class="ws-topic">'+(l.cancelled?'🚫 Отменён':e(l.topic||'(без темы)'))+'</div>'+
+    '</div>';
+    return
+   }
+   body+='<div class="ws-cell ws-empty click" onclick="quickCreateLesson(\''+d+'\','+t.n+')">+</div>';
+  });
+ });
+ return '<div class="card ws-card">'+
+  '<div class="ws-head"><h2 style="margin:0">Расписание недели</h2><button class="ws-open" onclick="goto(\'fullschedule\')">Всё расписание →</button></div>'+
+  '<div class="ws-nav"><button class="ws-arrow" onclick="shiftWeek(-1)">‹</button><span class="ws-title">'+fmtDateShort(dates[0])+' — '+fmtDateShort(dates[dates.length-1])+'</span><button class="ws-arrow" onclick="shiftWeek(1)">›</button><button class="ws-arrow ws-today" onclick="curWeek()">Сегодня</button></div>'+
+   '<div class="ws-grid" style="grid-template-columns:56px repeat('+dates.length+',1fr);gap:6px">'+
+   '<div class="ws-headcell">№</div>'+head+
+   body+
+  '</div>'+
+ '</div>';
 }
 function fullSchedulePage(){
  let dates=weekDates(S.weekStart);
