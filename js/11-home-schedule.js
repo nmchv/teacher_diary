@@ -156,32 +156,30 @@ function confirmBulkCreateWeek(){
  alert('Создано пустых уроков: '+created+(skipped.length?'.\nПропущено:\n'+skipped.join('\n'):''));
  render();
 }
-function widgetStats(){
- let planned=activeLessons().filter(l=>lessonStatus(l)==='red').length;
- let done=activeLessons().filter(l=>lessonStatus(l)==='green').length;
- let needsWork=activeLessons().filter(l=>lessonStatus(l)==='blue').length;
- return '<div class="grid">'+stat(D.classes.length,'Классов')+stat(D.students.filter(s=>s.status!=='archived').length,'Учеников')+
-  stat(D.lessons.length,'Всего уроков')+stat(done,'🟢 Заполнено')+stat(needsWork,'🔵 Нужна рефлексия')+stat(planned,'🔴 Не подготовлено')+'</div>';
-}
 function widgetTasks(){
- S.homeTaskFilter=S.homeTaskFilter||{priority:'',status:'open',sort:'due'};
- let f=S.homeTaskFilter;
- let items=D.workTasks.filter(t=>(!f.priority||t.priority===f.priority)&&(f.status==='open'?t.status!=='done':f.status==='done'?t.status==='done':true));
- let sorters={
-  due:(a,b)=>(a.dueDate||'9999-99-99').localeCompare(b.dueDate||'9999-99-99'),
-  priority:(a,b)=>({high:0,med:1,low:2}[b.priority||'med'])-({high:0,med:1,low:2}[a.priority||'med']),
-  title:(a,b)=>a.title.localeCompare(b.title,'ru')
- };
- items=[...items].sort(sorters[f.sort]||sorters.due);
- let today=toISO(new Date());
- return '<div class="card"><div class="top"><h2 style="margin-top:0">✅ Задачи</h2><a href="#" class="small" onclick="event.preventDefault();S.view=\'work\';S.workTab=\'tasks\';render()">Все задачи →</a></div>'+
-  '<div class="row" style="margin-bottom:8px"><input id="todo-input" placeholder="Новая задача..." onkeydown="if(event.key===\'Enter\'){event.preventDefault();addQuickTask()}"><button class="primary" style="flex:0" onclick="addQuickTask()">Добавить</button></div>'+
-  '<div class="toolbar" style="margin-bottom:8px">'+
-   '<select onchange="S.homeTaskFilter.status=this.value;render()"><option value="open"'+(f.status==='open'?' selected':'')+'>Незавершённые</option><option value="done"'+(f.status==='done'?' selected':'')+'>Завершённые</option><option value="all"'+(f.status==='all'?' selected':'')+'>Все</option></select>'+
-   '<select onchange="S.homeTaskFilter.priority=this.value;render()"><option value="">Любой приоритет</option><option value="high"'+(f.priority==='high'?' selected':'')+'>Высокий</option><option value="med"'+(f.priority==='med'?' selected':'')+'>Средний</option><option value="low"'+(f.priority==='low'?' selected':'')+'>Низкий</option></select>'+
-   '<select onchange="S.homeTaskFilter.sort=this.value;render()"><option value="due"'+(f.sort==='due'?' selected':'')+'>По сроку</option><option value="priority"'+(f.sort==='priority'?' selected':'')+'>По приоритету</option><option value="title"'+(f.sort==='title'?' selected':'')+'>По названию</option></select>'+
-  '</div>'+
-  (items.length?'<div class="checks">'+items.map(t=>{let overdue=t.dueDate&&t.dueDate<today&&t.status!=='done';return '<div class="attrow"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;margin:0"><input type="checkbox" style="width:auto" '+(t.status==='done'?'checked':'')+' onchange="toggleWorkTaskDone(\''+t.id+'\')"><span style="'+(t.status==='done'?'text-decoration:line-through;color:var(--muted)':'')+'">'+e(t.title)+'</span>'+(t.dueDate?' <span class="small '+(overdue?'danger':'muted')+'">· '+fmtDate(t.dueDate)+(overdue?' ⚠':'')+'</span>':'')+' <span class="badge '+priorityBadgeClass(t.priority)+'">'+priorityLabel(t.priority)+'</span></label><button onclick="deleteWorkTask(\''+t.id+'\')">✕</button></div>'}).join('')+'</div>':'<div class="muted small">Подходящих задач нет.</div>')+
+  let items=[...D.workTasks].sort((a,b)=>{
+    let sa=a.status==='done'?1:0,sb=b.status==='done'?1:0;
+    if(sa!==sb)return sa-sb;
+    return (a.dueDate||'9999-99-99').localeCompare(b.dueDate||'9999-99-99');
+  });
+  return '<div class="card"><div class="top" style="justify-content:space-between;align-items:center">'+
+   '<h2 style="margin-top:0">Задачи</h2>'+
+   '<button class="primary" onclick="openNewWorkTask()" style="flex:0">＋</button>'+
+   '</div>'+
+   (items.length?'<div class="checks">'+items.map(t=>{
+    let overdue=t.dueDate&&t.dueDate<toISO(new Date())&&t.status!=='done';
+    return '<div class="attrow" style="align-items:center;justify-content:space-between">'+
+     '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;margin:0">'+
+      '<input type="checkbox" style="width:auto" '+(t.status==='done'?'checked':'')+' onchange="toggleWorkTaskDone(\''+t.id+'\')">'+
+      '<span style="'+(t.status==='done'?'text-decoration:line-through;color:var(--color-text-secondary)':'')+'">'+e(t.title)+'</span>'+
+     '</label>'+
+     '<div style="display:flex;align-items:center;gap:6px">'+
+      (t.dueDate?'<span class="small '+(overdue?'danger':'muted')+'">'+fmtDate(t.dueDate)+(overdue?' ⚠':'')+'</span>':'')+
+      '<span class="badge '+priorityBadgeClass(t.priority)+'">'+priorityLabel(t.priority)+'</span>'+
+      '<button onclick="event.stopPropagation();openEditWorkTask(\''+t.id+'\')" style="background:none;border:none;padding:4px;font-size:14px;cursor:pointer;color:var(--color-text-secondary)">⋮</button>'+
+     '</div>'+
+    '</div>';
+   }).join('')+'</div>':'<div class="muted small">Задач пока нет.</div>')+
   '</div>';
 }
 function addQuickTask(){
@@ -213,12 +211,10 @@ function widgetBirthdays(){
   '</div>';
 }
 const HOME_WIDGETS={
- clock:{label:'Часы и дата',render:widgetClock},
+ clock:{label:'Часы, погода и учебный год',render:widgetClock},
  schedule:{label:'Расписание недели',render:widgetSchedule},
- stats:{label:'Быстрые показатели',render:widgetStats},
  todo:{label:'Задачи',render:widgetTasks},
  birthdays:{label:'Ближайшие дни рождения',render:widgetBirthdays},
- recent:{label:'Последние уроки',render:recentLessonsCard}
 };
 function openHomeConfig(){
  let widgets=D.settings.homeWidgets;

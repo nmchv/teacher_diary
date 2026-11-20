@@ -58,7 +58,7 @@ if(D.settings.lastBackupAt===undefined)D.settings.lastBackupAt=null;
  if(!D.settings.fields.student.find(f=>f.key==='nickname'))D.settings.fields.student.unshift({key:'nickname',label:'Никнейм (как называть в рассадке)',type:'text',system:false,visible:true});
  if(!D.settings.fields.lesson.find(f=>f.key==='ktpNumber'))D.settings.fields.lesson.unshift({key:'ktpNumber',label:'№ по КТП',type:'number',system:false,visible:true});
  if(!D.settings.fields.lesson.find(f=>f.key==='ktpDate'))D.settings.fields.lesson.splice(1,0,{key:'ktpDate',label:'Дата по КТП',type:'date',system:false,visible:true});
- if(!D.settings.homeWidgets)D.settings.homeWidgets=[{key:'clock',visible:true},{key:'schedule',visible:true},{key:'stats',visible:true},{key:'todo',visible:true},{key:'birthdays',visible:true},{key:'recent',visible:true}];
+ if(!D.settings.homeWidgets)D.settings.homeWidgets=[{key:'clock',visible:true},{key:'schedule',visible:true},{key:'todo',visible:true},{key:'birthdays',visible:true}];
  if(!D.settings.teacherName)D.settings.teacherName='';
 if(!D.settings.pointsThreshold)D.settings.pointsThreshold=5;
 if(!D.settings.assistant)D.settings.assistant={enabled:true,character:'dog',freq:20,lastTipAt:null,peeked:false,motivation:true};
