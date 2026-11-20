@@ -394,11 +394,13 @@ html.dark .progress-track{background:rgba(255,255,255,.06)}
 .ws-extra-label{grid-column:1/-1;font-weight:700;font-size:11px;color:var(--color-text-secondary);padding:6px 8px;background:var(--color-surface-elevated);border-radius:var(--radius-sm);border:1px solid var(--color-border);text-align:center;display:block}
 .ws-extra-col{display:flex;flex-direction:column;gap:3px}
 .ws-extra-col.ws-today-col{background:rgb(91 141 239 / .03);border-radius:var(--radius-sm)}
-.ws-extra-item{font-size:11px;line-height:1.3;padding:4px 6px;border-radius:var(--radius-sm);border:1px solid var(--color-border);background:var(--color-surface);cursor:pointer}
+.ws-extra-item{font-size:11px;line-height:1.3;padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--color-border);background:var(--color-surface);cursor:pointer;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
 .ws-extra-item:hover{background:rgba(91 141 239 / .12)!important;border-color:var(--color-accent)}
 .ws-extra-item.ws-past{opacity:.45;filter:grayscale(50%)}
-.ws-meeting-item{font-size:11px;line-height:1.3;padding:4px 6px;border-radius:var(--radius-sm);background:rgb(229 169 33 / .12);border:1px solid var(--color-warn);color:var(--color-warn);cursor:pointer}
-.ws-meeting-item:hover{background:rgb(229 169 33 / .2);filter:brightness(.95)}
+.ws-meeting-item{font-size:11px;line-height:1.3;padding:6px 8px;border-radius:var(--radius-sm);background:var(--color-surface);border:1px solid var(--color-border);color:var(--color-text-primary);cursor:pointer;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.ws-meeting-item:hover{background:rgba(91 141 239 / .12)!important;border-color:var(--color-accent)}
+.ws-extra-empty{font-size:18px;line-height:1;color:var(--color-text-secondary);background:transparent;align-items:center;justify-content:center;border:1px dashed var(--color-border);border-radius:var(--radius-sm);cursor:pointer;display:flex;height:44px}
+.ws-extra-empty:hover{background:var(--color-surface-elevated);border-style:dashed;border-color:var(--color-accent)}
 .ws-empty-section{background:var(--color-surface-elevated);border-radius:var(--radius-sm);padding:8px}
 .ws-empty-msg{font-size:12px;font-style:italic}
 .ws-st-red{background:rgb(239 91 100 / .12)}

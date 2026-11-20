@@ -11,7 +11,48 @@ function bdayDiff(dateStr){
  return diffs.reduce((best,d)=>Math.abs(d)<Math.abs(best)?d:best);
 }
 function classHasBirthdayToday(classId){
- return D.students.some(s=>s.status!=='archived'&&(s.classIds||[]).includes(classId)&&s.customFields.birthDate&&bdayDiff(s.customFields.birthDate)===0);
+  return D.students.some(s=>s.status!=='archived'&&(s.classIds||[]).includes(classId)&&s.customFields.birthDate&&bdayDiff(s.customFields.birthDate)===0);
+}
+function quickCreateClub(date){
+  let clubs=sortedClasses(D.classes.filter(c=>c.type==='club'));
+  if(!clubs.length){alert('Сначала создайте кружок/секцию в «＋ Новый урок» → Кружок/секция.');return}
+  if(!checkNotBlocked(date,null))return;
+  let opts=clubs.map(c=>'<option value="'+c.id+'">'+e(c.name)+'</option>').join('');
+  setModalHtml('Новое занятие кружка/секции','<div class="notice">'+fmtDate(date)+' · '+DAY_NAMES[dayIndexOfDate(date)]+'</div>'+
+   '<label>Кружок / секция</label><select id="qc-club">'+opts+'</select>'+
+   '<label>Время начала</label><input id="qc-start" type="time" value="15:30">'+
+   '<label>Время окончания</label><input id="qc-end" type="time" value="16:10">'+
+   '<label>Тема</label><input id="qc-topic" placeholder="Тема занятия">'+
+   '<div class="toolbar" style="margin-top:14px"><button class="primary" onclick="quickCreateClubConfirm(\''+date+'\')">Создать</button><button onclick="closeModal()">Отмена</button></div>');
+}
+function quickCreateClubConfirm(date){
+  let classId=document.getElementById('qc-club').value;
+  let startTime=document.getElementById('qc-start').value;
+  let endTime=document.getElementById('qc-end').value;
+  let topic=document.getElementById('qc-topic').value.trim();
+  if(!startTime||!endTime){alert('Укажите время начала и окончания.');return}
+  let l={id:uid(),date,lessonNumber:null,startTime,endTime,classId,topic,customFields:{},attendance:{},grades:{},materialIds:[]};
+  D.lessons.push(l);save();closeModal();openLessonModal(l.id);
+}
+function quickCreateMeeting(date){
+  setModalHtml('Новое совещание','<div class="notice">'+fmtDate(date)+' · '+DAY_NAMES[dayIndexOfDate(date)]+'</div>'+
+   '<label>Тема</label><input id="mt-title" placeholder="Педсовет">'+
+   '<label>Время</label><input id="mt-time" placeholder="15:30">'+
+   '<label>Место / формат</label><input id="mt-loc" placeholder="Каб. 204 / Zoom">'+
+   '<label>Участники</label><input id="mt-part" placeholder="Завуч, кл. руководители 5-х классов">'+
+   '<label>Повестка / заметки</label><textarea id="mt-agenda" class="autosize"></textarea>'+
+   '<div class="toolbar" style="margin-top:14px"><button class="primary" onclick="quickCreateMeetingConfirm(\''+date+'\')">Сохранить</button><button onclick="closeModal()">Отмена</button></div>');
+  initAutosize();
+}
+function quickCreateMeetingConfirm(date){
+  let title=document.getElementById('mt-title').value.trim();
+  let time=document.getElementById('mt-time').value.trim();
+  let location=document.getElementById('mt-loc').value.trim();
+  let participants=document.getElementById('mt-part').value.trim();
+  let agenda=document.getElementById('mt-agenda').value;
+  if(!title){alert('Укажите тему совещания.');return}
+  D.meetings.push({id:uid(),title,date,time,location:document.getElementById('mt-loc').value.trim(),participants:document.getElementById('mt-part').value.trim(),agenda:document.getElementById('mt-agenda').value});
+  save();closeModal();render();
 }
 function fmtClockTime(d){return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
 function fmtClockDate(d){let s=d.toLocaleDateString('ru-RU',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});return s.charAt(0).toUpperCase()+s.slice(1)}
@@ -147,39 +188,39 @@ function widgetSchedule(){
    body+='<div class="ws-cell ws-empty click" onclick="quickCreateLesson(\''+d+'\','+t.n+')">+</div>';
   });
  });
- let clubsHtml='';
- let hasClubs=false;
- dates.forEach((d,i)=>{
-  let isToday=i===todayIndex;
-  let items=activeLessons().filter(x=>x.date===d&&!x.lessonNumber&&C(x.classId)&&C(x.classId).type==='club').sort((a,b)=>(a.startTime||'').localeCompare(b.startTime||''));
-  if(items.length){
-   hasClubs=true;
-   clubsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"><div style="display:flex;flex-direction:column;gap:3px">'+
-    items.map(l=>{
-     let cls=C(l.classId);let st=lessonStatus(l);
-     let isPast=(d<todayStr)||(isToday&&l.endTime&&nowMinutes>=timeToMin(l.endTime));
-     let cake=(isToday&&d===todayStr&&classHasBirthdayToday(l.classId))?' 🎂':'';
-     return '<div class="ws-extra-item ws-st-'+st+(isPast?' ws-past':'')+' click" onclick="openLessonModal(\''+l.id+'\')"><b>'+e(l.startTime||'')+(l.endTime?'–'+e(l.endTime):'')+'</b> '+e(cls?cls.name:'')+cake+' — '+e(l.topic||'(без темы)')+'</div>';
-    }).join('')+
-   '</div></div>';
-  }else{
-   clubsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"></div>';
-  }
- });
- let meetingsHtml='';
- let hasMeetings=false;
- dates.forEach((d,i)=>{
-  let isToday=i===todayIndex;
-  let ms=D.meetings.filter(m=>m.date===d);
-  if(ms.length){
-   hasMeetings=true;
-   meetingsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"><div style="display:flex;flex-direction:column;gap:3px">'+
-    ms.map(m=>'<div class="ws-meeting-item click" onclick="openEditMeeting(\''+m.id+'\')">🗓 '+(m.time?e(m.time)+' ':'')+e(m.title)+'</div>').join('')+
-   '</div></div>';
-  }else{
-   meetingsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"></div>';
-  }
- });
+let clubsHtml='';
+  let hasClubs=false;
+  dates.forEach((d,i)=>{
+   let isToday=i===todayIndex;
+   let items=activeLessons().filter(x=>x.date===d&&!x.lessonNumber&&C(x.classId)&&C(x.classId).type==='club').sort((a,b)=>(a.startTime||'').localeCompare(b.startTime||''));
+   if(items.length){
+    hasClubs=true;
+    clubsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"><div style="display:flex;flex-direction:column;gap:3px">'+
+     items.map(l=>{
+      let cls=C(l.classId);let st=lessonStatus(l);
+      let isPast=(d<todayStr)||(isToday&&l.endTime&&nowMinutes>=timeToMin(l.endTime));
+      let cake=(isToday&&d===todayStr&&classHasBirthdayToday(l.classId))?' 🎂':'';
+      return '<div class="ws-extra-item ws-st-'+st+(isPast?' ws-past':'')+' click" onclick="openLessonModal(\''+l.id+'\')"><b>'+e(l.startTime||'')+(l.endTime?'–'+e(l.endTime):'')+'</b> '+e(cls?cls.name:'')+cake+' — '+e(l.topic||'(без темы)')+'</div>';
+     }).join('')+
+    '</div></div>';
+   }else{
+    clubsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"><div class="ws-extra-empty click" onclick="quickCreateClub(\''+d+'\')">+</div></div>';
+   }
+  });
+  let meetingsHtml='';
+  let hasMeetings=false;
+  dates.forEach((d,i)=>{
+   let isToday=i===todayIndex;
+   let ms=D.meetings.filter(m=>m.date===d);
+   if(ms.length){
+    hasMeetings=true;
+    meetingsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"><div style="display:flex;flex-direction:column;gap:3px">'+
+     ms.map(m=>'<div class="ws-meeting-item click" onclick="openEditMeeting(\''+m.id+'\')">🗓 '+(m.time?e(m.time)+' ':'')+e(m.title)+'</div>').join('')+
+    '</div></div>';
+   }else{
+    meetingsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"><div class="ws-extra-empty click" onclick="quickCreateMeeting(\''+d+'\')">+</div></div>';
+   }
+  });
  let weekRange=fmtDateShort(dates[0])+' — '+fmtDateShort(dates[dates.length-1]);
  return '<div class="card ws-card">'+
   '<div class="ws-head">'+
