@@ -535,10 +535,10 @@ html.dark .att-dark{display:block}
 .lb-row{display:flex;align-items:center;gap:10px;padding:6px 4px;border-bottom:1px solid rgba(0,0,0,.03)}
 .lb-row:last-child{border-bottom:none}
 html.dark .lb-row{border-bottom-color:rgba(255,255,255,.03)}
-.lb-row .click{color:inherit}
-.lb-row .click:hover{color:inherit;text-decoration:none}
+.lb-row .click{color:inherit;background:transparent}
+.lb-row .click:hover{color:inherit;text-decoration:none;background:transparent}
 .lb-name.click{display:inline-block}
-.lb-name.click:hover{transform:translateY(-2px);font-size:15px}
+.lb-name.click:hover{font-size:17px}
 .lb-pos{width:24px;text-align:center;font-weight:700;color:var(--color-text-secondary);font-size:13px;flex-shrink:0}
 .lb-name{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lb-cls{font-size:12px;color:var(--color-text-secondary);white-space:nowrap;flex-shrink:0}
