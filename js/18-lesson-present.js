@@ -283,6 +283,77 @@ function movePresentBlock(kind,side,i,dir){
  let arr=D.settings[presentLayoutKey(kind)][side];let j=i+dir;if(j<0||j>=arr.length)return;
  [arr[i],arr[j]]=[arr[j],arr[i]];save();openPresentLayoutConfig(kind);
 }
+let PLE_kind=null;
+function openPresentVisualEditor(){
+ if(!S.lessonPresentId)return;
+ let l=L(S.lessonPresentId);
+ if(!l)return;
+ let cls=C(l.classId);
+ PLE_kind=(cls&&cls.type==='club')?'club':'lesson';
+ let layoutKey=presentLayoutKey(PLE_kind);
+ let layout=D.settings[layoutKey]||{left:['plan','extra','homework'],right:['attendance','whoToAsk','grade','points','behavior','seating']};
+ let editor=document.createElement('div');
+ editor.id='present-layout-editor';
+ editor.className='present-layout-editor';
+ editor.style.position='fixed';editor.style.inset='0';editor.style.zIndex='100';editor.style.background='rgba(8,9,11,.45)';
+ editor.style.display='flex';editor.style.alignItems='center';editor.style.justifyContent='center';editor.style.padding='24px';
+ let blocksHtml=(arr,side)=>{
+  let allKeys=Object.keys(PRESENT_BLOCKS);
+  let available=allKeys.filter(k=>!arr.includes(k));
+  return '<div class="ple-column ple-'+side+'" data-side="'+side+'">'+
+   '<div class="ple-col-head"><span class="ple-col-title">'+(side==='left'?'Левая колонка (широкая)':'Правая колонка (узкая)')+'</span></div>'+
+   '<div class="ple-slots" data-side="'+side+'">'+arr.map((k,i)=>{let meta=PRESENT_BLOCKS[k];if(!meta)return'';return '<div class="ple-card draggable" data-key="'+k+'" data-idx="'+i+'" draggable="true"><div class="ple-drag">⋮⋮</div><span class="ple-name">'+e(meta.label)+'</span><button class="ple-remove" onclick="event.stopPropagation();presentLayoutEditorRemove(\''+PLE_kind+'\',\''+side+'\','+i+')">✕</button></div>'}).join('')+available.map(k=>{let meta=PRESENT_BLOCKS[k];if(!meta)return'';return '<div class="ple-card available" data-key="'+k+'" draggable="true"><div class="ple-drag">+</div><span class="ple-name">'+e(meta.label)+'</span></div>'}).join('')+'</div></div>';
+ };
+ editor.innerHTML='<div style="background:var(--color-surface);border-radius:var(--radius);padding:22px;width:min(720px,94vw);max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:14px">'+
+  '<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Настроить расположение блоков</h3><div class="tabs" style="gap:6px"><button class="'+(PLE_kind==='lesson'?'ple-tab-active':'')+'" onclick="PLESwitch(\'lesson\')">Для уроков</button><button class="'+(PLE_kind==='club'?'ple-tab-active':'')+'" onclick="PLESwitch(\'club\')">Для кружков</button></div></div>'+
+  '<div class="muted small" style="font-size:12.5px">Перетащите блоки между колонками и внутри них. Нажмите ✕ чтобы убрать блок из колонки.</div>'+
+  '<div class="ple-columns" style="display:flex;gap:24px;align-items:flex-start">'+blocksHtml(layout.left,'left')+blocksHtml(layout.right,'right')+'</div>'+
+  '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px"><button onclick="closePresentLayoutEditor()">Отмена</button><button class="primary" onclick="savePresentLayoutEditor()">Готово</button></div>'+
+  '</div>';
+ document.body.appendChild(editor);
+ editor.onclick=function(ev){if(ev.target===editor)closePresentLayoutEditor();};
+ setupDragDrop();
+}
+function PLESwitch(kind){
+ PLE_kind=kind;
+ document.getElementById('present-layout-editor').remove();
+ openPresentVisualEditor();
+}
+function presentLayoutEditorRemove(kind,side,i){
+ let layout=D.settings[presentLayoutKey(kind)];
+ layout[side].splice(i,1);
+ save();
+ openPresentVisualEditor();
+}
+function setupDragDrop(){
+ let slots=document.querySelectorAll('.ple-slots');
+ slots.forEach(slot=>{
+  slot.ondragover=function(ev){ev.preventDefault();slot.classList.add('ple-over');};
+  slot.ondragleave=function(){slot.classList.remove('ple-over');};
+  slot.ondrop=function(ev){ev.preventDefault();slot.classList.remove('ple-over');let key=ev.dataTransfer.getData('text/plain');if(!key)return;let targetSide=slot.dataset.side;presentLayoutEditorMoveTo(PLE_kind,key,targetSide);};
+ });
+}
+function presentLayoutEditorMoveTo(kind,key,targetSide){
+ let layout=D.settings[presentLayoutKey(kind)];
+ ['left','right'].forEach(s=>{let idx=layout[s].indexOf(key);if(idx>=0)layout[s].splice(idx,1);});
+ if(!layout[targetSide].includes(key))layout[targetSide].push(key);
+ save();
+ openPresentVisualEditor();
+}
+function closePresentLayoutEditor(){let el=document.getElementById('present-layout-editor');if(el)el.remove();}
+function savePresentLayoutEditor(){
+ let editor=document.getElementById('present-layout-editor');
+ if(!editor||!PLE_kind)return;
+ let slots=editor.querySelectorAll('.ple-slots');
+ slots.forEach(slot=>{
+  let side=slot.dataset.side;
+  let keys=[...slot.querySelectorAll('.ple-card.draggable')].map(c=>c.dataset.key);
+  D.settings[presentLayoutKey(PLE_kind)][side]=keys;
+ });
+ save();
+ closePresentLayoutEditor();
+ renderPresentMode();
+}
 function movePresentBlockSide(kind,side,i){
  let layout=D.settings[presentLayoutKey(kind)];
  let other=side==='left'?'right':'left';

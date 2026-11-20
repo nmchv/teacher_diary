@@ -230,6 +230,26 @@ html.dark .fieldrow{border-bottom-color:rgba(255,255,255,.06)}
 .wta-ask{padding:6px 14px;font-size:14px}
 .wta-reroll{padding:6px 14px;font-size:14px;flex:0 0 auto}
 
+/* ---- Редактор расположения блоков режима урока ---- */
+.present-layout-editor{font-size:var(--fs-body)}
+.ple-column{display:flex;flex-direction:column;gap:8px;min-width:240px;flex:1}
+.ple-column.ple-left{min-width:280px}
+.ple-col-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.ple-col-title{font-weight:600;font-size:13px;color:var(--color-text-secondary)}
+.ple-slots{border:2px dashed var(--border);border-radius:var(--radius);padding:8px;min-height:120px;background:rgba(0,0,0,.02)}
+.ple-slots.ple-over{border-color:var(--color-accent);background:rgb(91 141 239 / .08)}
+.ple-card{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--color-surface);cursor:grab;margin-bottom:6px;flex-wrap:wrap}
+.ple-card:active{cursor:grabbing}
+.ple-card.draggable{opacity:1}
+.ple-card.draggable.ple-dragging{opacity:.5;border-color:transparent}
+.ple-card.available{background:var(--color-surface-elevated);color:var(--color-text-secondary);border-style:dashed}
+.ple-drag{font-size:12px;user-select:none}
+.ple-name{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ple-remove{background:transparent;border:none;color:var(--color-text-secondary);font-size:14px;padding:2px 6px;border-radius:4px}
+.ple-remove:hover{background:var(--color-surface-elevated);color:var(--color-bad)}
+.ple-tab-active{background:var(--color-accent);color:#fff}
+.ple-columns{width:100%;display:flex;gap:24px;align-items:flex-start}
+
 .pga-card{padding:10px 14px}
 .pga-card h3{font-size:14px;margin-bottom:8px}
 .pga-row{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
