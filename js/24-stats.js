@@ -103,7 +103,7 @@ function statsPage(){
   '<div class="card"><h2 style="margin-top:0">Распределение оценок</h2>'+svgBarChart(gradeDistData(distVals,scope,scopeId,r.from,r.to),{width:900,height:380})+'</div>'+
   '<div class="stats-pair">'+attendanceWidget(attPct)+problemStudentsWidget()+'</div>'+
   behaviorLeaderboardCard()+
-   statsClassesCard();
+   statsClassesCard()+studentsLeaderboardCard();
 }
 function mstat(n,t){return '<div class="mstat"><div class="mv">'+n+'</div><div class="ml">'+t+'</div></div>'}
 function donutPlain(pct,size){
@@ -193,48 +193,41 @@ function statsClassesCard(){
    (rows.length?'<table class="table stats-classes-table"><tr><th class="click">Класс</th><th>Учеников</th><th>Средняя</th><th>Посещаемость</th><th>Уроков</th><th>Заметок о поведении</th></tr>'+
    rows.map(r=>'<tr class="click" onclick="openClass(\''+r.c.id+'\')"><td><b>'+e(r.c.name)+'</b></td><td>'+r.studentsCount+'</td><td>'+round2(r.avgGrade)+'</td><td>'+(r.attendancePct===null?'—':r.attendancePct+'%')+'</td><td>'+r.lessonsCount+'</td><td>'+r.behaviorCount+'</td></tr>').join('')+'</table>':'<div class="empty">Классов пока нет.</div>')+'</div>';
 }
-function studentBadgeInfo(metrics,baseline){
- let reasons=[];let top=false,attention=false;
- let avgGrade=metrics.avgGrade,absences=metrics.absences||0,behaviorCount=metrics.behaviorCount||0;
- if(avgGrade!==null&&baseline!==null){
-  if(avgGrade-baseline>=1){top=true;reasons.push('средняя выше группы на '+round2(avgGrade-baseline));}
-  if(baseline-avgGrade>=1){attention=true;reasons.push('средняя ниже группы на '+round2(baseline-avgGrade));}
- }
- if(absences>=3){attention=true;reasons.push('пропусков: '+absences);}
- if(behaviorCount>=2){attention=true;reasons.push('замечаний о поведении: '+behaviorCount);}
- return {top,attention,reasons};
-}
-function studentBadgeHtml(metrics,baseline){
- let info=studentBadgeInfo(metrics,baseline);
- let out='';
- if(info.top)out+='<span class="stbadge" title="Высокий результат: '+e(info.reasons.join(', '))+'">🏆</span>';
- if(info.attention)out+='<span class="stbadge" title="Стоит обратить внимание: '+e(info.reasons.join(', '))+'">❗</span>';
- return out;
-}
-function statsStudentsCard(){
+function studentsLeaderboardCard(){
  let f=S.statsFilter,r=periodRange();
  let students=D.students.filter(s=>s.status!=='archived'&&(!f.classId||(s.classIds||[]).some(i=>groupIds(f.classId).includes(i))));
  let rows=students.map(s=>{
   let ls=activeLessons().filter(l=>(s.classIds||[]).includes(l.classId)&&!l.cancelled&&l.date>=r.from&&l.date<=r.to);
   let gv=[];ls.forEach(l=>{let g=(l.grades||{})[s.id];if(g){let n=gradeNumericValue(g.value);if(n!==null)gv.push(n)}});
   let at=0,ap=0;ls.forEach(l=>{let v=(l.attendance||{})[s.id];if(v){at++;if(v!=='н')ap++}});
-  let behaviorCount=0;ls.forEach(l=>{if((l.behaviorNotes||{})[s.id])behaviorCount++});
-  return {s,avgGrade:avg(gv),gradesCount:gv.length,attendancePct:at?Math.round(ap/at*1000)/10:null,absences:at-ap,behaviorCount};
- });
- let sortKey=S.statsFilter.sortStudents;
- let sorters={fio:(a,b)=>(a.s.lastName+a.s.firstName).localeCompare(b.s.lastName+b.s.firstName,'ru'),avg:(a,b)=>(b.avgGrade||0)-(a.avgGrade||0),att:(a,b)=>(b.attendancePct||0)-(a.attendancePct||0),grades:(a,b)=>b.gradesCount-a.gradesCount,absences:(a,b)=>b.absences-a.absences};
- rows.sort(sorters[sortKey]||sorters.fio);
- let baseline=avg(rows.map(r=>r.avgGrade).filter(x=>x!==null));
- return '<div class="card"><div class="top"><h2>Статистика по ученикам</h2><select onchange="S.statsFilter.sortStudents=this.value;render()">'+
-  [['fio','По ФИО'],['avg','По средней оценке'],['att','По посещаемости'],['grades','По кол-ву оценок'],['absences','По кол-ву пропусков']].map(o=>'<option value="'+o[0]+'"'+(sortKey===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></div>'+
-  (rows.length?'<table class="table"><tr><th>Ученик</th><th>Класс</th><th>Средняя</th><th>Оценок</th><th>Посещаемость</th><th>Пропусков</th><th>Заметок о поведении</th></tr>'+
-   rows.map(r=>{let info=studentBadgeInfo(r,baseline);let rowClass='click'+(info.top?' row-top':'')+(info.attention?' row-attention':'');
-    return '<tr class="'+rowClass+'" onclick="openStudentPage(\''+r.s.id+'\')"><td>'+studentFio(r.s)+studentBadgeHtml(r,baseline)+'</td><td>'+e(studentClassNames(r.s))+'</td><td>'+round2(r.avgGrade)+'</td><td>'+r.gradesCount+'</td><td>'+(r.attendancePct===null?'—':r.attendancePct+'%')+'</td><td>'+r.absences+'</td><td>'+r.behaviorCount+'</td></tr>';
-   }).join('')+'</table>'+
-   '<div class="badge-legend"><span>🏆 — средняя заметно выше остальных в этом списке</span><span>❗ — стоит обратить внимание: низкая средняя, много пропусков или замечаний о поведении</span></div>'
-   :'<div class="empty">Учеников пока нет.</div>')+'</div>';
+  return {s,avgGrade:avg(gv),gradesCount:gv.length,attendancePct:at?Math.round(ap/at*1000)/10:null,absences:at-ap,lessonsCount:ls.length};
+ }).filter(x=>x.lessonsCount>0);
+ if(!rows.length)return '<div class="card"><h2 style="margin-top:0">Рейтинг учеников</h2><div class="muted small">Недостаточно данных для рейтинга.</div></div>';
+ let topAll=[...rows].filter(x=>x.avgGrade!==null).sort((a,b)=>(b.avgGrade||0)-(a.avgGrade||0)).slice(0,3);
+ let lowAll=[...rows].filter(x=>x.avgGrade!==null).sort((a,b)=>(a.avgGrade||0)-(b.avgGrade||0)).slice(0,3);
+ let lowAtt=[...rows].filter(x=>x.attendancePct!==null).sort((a,b)=>(a.attendancePct||0)-(b.attendancePct||0)).slice(0,3);
+ let classes=D.classes.filter(c=>!f.classId||c.id===f.classId);
+ let classCards=classes.map(c=>{
+  let crows=rows.filter(x=>(x.s.classIds||[]).includes(c.id)&&x.avgGrade!==null);
+  if(!crows.length)return null;
+  let top=[...crows].sort((a,b)=>(b.avgGrade||0)-(a.avgGrade||0)).slice(0,3);
+  return leaderboardCardHtml('«'+e(c.name)+'» — лучшие по среднему',top,'avg');
+ }).filter(Boolean).join('');
+ return '<div class="card"><div class="top"><h2 style="margin:0 0 10px">Рейтинг учеников</h2></div>'+
+  leaderboardCardHtml('Высокие средние баллы (все классы)',topAll,'avg')+
+  leaderboardCardHtml('Низкие средние баллы',lowAll,'avg')+
+  leaderboardCardHtml('Низкая посещаемость',lowAtt,'att')+
+  classCards+
+  '</div>';
 }
-
+function leaderboardCardHtml(title,rows,type){
+ if(!rows.length)return '';
+ let items=rows.map((r,i)=>{
+  let val=type==='att'?(r.attendancePct===null?'—':r.attendancePct+'%'):round2(r.avgGrade);
+  return '<div class="lb-row"><div class="lb-pos">'+(i+1)+'</div><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+e(studentClassNames(r.s))+'</div><div class="lb-val">'+val+'</div></div>'
+ }).join('');
+ return '<div class="lb-card"><div class="lb-title">'+title+'</div><div class="lb-list">'+items+'</div></div>';
+}
 function openClass(id){S.view='class';S.classId=id;S.tab='lessons';render()}
 function studentInitials(s){return ((s.lastName||'')[0]||'')+((s.firstName||'')[0]||'')}
 function behaviorLeaderboardData(){
