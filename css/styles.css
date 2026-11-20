@@ -204,7 +204,7 @@ html.dark .fieldrow{border-bottom-color:rgba(255,255,255,.06)}
 .seat-box.absent{opacity:.35;text-decoration:line-through}
 .seat-box:hover{filter:brightness(.96)}
 .present-overlay{position:fixed;inset:0;background:var(--color-background);z-index:60;overflow:auto;padding:24px}
-.present-top{display:flex;justify-content:space-between;align-items:flex-start;max-width:1600px;margin:0 auto 10px;gap:16px;flex-wrap:wrap}
+.present-top{display:flex;justify-content:space-between;align-items:flex-start;max-width:1600px;margin:0 auto 10px;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:10;background:var(--color-background);padding:8px 0}
 .present-clock{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
 .present-time-info{text-align:right;margin-top:2px}
 .present-reminder-wrap{max-width:1600px;margin:0 auto 14px}
