@@ -2,16 +2,8 @@
 function workPage(){
  let tab=S.workTab||'meetings';
  return '<div class="top"><div><h1>Работа</h1><div class="muted">Отдельное пространство для административных дел: совещания, задачи, коллеги, документы</div></div></div>'+
-  '<div class="tabs">'+[['meetings','Совещания'],['tasks','Задачи'],['colleagues','Коллеги'],['documents','Документы'],['lessonarchive','Архив уроков']].map(x=>'<button class="'+(tab===x[0]?'active':'')+'" onclick="S.workTab=\''+x[0]+'\';render()">'+x[1]+'</button>').join('')+'</div>'+
-  (tab==='meetings'?workMeetingsTab():tab==='tasks'?workTasksTab():tab==='colleagues'?workColleaguesTab():tab==='documents'?workDocumentsTab():workLessonArchiveTab());
-}
-function workLessonArchiveTab(){
- let archived=D.lessons.filter(l=>l.archived).sort((a,b)=>(b.archivedAt||'').localeCompare(a.archivedAt||''));
- let today=toISO(new Date());
- return '<div class="card"><h2>Архив уроков</h2><p class="muted small">Заархивированные уроки скрыты из расписания и статистики. Автоматически удаляются через 30 дней после архивации — либо восстановите, либо удалите навсегда сами.</p>'+
-  (archived.length?'<table class="table"><tr><th>Дата</th><th>Класс</th><th>Тема</th><th>В архиве с</th><th>Осталось дней</th><th></th></tr>'+
-   archived.map(l=>{let cls=C(l.classId);let daysLeft=Math.max(0,30-daysBetween(l.archivedAt||today,today));return '<tr><td>'+fmtDate(l.date)+'</td><td>'+e(cls?cls.name:'—')+'</td><td>'+e(l.topic||'(без темы)')+'</td><td>'+fmtDate(l.archivedAt)+'</td><td>'+daysLeft+'</td><td><button onclick="restoreLessonFromArchive(\''+l.id+'\')">Восстановить</button> <button class="danger" onclick="purgeLessonForever(\''+l.id+'\')">Удалить навсегда</button></td></tr>'}).join('')+'</table>':'<div class="empty">Архив пуст.</div>')+
-  '</div>';
+  '<div class="tabs">'+[['meetings','Совещания'],['tasks','Задачи'],['colleagues','Коллеги'],['documents','Документы']].map(x=>'<button class="'+(tab===x[0]?'active':'')+'" onclick="S.workTab=\''+x[0]+'\';render()">'+x[1]+'</button>').join('')+'</div>'+
+  (tab==='meetings'?workMeetingsTab():tab==='tasks'?workTasksTab():tab==='colleagues'?workColleaguesTab():tab==='documents'?workDocumentsTab():'');
 }
 
 /* ---- Документы (планирование/отчёты — отдельно от материалов урока) ---- */
@@ -177,26 +169,39 @@ function deleteWorkTask(id){if(!confirm('Удалить задачу?'))return;D
 /* ---- Коллеги ---- */
 function colleagueFio(c){return e(c.lastName)+' '+e(c.firstName)+(c.middleName?' '+e(c.middleName):'')}
 function colleagueFioPlain(c){return (c.lastName+' '+c.firstName+(c.middleName?' '+c.middleName:'')).trim()}
+function colleagueSearchText(c){
+ let parts=[c.lastName||'',c.firstName||'',c.middleName||''];
+ let cf=D.settings.fields.colleague.filter(f=>f.visible);
+ cf.forEach(f=>{
+  let v=c.customFields&&c.customFields[f.key];
+  if(v!==undefined&&v!==null&&v!=='')parts.push(String(v));
+ });
+ return parts.join(' ');
+}
 function colleagueField(c,key){return (c.customFields&&c.customFields[key])||''}
+function hi(text,q){if(!q)return text;let r=new RegExp('('+String(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return String(text).replace(r,'<mark>$1</mark>')}
 function colleagueFormFields(c){
  let cf=D.settings.fields.colleague.filter(f=>f.visible);
  return cf.map(f=>'<label>'+e(f.label)+'</label>'+customFieldInput('clf_'+f.key,f,c.customFields?c.customFields[f.key]:''));
 }
+function colleagueSearch(val){
+ S.colleagueSearch=val;
+ render();
+ setTimeout(()=>{
+  let i=document.getElementById('colleague-search');
+  if(i){i.focus();try{i.setSelectionRange(i.value.length,i.value.length)}catch(e){}}
+ },0);
+}
 function workColleaguesTab(){
  let cf=D.settings.fields.colleague.filter(f=>f.visible);
- S.colleagueSort=S.colleagueSort||'fio';
+ let q=(S.colleagueSearch||'').toLowerCase();
  let cs=[...D.colleagues];
- if(S.colleagueSort==='fio'){cs.sort((a,b)=>(a.lastName+a.firstName).localeCompare(b.lastName+b.firstName,'ru'))}
- else{
-  let sf=fieldByKey('colleague',S.colleagueSort);
-  if(sf)cs.sort((a,b)=>String(customFieldView(sf,a.customFields[sf.key])||'').localeCompare(String(customFieldView(sf,b.customFields[sf.key])||''),'ru'));
- }
- let sortOptions='<option value="fio"'+(S.colleagueSort==='fio'?' selected':'')+'>ФИО</option>'+cf.map(f=>'<option value="'+f.key+'"'+(S.colleagueSort===f.key?' selected':'')+'>'+e(f.label)+'</option>').join('');
- return '<div class="card"><div class="top"><h2>Коллеги</h2><div class="toolbar"><select onchange="S.colleagueSort=this.value;render()">'+sortOptions+'</select><button class="primary" onclick="openNewColleague()">＋ Добавить коллегу</button></div></div>'+
-  '<div class="muted small" style="margin-bottom:6px">Подсказка: границы столбцов таблицы можно перетаскивать мышью, чтобы менять ширину.</div>'+
+ if(q)cs=cs.filter(c=>colleagueSearchText(c).toLowerCase().includes(q));
+ return '<div class="card"><div class="top"><h2>Коллеги</h2><button class="primary" onclick="openNewColleague()">＋ Добавить коллегу</button></div>'+
+  '<div style="margin-bottom:10px"><label style="display:block;font-size:12.5px;font-weight:600;color:var(--color-text-secondary);margin-bottom:5px">Поиск</label><input id="colleague-search" value="'+e(S.colleagueSearch||'')+'" placeholder="ФИО, кабинет и др." oninput="colleagueSearch(this.value)"></div>'+
   '<div style="overflow-x:auto">'+
-  (cs.length?'<table class="table restable" id="colleagues-table"><tr><th>ФИО</th>'+cf.map(f=>'<th>'+e(f.label)+'</th>').join('')+'<th style="width:90px"></th></tr>'+
-   cs.map(c=>'<tr class="click" onclick="openColleagueCard(\''+c.id+'\')"><td>'+colleagueFio(c)+'</td>'+cf.map(f=>'<td>'+(customFieldView(f,c.customFields[f.key])?richTextView(customFieldView(f,c.customFields[f.key])):'—')+'</td>').join('')+'<td><button onclick="event.stopPropagation();openEditColleague(\''+c.id+'\')">✎</button> <button onclick="event.stopPropagation();deleteColleague(\''+c.id+'\')">✕</button></td></tr>').join('')+'</table>':'<div class="empty">Коллеги пока не добавлены.</div>')+
+  (cs.length?'<table class="table restable" id="colleagues-table"><tr><th>ФИО</th>'+cf.map(f=>'<th>'+e(f.label)+'</th>').join('')+'<th style="width:100px;text-align:right"></th></tr>'+
+   cs.map(c=>'<tr class="click" onclick="openColleagueCard(\''+c.id+'\')"><td>'+hi(colleagueFio(c),q)+'</td>'+cf.map(f=>{let v=customFieldView(f,c.customFields[f.key]);return '<td>'+hi(v?richTextView(v):'—',q)+'</td>'}).join('')+'<td style="text-align:right"><button onclick="event.stopPropagation();openEditColleague(\''+c.id+'\')" style="display:block;width:max-content;margin-left:auto;margin-bottom:4px">✎</button><button onclick="event.stopPropagation();deleteColleague(\''+c.id+'\')" style="display:block;width:max-content;margin-left:auto">✕</button></td></tr>').join('')+'</table>':'<div class="empty">Коллеги пока не добавлены.</div>')+
   '</div></div>';
 }
 function initColumnResize(tableId,stateKey){
