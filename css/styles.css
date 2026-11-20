@@ -89,6 +89,11 @@ details.card.collapsible>summary:hover{background:var(--color-surface-elevated)}
 details.card.collapsible>.cbody{padding:0 18px 18px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
 .stat{font-size:26px;font-weight:700}
+.mgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.mstat{height:72px;background:var(--color-surface-elevated);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:10px 6px;text-align:center;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;overflow:hidden}
+.mstat .mv{font-size:20px;font-weight:700;line-height:1.1}
+.mstat .ml{font-size:11px;color:var(--color-text-secondary);line-height:1.25;min-height:2.2em;display:flex;align-items:flex-end;word-break:normal}
+@media(max-width:900px){.mgrid{grid-template-columns:repeat(3,1fr)}.mstat{height:62px}}
 .small{font-size:12px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .row>*{flex:1}

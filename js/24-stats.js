@@ -92,11 +92,12 @@ function statsPage(){
  let scope=f.classId?'class':'global',scopeId=f.classId||'';
  return '<div class="top"><div><h1>Статистика</h1><div class="muted">Показатели учителя, классов и учеников</div></div></div>'+
   statsFilterBar()+
-  '<div class="card"><h2>Мои показатели</h2><div class="grid">'+
-   stat(ls.length,'Всего уроков')+stat(done,'Заполнено полностью')+stat(partial,'Частично подготовлено')+stat(prepared,'Требуют рефлексии')+stat(planned,'Не подготовлено')+
-   stat(round2(avg(gradeVals)),'Средняя оценка')+stat(attPct===null?'—':Math.round(attPct*10)/10+'%','Общая посещаемость')+
-   stat(gradeVals.length,'Оценок выставлено')+stat(absencesCount,'Пропусков')+stat(behaviorCount,'Заметок о поведении')+
-   stat(D.classes.length,'Классов')+stat(activeStudents,'Активных учеников')+stat(archivedStudents,'Архивных учеников')+
+  '<div class="card"><h2 style="margin-top:0">Мои показатели</h2><div class="mgrid">'+
+   mstat(ls.length,'Всего уроков')+mstat(planned,'Не подготовлено')+mstat(partial,'Частично подготовлено')+
+   mstat(D.classes.length,'Классов')+mstat(activeStudents,'Учеников')+
+   mstat(gradeVals.length,'Оценок выставлено')+mstat(round2(avg(gradeVals)),'Средняя оценка')+
+   mstat(absencesCount,'Пропусков')+mstat(attPct===null?'—':Math.round(attPct*10)/10+'%','Посещаемость')+
+   mstat(behaviorCount,'Заметок о поведении')+
   '</div></div>'+
   statsAssistantCard()+
   '<div class="card"><h2 style="margin-top:0">Распределение оценок <span class="muted small">(нажмите на столбец, чтобы увидеть кому и когда)</span></h2>'+svgBarChart(gradeDistData(distVals,scope,scopeId,r.from,r.to),{width:900,height:260})+'</div>'+
@@ -104,6 +105,7 @@ function statsPage(){
   behaviorLeaderboardCard()+
   statsClassesCard()+statsStudentsCard();
 }
+function mstat(n,t){return '<div class="mstat"><div class="mv">'+n+'</div><div class="ml">'+t+'</div></div>'}
 function statsFilterBar(){
  let f=S.statsFilter;
  let quarterOpts=(D.settings.quarters||[]).map(q=>['<option value="'+q.id+'"'+(f.period===q.id?' selected':'')+'>'+e(q.name)+'</option>']).map(x=>x[0]).join('');
