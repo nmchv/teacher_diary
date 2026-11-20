@@ -188,7 +188,7 @@ function widgetSchedule(){
    body+='<div class="ws-cell ws-empty click" onclick="quickCreateLesson(\''+d+'\','+t.n+')">+</div>';
   });
  });
-let clubsHtml='';
+let clubsHtml='<div class="ws-extra-time-col"></div>';
   let hasClubs=false;
   dates.forEach((d,i)=>{
    let isToday=i===todayIndex;
@@ -207,7 +207,7 @@ let clubsHtml='';
     clubsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"><div class="ws-extra-empty click" onclick="quickCreateClub(\''+d+'\')">+</div></div>';
    }
   });
-  let meetingsHtml='';
+  let meetingsHtml='<div class="ws-extra-time-col"></div>';
   let hasMeetings=false;
   dates.forEach((d,i)=>{
    let isToday=i===todayIndex;
