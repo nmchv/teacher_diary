@@ -484,38 +484,6 @@ html.dark .progress-track{background:rgba(255,255,255,.06)}
 .rp-date b{font-size:12.5px;color:var(--color-text-secondary)}
 .rp-date input{width:auto;max-width:170px}
 
-/* ---- Статистика: пара виджетов пополам ---- */
-.stats-pair{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
-.stat-half{display:flex;flex-direction:column;min-height:240px}
-.att-widget .att-visual{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-.att-big{font-size:34px;font-weight:700;color:var(--color-text-primary)}
-.att-dark{display:none}
-html.dark .att-dark{display:block}
-.status-widget .status-visual{display:flex;gap:18px;align-items:flex-start;padding-top:8px}
-.status-widget .status-donut{flex:0 0 auto}
-.status-widget .status-legend{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
-.status-item{display:flex;align-items:center;gap:10px;font-size:14px}
-.status-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
-.status-item span:nth-child(2){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.status-num{font-weight:700;flex:0 0 auto}
-.prob-widget{flex:1;min-height:240px;overflow:hidden}
-.prob-list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:10px 4px}
-.prob-row{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--color-border);background:var(--color-surface)}
-.prob-row:hover{border-color:rgb(91 141 239 / .45);background:var(--color-surface-elevated)}
-.prob-name{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.prob-cls{font-size:12px;color:var(--color-text-secondary);white-space:nowrap;flex-shrink:0}
-.prob-reason{flex:1;min-width:0;font-size:13px;color:var(--color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 10px}
-.prob-chip{font-size:12px;padding:4px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-accent);background:transparent;white-space:nowrap;flex-shrink:0}
-.prob-chip:hover{border-color:var(--color-accent);background:rgb(91 141 239 / .08)}
-.card > .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.card > .top h2{margin:0}
-.card > .top select,.card > .top button{flex:0 0 auto}
-.sort-select{width:auto;max-width:210px}
-.small-btn{font-size:12px;padding:6px 10px}
-.sort-dir-btn{font-size:14px;padding:2px 8px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);color:var(--color-text-primary);cursor:pointer}
-.sort-dir-btn:hover{border-color:var(--color-accent);background:var(--color-surface-elevated)}
-@media(max-width:900px){.stats-pair{grid-template-columns:1fr}}
-
 /* ---- Статистика: таблица классов ---- */
 .stats-classes-table tr.click:hover{background:var(--color-surface-elevated)}
 .stats-classes-table th:first-child{text-align:left}
@@ -542,4 +510,4 @@ html.dark .lb-row{border-bottom-color:rgba(255,255,255,.03)}
 .lb-name{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lb-cls{font-size:12px;color:var(--color-text-secondary);white-space:nowrap;flex-shrink:0}
 .lb-val{font-weight:700;color:var(--color-accent);flex-shrink:0;min-width:40px;text-align:right}
-.lb-row-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:10px 12px;max-height:340px;overflow-y:auto}
+.lb-row-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:10px 12px}
