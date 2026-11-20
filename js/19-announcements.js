@@ -126,7 +126,7 @@ function renderPresentMode(){
     '<div style="display:flex;align-items:center;gap:16px;margin-left:auto"><div><div id="present-clock" class="present-clock">'+fmtPresentClock(new Date())+'</div><div class="muted small present-time-info">'+fmtClockDate(new Date())+'</div><div class="muted small present-time-info">'+presentTimeInfoText(l)+'</div></div><button onclick="openPresentVisualEditor()" title="Настроить расположение блоков">⚙</button><button class="danger" onclick="closeLessonPresent()">Завершить</button></div>'+
    '</div>'+
   (l.announcementText?'<div class="present-reminder-wrap"><div class="notice" style="background:#eef2ff;border-color:#5b6fe6;color:#2a3499;font-weight:600">📣 '+richTextView(l.announcementText)+'</div></div>':'')+
-  '<div class="present-reminder-wrap"><div id="present-reminder" class="notice" style="background:#fdecec;border-color:#d9a0a0;color:#8a4a4a;font-weight:600;text-align:center;'+(reminderText?'':'display:none')+'">'+reminderText+'</div></div>'+
+  '<div class="present-reminder-wrap"><div id="present-reminder" class="notice" style="background:transparent;border:none;color:#d6404a;font-weight:700;text-align:center;padding:4px 0;'+(reminderText?'':'display:none')+'">'+reminderText+'</div></div>'+
   '<div class="present-grid"><div>'+
    layout.left.map(k=>presentBlockHtml(k,l,cls,extra)).join('')+
   '</div>'+
