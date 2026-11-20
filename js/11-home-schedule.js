@@ -117,7 +117,12 @@ function widgetSchedule(){
  let head='';
  dates.forEach((d,i)=>{
   let isToday=i===todayIndex;
-  head+='<div class="ws-dayhead'+(isToday?' ws-today':'')+'">'+DAY_NAMES[i]+' '+fmtDateShort(d)+(isToday?'<span class="ws-badge">СЕГОДНЯ</span>':'')+'</div>';
+  let dayNameFull=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'][i];
+  head+='<div class="ws-dayhead'+(isToday?' ws-today':'')+'">'+
+   '<div class="ws-dayname">'+dayNameFull+'</div>'+
+   '<div class="ws-daydate">'+fmtDateShort(d)+'</div>'+
+   (isToday?'<div class="ws-today-label">сегодня</div>':'')+
+  '</div>';
  });
  let body='';
  LESSON_TIMES.forEach(t=>{
@@ -142,10 +147,18 @@ function widgetSchedule(){
    body+='<div class="ws-cell ws-empty click" onclick="quickCreateLesson(\''+d+'\','+t.n+')">+</div>';
   });
  });
+ let weekRange=fmtDateShort(dates[0])+' — '+fmtDateShort(dates[dates.length-1]);
  return '<div class="card ws-card">'+
-  '<div class="ws-head"><h2 style="margin:0">Расписание недели</h2><button class="ws-open" onclick="goto(\'fullschedule\')">Всё расписание →</button></div>'+
-  '<div class="ws-nav"><button class="ws-arrow" onclick="shiftWeek(-1)">‹</button><span class="ws-title">'+fmtDateShort(dates[0])+' — '+fmtDateShort(dates[dates.length-1])+'</span><button class="ws-arrow" onclick="shiftWeek(1)">›</button><button class="ws-arrow ws-today" onclick="curWeek()">Сегодня</button></div>'+
-   '<div class="ws-grid" style="grid-template-columns:56px repeat('+dates.length+',1fr);gap:6px">'+
+  '<div class="ws-head">'+
+   '<h2 style="margin:0">Расписание недели</h2>'+
+   '<div class="ws-head-nav">'+
+    '<button class="ws-arrow" onclick="shiftWeek(-1)">‹</button>'+
+    '<span class="ws-title">'+weekRange+'</span>'+
+    '<button class="ws-arrow" onclick="shiftWeek(1)">›</button>'+
+   '</div>'+
+   '<button class="ws-open" onclick="goto(\'fullschedule\')">Моё расписание</button>'+
+  '</div>'+
+  '<div class="ws-grid" style="grid-template-columns:56px repeat('+dates.length+',1fr);gap:6px">'+
    '<div class="ws-headcell">№</div>'+head+
    body+
   '</div>'+

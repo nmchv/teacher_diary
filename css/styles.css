@@ -361,19 +361,20 @@ html.dark .progress-track{background:rgba(255,255,255,.06)}
 
 /* ---- Home: schedule widget ---- */
 .ws-card{position:relative}
-.ws-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.ws-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+.ws-head-nav{display:flex;align-items:center;gap:6px}
 .ws-open{font-size:12px;padding:5px 10px;border:1px solid var(--color-border);background:transparent;border-radius:var(--radius-sm);color:var(--color-accent-hover)}
 .ws-open:hover{background:var(--color-surface-elevated);border-color:var(--color-accent)}
-.ws-nav{display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:10px}
-.ws-arrow{width:28px;height:28px;border-radius:8px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-primary);font-size:15px;line-height:1;display:grid;place-items:center}
+.ws-arrow{width:28px;height:28px;border-radius:8px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-primary);font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center}
 .ws-arrow:hover{background:var(--color-accent);border-color:var(--color-accent);color:#06080c}
 .ws-title{font-weight:700;min-width:150px;text-align:center;font-size:13.5px}
-.ws-arrow.ws-today{font-size:12px;padding:0 8px}
 .ws-grid{display:grid;gap:6px;min-width:0}
 .ws-headcell{min-width:0;overflow:hidden;padding:8px 4px;font-size:11px;color:var(--color-text-secondary);font-weight:700;text-align:center;background:var(--color-surface-elevated);border-radius:var(--radius-sm)}
-.ws-dayhead{min-width:0;overflow:hidden;padding:8px 4px;font-size:12.5px;font-weight:700;text-align:center;background:var(--color-surface-elevated);border:1px solid var(--color-border);border-radius:var(--radius-sm)}
-.ws-dayhead.ws-today{background:rgb(91 141 239 / .1);border-color:var(--color-accent)}
-.ws-badge{font-size:8px;padding:1px 5px;border-radius:10px;background:var(--color-accent);color:#06080c;margin-left:6px;vertical-align:middle;font-weight:700}
+.ws-dayhead{min-width:0;overflow:hidden;padding:8px 6px;font-size:12px;font-weight:700;text-align:center;background:var(--color-surface-elevated);border:1px solid var(--color-border);border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;gap:2px}
+.ws-dayhead.ws-today{border-color:var(--color-accent);background:rgb(91 141 239 / .08)}
+.ws-dayname{font-size:12.5px;font-weight:700;line-height:1.2}
+.ws-daydate{font-size:11px;color:var(--color-text-secondary);line-height:1.2}
+.ws-today-label{font-size:10px;font-weight:600;color:var(--color-accent);background:rgb(91 141 239 / .15);border-radius:var(--radius-sm);padding:1px 6px;line-height:1}
 .ws-time{min-width:0;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 2px;font-size:11px;color:var(--color-text-secondary);border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface)}
 .ws-num{font-weight:700;font-size:12px;color:var(--color-text-primary);overflow:hidden}
 .ws-times{font-size:10px;line-height:1.2;text-align:center;overflow:hidden}
