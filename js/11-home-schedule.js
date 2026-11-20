@@ -147,6 +147,39 @@ function widgetSchedule(){
    body+='<div class="ws-cell ws-empty click" onclick="quickCreateLesson(\''+d+'\','+t.n+')">+</div>';
   });
  });
+ let clubsHtml='';
+ let hasClubs=false;
+ dates.forEach((d,i)=>{
+  let isToday=i===todayIndex;
+  let items=activeLessons().filter(x=>x.date===d&&!x.lessonNumber&&C(x.classId)&&C(x.classId).type==='club').sort((a,b)=>(a.startTime||'').localeCompare(b.startTime||''));
+  if(items.length){
+   hasClubs=true;
+   clubsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"><div style="display:flex;flex-direction:column;gap:3px">'+
+    items.map(l=>{
+     let cls=C(l.classId);let st=lessonStatus(l);
+     let isPast=(d<todayStr)||(isToday&&l.endTime&&nowMinutes>=timeToMin(l.endTime));
+     let cake=(isToday&&d===todayStr&&classHasBirthdayToday(l.classId))?' 🎂':'';
+     return '<div class="ws-extra-item ws-st-'+st+(isPast?' ws-past':'')+' click" onclick="openLessonModal(\''+l.id+'\')"><b>'+e(l.startTime||'')+(l.endTime?'–'+e(l.endTime):'')+'</b> '+e(cls?cls.name:'')+cake+' — '+e(l.topic||'(без темы)')+'</div>';
+    }).join('')+
+   '</div></div>';
+  }else{
+   clubsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"></div>';
+  }
+ });
+ let meetingsHtml='';
+ let hasMeetings=false;
+ dates.forEach((d,i)=>{
+  let isToday=i===todayIndex;
+  let ms=D.meetings.filter(m=>m.date===d);
+  if(ms.length){
+   hasMeetings=true;
+   meetingsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"><div style="display:flex;flex-direction:column;gap:3px">'+
+    ms.map(m=>'<div class="ws-meeting-item click" onclick="openEditMeeting(\''+m.id+'\')">🗓 '+(m.time?e(m.time)+' ':'')+e(m.title)+'</div>').join('')+
+   '</div></div>';
+  }else{
+   meetingsHtml+='<div class="ws-extra-col'+(isToday?' ws-today-col':'')+'"></div>';
+  }
+ });
  let weekRange=fmtDateShort(dates[0])+' — '+fmtDateShort(dates[dates.length-1]);
  return '<div class="card ws-card">'+
   '<div class="ws-head">'+
@@ -162,7 +195,14 @@ function widgetSchedule(){
    '<div class="ws-headcell">№</div>'+head+
    body+
   '</div>'+
- '</div>';
+  (hasClubs?'<div class="ws-extra-section" style="grid-template-columns:56px repeat('+dates.length+',1fr);gap:6px">'+
+   '<div class="ws-extra-label">Кружки / секции</div>'+clubsHtml+'</div>':'')+
+  (hasMeetings?'<div class="ws-extra-section" style="grid-template-columns:56px repeat('+dates.length+',1fr);gap:6px">'+
+   '<div class="ws-extra-label">Совещания</div>'+meetingsHtml+'</div>':
+   '<div class="ws-extra-section ws-empty-section" style="grid-template-columns:56px repeat('+dates.length+',1fr);gap:6px">'+
+   '<div class="ws-extra-label">Совещания</div>'+
+   '<div class="ws-empty-msg" style="grid-column:2/-1;text-align:center;color:var(--color-text-secondary);padding:12px">Совещаний на этой неделе нет!</div></div>')+
+  '</div>';
 }
 function fullSchedulePage(){
  let dates=weekDates(S.weekStart);
