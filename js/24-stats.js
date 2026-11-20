@@ -230,16 +230,16 @@ function studentsLeaderboardCard(){
    '<div class="lb-row-wrap">'+parallelCards.join('')+'</div>'+
   '</div>';
 }
-function leaderboardCardHtml(title,rows,type,wide){
+ function leaderboardCardHtml(title,rows,type,wide){
  if(!rows.length)return '';
  let wc=wide?' lb-card-wide':'';
  let items=rows.map((r,i)=>{
   let val=type==='att'?(r.attendancePct===null?'—':r.attendancePct+'%'):round2(r.avgGrade);
-  let cls=e(studentClassNames(r.s));
+  let sid=r.s.id;
   if(wide){
-   return '<div class="lb-row"><div class="lb-pos">'+(i+1)+'</div><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+cls+'</div><div class="lb-val">'+val+'</div></div>'
+   return '<div class="lb-row"><div class="lb-pos">'+(i+1)+'</div><div class="lb-name click" onclick="openStudentPage(\''+sid+'\')">'+studentFio(r.s)+'</div><div class="lb-cls">'+e(studentClassNames(r.s))+'</div><div class="lb-val">'+val+'</div></div>'
   }
-  return '<div class="lb-row small"><div class="lb-info"><div class="lb-name">'+studentFio(r.s)+'</div><div class="lb-cls">'+studentRegularClasses(r.s)+'</div></div><div class="lb-val">'+val+'</div></div>'
+  return '<div class="lb-row small"><div class="lb-info"><div class="lb-name click" onclick="openStudentPage(\''+sid+'\')">'+studentFio(r.s)+'</div><div class="lb-cls">'+studentRegularClasses(r.s)+'</div></div><div class="lb-val click" onclick="openStudentPage(\''+sid+'\')">'+val+'</div></div>'
  }).join('');
  return '<div class="lb-card'+wc+'"><div class="lb-title">'+title+'</div><div class="lb-list">'+items+'</div></div>';
 }
