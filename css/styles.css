@@ -221,9 +221,8 @@ html.dark .fieldrow{border-bottom-color:rgba(255,255,255,.06)}
 .wta-name{font-weight:600;font-size:14px}
 .wta-label{font-size:13px;text-align:right;flex:1}
 .wta-stats{font-size:13px;color:var(--color-text-secondary);margin-bottom:6px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;width:100%}
-.wta-count{flex:1;text-align:left}
-.wta-avg{flex:1;text-align:center}
-.wta-recent{flex:1;text-align:right}
+.wta-left{text-align:left;flex:1}
+.wta-recent{text-align:right}
 .wta-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
 .wta-form input{font-size:14px;padding:6px 8px;min-height:auto}
 .wta-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}

@@ -44,7 +44,7 @@ function widgetWhoToAsk(cls,lessonId){
   let vals=lessons.map(l=>gradeNumericValue((l.grades||{})[sid].value)).filter(v=>v!==null);
   let avg=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2).replace('.',','):'—';
   let last=lessons.slice(-3).map(x=>{let v=(x.grades||{})[sid];return e(v&&v.value!==''&&v.value!=null?v.value:gradePointsText(v));}).join(', ');
-  return'<span class="wta-count muted small">Оценок: '+lessons.length+'</span>'+(avg!=='—'?'<span class="wta-avg muted small">· Ср. балл: '+avg+'</span>':'')+(last?'<span class="wta-recent muted small">· Последние: '+last+'</span>':'');
+  return'<span class="wta-left">'+'<span class="wta-count muted small">Оценок: '+lessons.length+'</span>'+(avg!=='—'?'<span class="wta-avg muted small">· Ср. балл: '+avg+'</span>':'')+'</span>'+(last?'<span class="wta-recent muted small">· Последние: '+last+'</span>':'');
  }
  function studentRow(item,label,canReroll){
   if(!item)return'';
