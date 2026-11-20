@@ -164,7 +164,7 @@ function widgetTasks(){
   });
   return '<div class="card"><div class="top" style="justify-content:space-between;align-items:center">'+
    '<h2 style="margin-top:0">Задачи</h2>'+
-   '<button class="primary" onclick="openNewWorkTask()" style="flex:0;height:32px;width:32px;display:grid;place-items:center;font-size:16px;padding:0;border-radius:8px">＋</button>'+
+   '<button class="primary" onclick="openNewWorkTask()" style="flex:0;height:34px;width:34px;min-width:34px;min-height:34px;display:grid;place-items:center;font-size:18px;padding:0;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15)">＋</button>'+
    '</div>'+
    (items.length?'<div class="checks">'+items.map(t=>{
     let overdue=t.dueDate&&t.dueDate<toISO(new Date())&&t.status!=='done';
@@ -176,17 +176,11 @@ function widgetTasks(){
      '<div style="display:flex;align-items:center;gap:6px">'+
       (t.dueDate?'<span class="small '+(overdue?'danger':'muted')+'">'+fmtDate(t.dueDate)+(overdue?' ⚠':'')+'</span>':'')+
       '<span class="badge '+priorityBadgeClass(t.priority)+'">'+priorityLabel(t.priority)+'</span>'+
-      '<button onclick="event.stopPropagation();openEditWorkTask(\''+t.id+'\')" style="background:none;border:none;padding:4px;font-size:14px;cursor:pointer;color:var(--color-text-secondary)">✎</button>'+
+      '<button onclick="event.stopPropagation();openEditWorkTask(\''+t.id+'\')" style="background:none;border:none;padding:4px;font-size:14px;cursor:pointer;color:var(--color-text-secondary);display:inline-block;transform:rotate(90deg)">✎</button>'+
      '</div>'+
     '</div>';
    }).join('')+'</div>':'<div class="muted small">Задач пока нет.</div>')+
   '</div>';
-}
-function addQuickTask(){
- let inp=document.getElementById('todo-input');
- let text=inp.value.trim();if(!text)return;
- D.workTasks.push({id:uid(),title:text,dueDate:'',priority:'med',status:'todo',notes:''});
- save();render();
 }
 function widgetBirthdays(){
   let items=[];
