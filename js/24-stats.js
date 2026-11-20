@@ -100,12 +100,67 @@ function statsPage(){
    mstat(behaviorCount,'Заметок о поведении')+
   '</div></div>'+
   statsAssistantCard()+
-  '<div class="card"><h2 style="margin-top:0">Распределение оценок <span class="muted small">нажмите на столбец, чтобы увидеть кому и когда</span></h2>'+svgBarChart(gradeDistData(distVals,scope,scopeId,r.from,r.to),{width:900,height:260})+'</div>'+
-  '<div class="card"><h2 style="margin-top:0">Посещаемость <span class="muted small">(нажмите, чтобы увидеть кто и когда пропускал)</span></h2>'+donutChartPct(attPct,140,"showAttendanceBreakdown('"+scope+"','"+scopeId+"','"+r.from+"','"+r.to+"')")+'</div>'+
+  '<div class="card"><h2 style="margin-top:0">Распределение оценок</h2>'+svgBarChart(gradeDistData(distVals,scope,scopeId,r.from,r.to),{width:900,height:380})+'</div>'+
+  '<div class="stats-pair">'+attendanceWidget(attPct)+problemStudentsWidget()+'</div>'+
   behaviorLeaderboardCard()+
-  statsClassesCard()+statsStudentsCard();
+   statsClassesCard();
 }
 function mstat(n,t){return '<div class="mstat"><div class="mv">'+n+'</div><div class="ml">'+t+'</div></div>'}
+function donutPlain(pct,size){
+ size=size||160;
+ let deg=pct===null?0:Math.round(pct*3.6);
+ let show=pct===null?'—':Math.round(pct*10)/10+'%';
+ return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:conic-gradient(var(--color-accent) '+deg+'deg, var(--color-border) 0deg);display:flex;align-items:center;justify-content:center;flex:0 0 auto;margin:0 auto">'+
+ '<div style="width:'+Math.round(size*0.62)+'px;height:'+Math.round(size*0.62)+'px;border-radius:50%;background:var(--color-surface);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">'+show+'</div>'+
+ '</div>';
+}
+function attendanceWidget(attPct){
+ let pct=attPct===null?0:Math.round(attPct*10)/10;
+ let pctText=attPct===null?'—':pct+'%';
+ return '<div class="card stat-half att-widget">'+
+  '<div class="top"><h2 style="margin:0 0 10px">Посещаемость</h2></div>'+
+  '<div class="att-visual">'+
+   '<div class="att-dark">'+donutPlain(pct,160)+'</div>'+
+   '<div class="att-big">'+pctText+'</div>'+
+  '</div>'+
+ '</div>';
+}
+function problemStudentsWidget(){
+ let f=S.statsFilter,r=periodRange();
+ let students=D.students.filter(s=>s.status!=='archived'&&(!f.classId||(s.classIds||[]).some(i=>groupIds(f.classId).includes(i))));
+ let rows=students.map(s=>{
+  let ls=activeLessons().filter(l=>(s.classIds||[]).includes(l.classId)&&!l.cancelled&&l.date>=r.from&&l.date<=r.to);
+  let gv=[];ls.forEach(l=>{let g=(l.grades||{})[s.id];if(g){let n=gradeNumericValue(g.value);if(n!==null)gv.push(n)}});
+  let at=0,ap=0;ls.forEach(l=>{let v=(l.attendance||{})[s.id];if(v){at++;if(v!=='н')ap++}});
+  let behaviorCount=0;ls.forEach(l=>{if((l.behaviorNotes||{})[s.id])behaviorCount++});
+  return {s,avgGrade:avg(gv),gradesCount:gv.length,attendancePct:at?Math.round(ap/at*1000)/10:null,absences:at-ap,behaviorCount,lessonsCount:ls.length};
+ }).filter(x=>x.lessonsCount>0);
+ let baseline=avg(rows.map(r=>r.avgGrade).filter(x=>x!==null));
+ let problems=rows.filter(x=>{
+  let drop=baseline!==null&&x.avgGrade!==null&&baseline-x.avgGrade>=1;
+  let manyAbs=x.absences>=3;
+  let fewGrades=x.gradesCount>0&&x.gradesCount<=2;
+  return drop||manyAbs||fewGrades;
+ });
+ problems.sort((a,b)=>{
+  let pa=(baseline!==null&&a.avgGrade!==null?baseline-a.avgGrade:0)+(a.absences>=3?2:0)+(a.gradesCount<=2&&a.gradesCount>0?1:0);
+  let pb=(baseline!==null&&b.avgGrade!==null?baseline-b.avgGrade:0)+(b.absences>=3?2:0)+(b.gradesCount<=2&&b.gradesCount>0?1:0);
+  return pb-pa;
+ });
+ if(!problems.length)return '<div class="card stat-half prob-widget"><div class="top"><h2 style="margin:0 0 10px">Карта проблемных учеников</h2></div><div class="empty" style="padding:20px">Нет проблемных учеников за выбранный период.</div></div>';
+ let items=problems.slice(0,8).map(x=>{
+  let reasons=[];
+  if(baseline!==null&&x.avgGrade!==null&&baseline-x.avgGrade>=1)reasons.push('среднее ниже группы на '+round2(baseline-x.avgGrade));
+  if(x.absences>=3)reasons.push('пропусков: '+x.absences);
+  if(x.gradesCount>0&&x.gradesCount<=2)reasons.push('оценок: '+x.gradesCount);
+  return '<div class="prob-row"><div class="prob-name">'+studentFio(x.s)+'</div><div class="prob-cls">'+e(studentClassNames(x.s))+'</div><div class="prob-reason">'+reasons.join('; ')+'</div><div class="prob-chip" onclick="openStudentPage(\''+x.s.id+'\')">открыть профиль</div></div>';
+ }).join('');
+ return '<div class="card stat-half prob-widget">'+
+  '<div class="top"><h2 style="margin:0 0 10px">Карта проблемных учеников</h2></div>'+
+  '<div class="prob-list">'+items+'</div>'+
+  (problems.length>8?'<div class="muted small" style="margin-top:6px">И ещё '+(problems.length-8)+' учеников.</div>':'')+
+ '</div>';
+}
 function statsFilterBar(){
  let f=S.statsFilter;
  let quarterOpts=(D.settings.quarters||[]).map(q=>['<option value="'+q.id+'"'+(f.period===q.id?' selected':'')+'>'+e(q.name)+'</option>']).map(x=>x[0]).join('');
@@ -128,13 +183,15 @@ function statsClassesCard(){
   return {c,studentsCount:peopleGroup(c.id).length,lessonsCount:ls.length,avgGrade:avg(gv),attendancePct:attPct===null?null:Math.round(attPct*10)/10,behaviorCount,
    planned:ls.filter(l=>lessonStatus(l)==='red').length,partial:ls.filter(l=>lessonStatus(l)==='yellow').length,prepared:ls.filter(l=>lessonStatus(l)==='blue').length,done:ls.filter(l=>lessonStatus(l)==='green').length};
  });
- let sortKey=S.statsFilter.sortClasses;
- let sorters={name:(a,b)=>compareClasses(a.c,b.c),avg:(a,b)=>(b.avgGrade||0)-(a.avgGrade||0),att:(a,b)=>(b.attendancePct||0)-(a.attendancePct||0),students:(a,b)=>b.studentsCount-a.studentsCount,lessons:(a,b)=>b.lessonsCount-a.lessonsCount};
- rows.sort(sorters[sortKey]||sorters.name);
- return '<div class="card"><div class="top"><h2>Статистика по классам</h2><select onchange="S.statsFilter.sortClasses=this.value;render()">'+
-  [['name','По названию'],['avg','По средней оценке'],['att','По посещаемости'],['students','По кол-ву учеников'],['lessons','По кол-ву уроков']].map(o=>'<option value="'+o[0]+'"'+(sortKey===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></div>'+
-  '<div class="grid">'+rows.map(r=>'<div class="card click" onclick="openClass(\''+r.c.id+'\')"><b>'+e(r.c.name)+'</b><div class="small muted">'+r.studentsCount+' учеников</div><div>Средняя: '+round2(r.avgGrade)+'</div><div>Посещаемость: '+(r.attendancePct===null?'—':r.attendancePct+'%')+'</div><div>Уроков: '+r.lessonsCount+'</div><div class="small muted">Заметок о поведении: '+r.behaviorCount+'</div><div class="small">🔴'+r.planned+' 🟡'+r.partial+' 🔵'+r.prepared+' 🟢'+r.done+'</div></div>').join('')+
-  (rows.length?'':'<div class="empty">Классов пока нет.</div>')+'</div></div>';
+  let sortKey=S.statsFilter.sortClasses;
+  let sortDir=S.statsFilter.sortDirClasses==='desc'?-1:1;
+  let sorters={name:(a,b)=>compareClasses(a.c,b.c)*sortDir,avg:(a,b)=>((a.avgGrade||0)-(b.avgGrade||0))*sortDir,att:(a,b)=>((a.attendancePct||0)-(b.attendancePct||0))*sortDir,lessons:(a,b)=>(a.lessonsCount-b.lessonsCount)*sortDir};
+  rows.sort(sorters[sortKey]||sorters.name);
+  return '<div class="card"><div class="top"><h2 style="margin:0 0 10px">Статистика по классам</h2><select class="sort-select" onchange="S.statsFilter.sortClasses=this.value;render()">'+
+   [['name','По алфавиту'],['avg','По среднему баллу'],['att','По посещаемости'],['lessons','По количеству уроков']].map(o=>'<option value="'+o[0]+'"'+(sortKey===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+   '<button class="sort-dir-btn" onclick="S.statsFilter.sortDirClasses=S.statsFilter.sortDirClasses===\'asc\'?\'desc\':\'asc\';render()">'+(S.statsFilter.sortDirClasses==='asc'?'↑':'↓')+'</button></div>'+
+   (rows.length?'<table class="table stats-classes-table"><tr><th class="click">Класс</th><th>Учеников</th><th>Средняя</th><th>Посещаемость</th><th>Уроков</th><th>Заметок о поведении</th></tr>'+
+   rows.map(r=>'<tr class="click" onclick="openClass(\''+r.c.id+'\')"><td><b>'+e(r.c.name)+'</b></td><td>'+r.studentsCount+'</td><td>'+round2(r.avgGrade)+'</td><td>'+(r.attendancePct===null?'—':r.attendancePct+'%')+'</td><td>'+r.lessonsCount+'</td><td>'+r.behaviorCount+'</td></tr>').join('')+'</table>':'<div class="empty">Классов пока нет.</div>')+'</div>';
 }
 function studentBadgeInfo(metrics,baseline){
  let reasons=[];let top=false,attention=false;
@@ -200,13 +257,21 @@ function behaviorLeaderboardData(){
 function behaviorLeaderboardCard(){
  let rows=behaviorLeaderboardData();
  if(!rows.length)return '<div class="card"><h2 style="margin-top:0">🧭 Замечания о поведении</h2><div class="muted small">За выбранный период замечаний о поведении нет.</div></div>';
- let top=rows.slice(0,12);
- return '<div class="card"><h2 style="margin-top:0">🧭 Рейтинг замечаний о поведении <span class="muted small">(нажмите на ученика, чтобы увидеть список)</span></h2>'+
+ let top=rows.slice(0,5);
+ return   '<div class="card"><div class="top"><h2 style="margin:0 0 10px">🧭 Рейтинг замечаний о поведении</h2><button onclick="showAllBehavior()" class="primary small-btn">Все ученики</button></div>'+
   '<div class="rank-list">'+top.map((r,i)=>
    '<div class="rank-row'+(i<3?' top'+(i+1):'')+'" onclick="showBehaviorDetail(\''+r.s.id+'\')"><div class="rank-pos">'+(i+1)+'</div><div class="rank-avatar">'+e(studentInitials(r.s))+'</div><div><div class="rank-name">'+studentFio(r.s)+'</div><div class="rank-sub">'+e(studentClassNames(r.s))+'</div></div><div class="rank-count">'+r.count+'</div></div>'
   ).join('')+
   (rows.length>top.length?'<div class="muted small" style="margin-top:6px">И ещё '+(rows.length-top.length)+' учеников с замечаниями.</div>':'')+
   '</div></div>';
+}
+function showAllBehavior(){
+ let rows=behaviorLeaderboardData();
+ setModalHtml('Все ученики с замечаниями о поведении',
+  '<div class="muted small" style="margin-bottom:10px">Всего за выбранный период: <b>'+rows.length+'</b> учеников</div>'+
+  '<div style="overflow:auto"><table class="table"><tr><th>Ученик</th><th>Класс</th><th>Кол-во замечаний</th></tr>'+
+  rows.map(r=>'<tr class="click" onclick="closeModal();showBehaviorDetail(\''+r.s.id+'\')"><td>'+studentFio(r.s)+'</td><td>'+e(studentClassNames(r.s))+'</td><td>'+r.count+'</td></tr>').join('')+
+  '</table></div><div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);
 }
 function showBehaviorDetail(sid){
  let rows=behaviorLeaderboardData();

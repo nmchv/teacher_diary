@@ -1,6 +1,6 @@
 /* ===================== СОСТОЯНИЕ ПРИЛОЖЕНИЯ ===================== */
 let S={view:'home',classId:null,studentId:null,tab:'lessons',q:'',weekStart:mondayOf(toISO(new Date())),
- sidebarCollapsed:false,studentSort:'fio',statsFilter:{period:'all',classId:'',studentId:'',from:'',to:'',sortClasses:'name',sortStudents:'fio'},
+ sidebarCollapsed:false,studentSort:'fio',statsFilter:{period:'all',classId:'',studentId:'',from:'',to:'',sortClasses:'name',sortDirClasses:'asc',sortStudents:'fio',sortDirStudents:'asc'},
  lessonModal:null /* {id, mode:'view'|'edit', draft} */, materialsCategory:'',
  chartPeriods:{student:{period:'all',from:'',to:''},class:{period:'all',from:'',to:''}},
  recentFilter:{classId:'',status:'',sort:'date_desc',limit:10},
