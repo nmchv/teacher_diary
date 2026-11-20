@@ -363,6 +363,14 @@ function movePresentBlockSide(kind,side,i){
 }
 function presentReminderHtml(l){
  let info=lessonTimeInfo(l,new Date());
- if(info&&info.remaining>0&&info.remaining<=5)return '⏰ До конца урока осталось '+fmtMinutes(info.remaining)+' мин.!';
+ if(info&&info.remaining>0&&info.remaining<=5){
+  let cls=C(l.classId);
+  let ps=attendablePeople(cls.id);
+  let att=l.attendance||{};
+  let unmarked=ps.filter(s=>!(s.id in att));
+  let msg='⏰ До конца урока осталось '+fmtMinutes(info.remaining)+' мин.';
+  if(unmarked.length)msg+=' · посещаемость не отмечена';
+  return msg+'!';
+ }
  return '';
 }
