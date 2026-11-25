@@ -78,7 +78,7 @@ function widgetClock(){
   let progress=schoolYearProgress();
   return '<div class="card home-header-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px">'+
    '<div class="weather-bg weather-'+condition+'" style="position:absolute;inset:0;z-index:0;pointer-events:none"></div>'+
-   '<div style="position:relative;z-index:2;flex:1;max-width:170px;text-align:left">'+
+   '<div class="click" onclick="openSchoolYearDetail()" style="position:relative;z-index:2;flex:1;max-width:170px;text-align:left">'+
     '<div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-hover);margin-bottom:6px">Учебный год</div>'+
     '<div style="font-size:20px;font-weight:700;color:var(--color-text-primary);margin-bottom:6px">'+progress+'%</div>'+
     '<div class="progress-track"><div class="progress-fill" style="width:'+progress+'%"></div></div>'+
@@ -148,6 +148,47 @@ function openWeatherDetail(){
    '</div>'+
   '</div>'+
   '<div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);
+}
+function openSchoolYearDetail(){
+  let ay=D.settings.academicYear||'2026–2027';
+  let m=String(ay).match(/(\d{4})/g);
+  if(!m){setModalHtml('Учебный год','<div class="empty">Учебный год не задан.</div><div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);return}
+  let startY=+m[0];
+  let endY=m.length>1?+m[1]:startY+1;
+  let start=new Date(startY,8,1);
+  let end=new Date(endY,4,31);
+  let now=new Date();
+  let progress=schoolYearProgress();
+  let yearLessons=activeLessons().filter(l=>{
+    let d=new Date(l.date+'T12:00:00');
+    return !isNaN(d)&&d>=start&&d<=end;
+  });
+  let todayStr=toISO(now);
+  let passedLessons=yearLessons.filter(l=>l.date<=todayStr).length;
+  let remainingLessons=yearLessons.filter(l=>l.date>todayStr).length;
+  let totalWeeks=Math.ceil((end-start)/(7*24*60*60*1000));
+  let passedWeeks=Math.floor((now-start)/(7*24*60*60*1000));
+  let remainingWeeks=Math.ceil((end-now)/(7*24*60*60*1000));
+  let daysLeft=Math.ceil((end-now)/(24*60*60*1000));
+  setModalHtml('Учебный год '+ay,
+   '<div class="grid" style="gap:16px">'+
+   '<div class="card" style="text-align:center;padding:20px">'+
+   '<div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-hover);margin-bottom:6px">Прогресс учебного года</div>'+
+   '<div style="font-size:32px;font-weight:700;color:var(--color-text-primary);margin-bottom:6px">'+progress+'%</div>'+
+   '<div class="progress-track"><div class="progress-fill" style="width:'+progress+'%"></div></div>'+
+   '<div class="muted" style="margin-top:8px">'+fmtDate(start)+' — '+fmtDate(toISO(end))+'</div>'+
+   '</div>'+
+   '<div class="card">'+
+   '<div class="mgrid">'+
+   '<div class="mstat"><div class="mv">'+passedLessons+'</div><div class="ml">Уроков прошло</div></div>'+
+   '<div class="mstat"><div class="mv">'+remainingLessons+'</div><div class="ml">Уроков осталось</div></div>'+
+   '<div class="mstat"><div class="mv">'+passedWeeks+'</div><div class="ml">Недель прошло</div></div>'+
+   '<div class="mstat"><div class="mv">'+Math.max(0,remainingWeeks)+'</div><div class="ml">Недель осталось</div></div>'+
+   '<div class="mstat"><div class="mv">'+Math.max(0,daysLeft)+' дн.</div><div class="ml">До конца года</div></div>'+
+   '</div>'+
+   '</div>'+
+   '</div>'+
+   '<div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);
 }
 function widgetSchedule(){
  let dates=weekDates(S.weekStart);
