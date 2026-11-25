@@ -137,7 +137,7 @@ table.classtable button.label:hover{background:var(--color-surface-elevated)}
 table.classtable td:last-child{width:1px;padding:5px 4px}
 table.classtable td:last-child button{opacity:.6;padding:3px 6px;font-size:11px}
 table.classtable td:last-child button:hover{opacity:1}
-.main{margin-left:64px;margin-top:var(--header-h);flex:1;overflow:auto;padding:28px 30px;max-width:none}
+.main{margin-left:64px;flex:1;overflow:auto;padding:28px 30px;max-width:none}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:20px;flex-wrap:wrap}
 h1{font-size:28px;margin:0 0 4px}
 h2{font-size:20px;margin:0 0 14px}
@@ -418,12 +418,12 @@ html.dark .theme-toggle .icon-moon{display:block}
   -webkit-backdrop-filter:blur(8px);
 }
 .header-wrap{
-  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  display:flex;align-items:center;gap:16px;
   height:100%;padding:0 var(--gutter);max-width:var(--max);margin:0 auto;width:100%;
 }
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:clamp(1rem,.92rem+.2vw,1.3rem);color:var(--color-text-primary)}
 .brand-icon{width:28px;height:28px;flex:0 0 28px}
-.header-nav{display:flex;align-items:center;gap:10px;flex:1;justify-content:flex-end}
+.header-nav{display:flex;align-items:center;gap:10px;margin-left:auto;justify-content:flex-end}
 .header-btn{
   display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);color:var(--color-text-primary);font-size:var(--fs-small);font-weight:600;transition:background-color .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease),transform .15s var(--ease);cursor:pointer;white-space:nowrap
 }
