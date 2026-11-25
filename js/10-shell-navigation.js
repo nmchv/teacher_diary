@@ -32,9 +32,10 @@ function render(){
   const side=document.querySelector('.side');
   if(side){
     if(sideOpen)side.classList.add('side-open');
-    side.onmousedown=function(){sideOpen=true;side.classList.add('side-open');};
-    side.onmouseleave=function(){sideOpen=false;side.classList.remove('side-open');};
+    side.onmousedown=function(){sideOpen=true;side.classList.add('side-open');document.body.classList.add('sidebar-open');};
+    side.onmouseleave=function(){sideOpen=false;side.classList.remove('side-open');document.body.classList.remove('sidebar-open');};
   }
+  document.body.classList.toggle('sidebar-open', sideOpen);
   initAutosize();
   if(S.lessonModal)renderLessonModal();
   if(S.view==='home')startClockTicker();
