@@ -29,6 +29,7 @@ function loadData(){
  if(!D.settings.gradeCommentTemplates)D.settings.gradeCommentTemplates=[...GRADE_COMMENT_TEMPLATES_DEFAULT];
  if(!D.settings.libraryGradeLevels)D.settings.libraryGradeLevels=[...LIBRARY_GRADE_LEVELS_DEFAULT];
  if(D.settings.showSaturday===undefined)D.settings.showSaturday=true;
+ if(!D.settings.formalSchedule)D.settings.formalSchedule=[];
 if(!D.settings.colorMode)D.settings.colorMode='light';
 if(D.settings.weatherCity===undefined)D.settings.weatherCity=WEATHER_DEFAULT_CITY;
 if(D.settings.lastBackupAt===undefined)D.settings.lastBackupAt=null;

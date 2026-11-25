@@ -190,6 +190,46 @@ function openSchoolYearDetail(){
    '</div>'+
    '<div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);
 }
+function openFormalScheduleModal(){
+  let days=D.settings.showSaturday?6:5;
+  let dayLabels=DAY_NAMES.slice(0,days);
+  let dayNamesFull=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'].slice(0,days);
+  let schedule={};
+  (D.settings.formalSchedule||[]).forEach(s=>{let key=s.day+'|'+s.lessonNum;(schedule[key]=schedule[key]||[]).push(s)});
+  D.classes.filter(c=>c.type==='club').forEach(c=>{
+   D.lessons.filter(l=>l.classId===c.id&&!l.lessonNumber).forEach(l=>{
+    let d=new Date(l.date+'T12:00:00');
+    if(isNaN(d))return;
+    let day=dayIndexOfDate(l.date);
+    if(day>=days)return;
+    let key=day+'|0';
+    (schedule[key]=schedule[key]||[]).push({classId:c.id,className:c.name,startTime:l.startTime,endTime:l.endTime,isClub:true});
+   });
+  });
+  let rows='';
+  dayLabels.forEach((dn,di)=>{
+   rows+='<tr><td style="font-weight:600;color:var(--color-text-secondary);width:70px">'+dayNamesFull[di]+'</td>'+
+    LESSON_TIMES.map(t=>{
+     let key=di+'|'+t.n;
+     let items=(schedule[key]||[]);
+     let clubKey=di+'|0';
+     let clubItems=(schedule[clubKey]||[]).filter(x=>x.isClub);
+     let allItems=[...items,...clubItems];
+     if(!allItems.length)return '<td style="height:44px"></td>';
+     return '<td style="height:44px;font-size:12px;line-height:1.3;position:relative">'+
+      allItems.map(it=>'<div style="padding:3px 5px;border-radius:4px;background:var(--color-surface-elevated);border:1px solid var(--color-border);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+
+       (it.isClub?'🔸 ':'')+e(it.className)+(it.startTime?' <span style="font-size:10px;color:var(--color-text-secondary)">'+it.startTime+(it.endTime?'–'+it.endTime:'')+'</span>':'')+
+      '</div>').join('')+'</td>';
+    }).join('')+'</tr>';
+  });
+  let head='<tr><th style="width:70px">День</th>'+LESSON_TIMES.map(t=>'<th style="text-align:center">'+t.n+'‑й<br><span style="font-size:11px;color:var(--color-text-secondary);font-weight:400">'+t.start+'–'+t.end+'</span></th>').join('')+'</tr>';
+  setModalHtml('Моё расписание (формальное)',
+   '<div style="max-height:70vh;overflow:auto">'+
+   '<table class="table" style="font-size:13px">'+head+rows+'</table>'+
+   '</div>'+
+   '<p class="muted small" style="margin-top:10px">🔸 — кружок / секция. Настроить расписание можно в «Настройки → Расписание / блокировки → Формальное расписание».</p>'+
+   '<div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);
+}
 function widgetSchedule(){
  let dates=weekDates(S.weekStart);
  let todayStr=toISO(new Date());
@@ -271,7 +311,7 @@ let clubsHtml='<div class="ws-extra-time-col"></div>';
     '<span class="ws-title">'+weekRange+'</span>'+
     '<button class="ws-arrow" onclick="shiftWeek(1)">›</button>'+
    '</div>'+
-   '<button class="ws-open" onclick="goto(\'fullschedule\')">Моё расписание</button>'+
+   '<button class="ws-open" onclick="openFormalScheduleModal()">Моё расписание</button>'+
   '</div>'+
   '<div class="ws-grid" style="grid-template-columns:56px repeat('+dates.length+',1fr);gap:6px">'+
    '<div class="ws-headcell">№</div>'+head+

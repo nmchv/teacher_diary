@@ -124,10 +124,14 @@ function setTeacherName(v){D.settings.teacherName=v.trim();save()}
 function setPointsThreshold(v){D.settings.pointsThreshold=Math.max(1,+v||5);save()}
 function setWeatherCity(v){D.settings.weatherCity=v;save();initWeather();render()}
 function settingsScheduleTab(){
- return sCard('Дни недели в расписании',
-  '<label class="attrow" style="cursor:pointer"><span>Показывать субботу как учебный день</span><input type="checkbox" '+(D.settings.showSaturday?'checked':'')+' style="width:auto" onchange="toggleShowSaturday(this.checked)"></label>'+
-  '<p class="muted small">Если выключить — суббота уберётся из недельного расписания, свободной таблицы «Расписание класса» и списка дней для авторасстановки.</p>')+
-  sCard('Четверти учебного года',
+  return sCard('Дни недели в расписании',
+   '<label class="attrow" style="cursor:pointer"><span>Показывать субботу как учебный день</span><input type="checkbox" '+(D.settings.showSaturday?'checked':'')+' style="width:auto" onchange="toggleShowSaturday(this.checked)"></label>'+
+   '<p class="muted small">Если выключить — суббота уберётся из недельного расписания, свободной таблицы «Расписание класса» и списка дней для авторасстановки.</p>')+
+   sCard('Формальное расписание (нагрузка)',
+   '<p class="muted small">Задайте формальное расписание: какие уроки и для каких классов проходят в каждый день недели. Эта таблица показывается по кнопке «Моё расписание» на главной.</p>'+
+   '<div class="toolbar" style="margin-bottom:10px"><button class="primary" onclick="openEditFormalSchedule()">Настроить формальное расписание</button></div>'+
+   (D.settings.formalSchedule&&D.settings.formalSchedule.length?'<div class="muted small">Записей в формальном расписании: <b>'+D.settings.formalSchedule.length+'</b></div>':'<div class="empty">Формальное расписание пока не задано.</div>'))+
+   sCard('Четверти учебного года',
   '<p class="muted small">Задайте границы четвертей один раз — тогда в статистике и на графиках оценок можно будет точно фильтровать «по четверти» вместо приблизительного периода.</p>'+
   '<div class="toolbar" style="margin-bottom:10px"><button class="primary" onclick="openAddQuarter()">＋ Добавить четверть</button></div>'+
   (D.settings.quarters.length?'<table class="table"><tr><th>Название</th><th>С</th><th>По</th><th></th></tr>'+
@@ -318,7 +322,35 @@ function confirmPlaceTemplate(templateId){
   D.lessons.push(nl);created++;
  });
  save();closeModal();
- alert('Создано уроков: '+created+(skipped.length?'.\nПропущено:\n'+skipped.join('\n'):''));
- render();
+  alert('Создано уроков: '+created+(skipped.length?'.\nПропущено:\n'+skipped.join('\n'):''));
+  render();
+}
+
+/* ---- Формальное расписание (нагрузка) ---- */
+function openEditFormalSchedule(){
+  let days=D.settings.showSaturday?6:5;
+  let dayLabels=DAY_NAMES.slice(0,days);
+  let classesHtml=sortedClasses(D.classes).map(c=>'<option value="'+c.id+'">'+e(c.name)+'</option>').join('');
+  let grid='';
+  dayLabels.forEach((dn,di)=>{
+   grid+='<div style="display:flex;flex-direction:column;gap:3px"><div style="font-weight:600;color:var(--color-text-secondary);font-size:12px;text-transform:uppercase;letter-spacing:.05em">'+dn+'</div>'+
+    LESSON_TIMES.map(t=>'<div style="display:flex;gap:5px;align-items:center"><span style="width:28px;text-align:right;font-size:11px;color:var(--color-text-secondary)">'+t.n+'.</span><select style="flex:1;padding:6px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);color:var(--color-text-primary);font-size:12px" onchange="setFormalSlot('+di+','+t.n+',this.value)"><option value="">—</option>'+classesHtml+'</select></div>').join('')+
+   '</div>';
+  });
+  setModalHtml('Формальное расписание',
+   '<div style="display:flex;gap:16px;flex-wrap:wrap">'+grid+'</div>'+
+   '<p class="muted small" style="margin-top:12px">Выберите класс для каждого урока в каждый день. Пусто — урока нет. Кружки и секции отображаются автоматически из классов с типом «club».</p>'+
+   '<div class="toolbar" style="margin-top:14px"><button class="primary" onclick="closeModal()">Закрыть</button></div>',true);
+}
+function setFormalSlot(day,lessonNum,classId){
+  let idx=D.settings.formalSchedule.findIndex(x=>x.day===day&&x.lessonNum===lessonNum);
+  if(classId){
+   let cls=C(classId);
+   if(idx>=0){D.settings.formalSchedule[idx].classId=classId;D.settings.formalSchedule[idx].className=cls?cls.name:''}
+   else D.settings.formalSchedule.push({day,lessonNum,classId,className:C(classId)?C(classId).name:''});
+  }else{
+   if(idx>=0)D.settings.formalSchedule.splice(idx,1);
+  }
+  save();
 }
 
