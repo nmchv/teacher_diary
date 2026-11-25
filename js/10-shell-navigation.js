@@ -1,8 +1,9 @@
 /* ===================== ОБОЛОЧКА / НАВИГАЦИЯ ===================== */
+let altNav=false;
+let sideOpen=false;
+function toggleAltNav(){altNav=!altNav;render();}
 function render(){
-  document.getElementById('app').innerHTML=
-  '<aside class="side'+(S.sidebarCollapsed?' collapsed':'')+'">'+
-   '<div class="brand"><span class="brand-text">Дневник учителя</span><button class="collapse-btn" onclick="toggleSidebar()" title="Свернуть/развернуть">'+(S.sidebarCollapsed?'»':'«')+'</button></div>'+
+  const navs =
    navBtn('home','⌂','Главная')+
    /* navBtn('fullschedule','📅','Расписание')+ — временно скрыто по просьбе пользователя, страница fullSchedulePage() и логика сохранены в коде */
    navBtn('students','☺','Ученики')+
@@ -14,24 +15,49 @@ function render(){
    navBtn('announcements','📣','Объявления')+
    navBtn('work','💼','Работа')+
    navBtn('settings','⚙','Настройки')+
-   navBtn('backup','⇩','Резервная копия')+
-   '<div class="classes"><div class="classes-head"><span class="label">Классы</span><button onclick="openNewClass(\'class\')">＋</button></div>'+
-   '<div class="classlist">'+sortedClasses(D.classes.filter(c=>c.type!=='club')).map(c=>'<div class="classrow"><button class="label" onclick="openClass(\''+c.id+'\')">'+e(c.name)+'</button><button class="label" onclick="event.stopPropagation();openEditClass(\''+c.id+'\')">⋯</button></div>').join('')+
-   (D.classes.filter(c=>c.type!=='club').length?'':'<div class="small muted label" style="padding:6px 8px">Классов пока нет</div>')+
-   '</div></div>'+
-   '<div class="classes"><div class="classes-head"><span class="label">Кружки / секции</span><button onclick="openNewClass(\'club\')">＋</button></div>'+
-   '<div class="classlist">'+clubsSidebarHtml()+'</div></div>'+
-  '</aside><main class="main">'+page()+'</main>';
- initAutosize();
- if(S.lessonModal)renderLessonModal();
- if(S.view==='home')startClockTicker();
- else if(window._clockInterval){clearInterval(window._clockInterval);window._clockInterval=null}
- if(S.view==='work'&&S.workTab==='colleagues')initColumnResize('colleagues-table','colleagueColWidths');
+   navBtn('backup','⇩','Резервная копия');
+  document.getElementById('app').innerHTML=
+  '<aside class="side'+(altNav?' alt-active':'')+'">'+
+   '<button class="navmode'+(altNav?' active':'')+'" onclick="toggleAltNav()" title="Классы и группы" aria-label="Классы и группы">'+
+    '<span class="navmode-icon">🗂</span>'+
+    '<span class="navmode-label">Классы и группы</span>'+
+   '</button>'+
+   '<div class="altbackdrop"></div>'+
+   '<div class="altwrap">'+
+    '<div class="altgrid">'+navs+'</div>'+
+    '<div class="altclasses">'+classesSidebar()+'</div>'+
+   '</div>'+
+   '<div class="navicons">'+navs+'</div>'+
+   '</aside><main class="main">'+page()+'</main>';
+  const side=document.querySelector('.side');
+  if(side){
+    if(sideOpen)side.classList.add('side-open');
+    side.onmousedown=function(){sideOpen=true;side.classList.add('side-open');};
+    side.onmouseleave=function(){sideOpen=false;side.classList.remove('side-open');};
+  }
+  initAutosize();
+  if(S.lessonModal)renderLessonModal();
+  if(S.view==='home')startClockTicker();
+  else if(window._clockInterval){clearInterval(window._clockInterval);window._clockInterval=null}
+  if(S.view==='work'&&S.workTab==='colleagues')initColumnResize('colleagues-table','colleagueColWidths');
 }
-function navBtn(view,icon,label){return '<button class="nav'+(S.view===view?' active':'')+'" onclick="goto(\''+view+'\')">'+icon+' <span class="label">'+label+'</span></button>'}
-function toggleSidebar(){S.sidebarCollapsed=!S.sidebarCollapsed;render()}
+function classesSidebar(){
+  let html='',sec=(title,kind)=>{
+   let list=sortedClasses(D.classes.filter(c=>c.type===kind));
+   if(!list.length)return;
+   html+='<div class="classes-head">'+title+' <button onclick="openNewClass(\''+kind+'\')">＋</button></div>';
+   html+='<table class="classtable"><tbody>';
+   list.forEach(c=>html+='<tr><td><button class="label" onclick="openClass(\''+c.id+'\')">'+e(c.name)+'</button></td><td><button class="label" onclick="event.stopPropagation();openEditClass(\''+c.id+'\')">⋯</button></td></tr>');
+   html+='</tbody></table>';
+  };
+  sec('Классы','class');
+  sec('Кружки / секции','club');
+  return html||'<div class="small muted" style="padding:6px 8px">Классов и кружков пока нет</div>';
+}
+function navBtn(view,icon,label){return '<button class="nav'+(S.view===view?' active':'')+'" onclick="goto(\''+view+'\')"><span class="icon">'+icon+'</span><span class="label">'+label+'</span></button>'}
 function goto(v){S.view=v;render()}
 function page(){
+ if(S.view==='classes')return '<div class="card" style="max-width:640px;margin:0 auto">'+classesSidebar()+'</div>';
  if(S.view==='students')return studentsPage();
  if(S.view==='student')return studentPage();
  if(S.view==='class')return classPage();
