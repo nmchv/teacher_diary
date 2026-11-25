@@ -137,7 +137,7 @@ table.classtable button.label:hover{background:var(--color-surface-elevated)}
 table.classtable td:last-child{width:1px;padding:5px 4px}
 table.classtable td:last-child button{opacity:.6;padding:3px 6px;font-size:11px}
 table.classtable td:last-child button:hover{opacity:1}
-.main{margin-left:64px;flex:1;overflow:auto;padding:28px 30px;max-width:none}
+.main{margin-left:64px;flex:1;overflow:auto;padding:12px 30px;max-width:none}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:20px;flex-wrap:wrap}
 h1{font-size:28px;margin:0 0 4px}
 h2{font-size:20px;margin:0 0 14px}
