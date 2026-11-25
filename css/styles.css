@@ -345,7 +345,7 @@ html.dark .theme-toggle .icon-moon{display:block}
 html.theme-anim,html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:background-color .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease),fill .3s var(--ease),stroke .3s var(--ease),box-shadow .3s var(--ease) !important}
 @media(max-width:900px){.side{width:190px;flex-basis:190px}.main{padding:16px}.grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
 
-@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
 @keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
