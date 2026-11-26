@@ -11,6 +11,7 @@ function closeLessonPresent(){
  S.lessonPresentId=null;
  if(window._presentInterval){clearInterval(window._presentInterval);window._presentInterval=null}
  document.getElementById('present').innerHTML='';
+ render(); /* страница под режимом урока показывает свежие оценки и отметки */
  let aw=document.getElementById('assistant-wrap');if(aw)aw.style.display='';
  let at=document.getElementById('assistant-toggle');if(at)at.style.display='';
 }
@@ -88,7 +89,7 @@ function openQuickGradePopup(sid,lessonId){
  let popup=document.createElement('div');
  popup.id='quick-grade-popup';
  popup.className='modalbg';
- popup.style.zIndex='75';
+ popup.style.zIndex='95';
  popup.innerHTML='<div class="modal" style="max-width:380px"><div class="top"><h2>'+presentName(s)+'</h2><button class="closebtn" onclick="closeQuickGradePopup()">×</button></div>'+
   '<label>Оценка (можно выбрать или вписать своё число)</label>'+gradeInputHtml('qg-grade',cur?cur.value:'')+
   '<label>Баллы (необязательно)</label><div class="row"><input id="qg-points" inputmode="decimal" placeholder="баллы" value="'+(cur&&cur.points!=null?e(fmtPts(cur.points)):'')+'" style="width:100px"><span>из</span><input id="qg-max" inputmode="decimal" placeholder="макс." value="'+e(cur&&cur.max?fmtPts(cur.max):(l&&l.gradeMax?fmtPts(l.gradeMax):''))+'" style="width:100px"></div>'+

@@ -10,7 +10,7 @@
   --color-ok:#1f9d68;
   --color-bad:#d6404a;
   --color-warn:#c98a0a;
-  --header-bg:rgb(245 247 250 / .85);
+  --header-bg:#f5f7fa;
   --shadow-card:0 18px 48px rgb(20 33 61 / .12);
   --radius:10px;
   --radius-sm:6px;
@@ -37,7 +37,7 @@ html.dark{
   --color-ok:#3bc48a;
   --color-bad:#ef5b64;
   --color-warn:#e5a921;
-  --header-bg:rgb(8 9 11 / .82);
+  --header-bg:#08090b;
   --shadow-card:0 18px 48px rgb(0 0 0 / .24);
   --muted:var(--color-text-secondary);
   --ink:var(--color-text-primary);
@@ -45,7 +45,7 @@ html.dark{
 }
 *,::before,::after{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--header-h)+16px);-webkit-text-size-adjust:100%;background:var(--color-background)}
-body{margin:0;background:var(--color-background);color:var(--color-text-primary);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:var(--fs-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{margin:0;background:var(--color-background);color:var(--color-text-primary);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:var(--fs-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-x:clip}
 img,svg{display:block;max-width:100%}
 h1,h2,h3,p,ul,ol{margin:0;padding:0}
 ul,ol{list-style:none}
@@ -173,7 +173,6 @@ html.dark .attrow{border-bottom-color:rgba(255,255,255,.06)}
 .gbulk{border:1px dashed var(--color-border);border-radius:var(--radius);padding:10px 12px;margin:4px 0 12px}
 .modalbg{position:fixed;top:var(--header-h);left:64px;right:0;bottom:0;background:rgb(8 9 11 / .35);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20;overflow:auto}
 html.dark .modalbg{background:rgb(8 9 11 / .45)}
-body.sidebar-open .present-overlay{left:256px}
 .modal{background:var(--color-surface);border-radius:calc(var(--radius)*1.6);padding:22px;max-width:820px;width:100%;max-height:calc(90vh - var(--header-h));overflow:auto;animation:modalIn .35s var(--ease) both}
 .modal.wide{max-width:1000px}
 .badge{padding:3px 9px;background:rgba(0,0,0,.06);border-radius:20px;font-size:11.5px;font-weight:600;color:var(--color-text-secondary)}
@@ -270,7 +269,7 @@ html.dark .fieldrow{border-bottom-color:rgba(255,255,255,.06)}
 .seat-box.empty{color:var(--color-text-secondary)}
 .seat-box.absent{opacity:.35;text-decoration:line-through}
 .seat-box:hover{filter:brightness(.96)}
-.present-overlay{transition:left .32s cubic-bezier(.32,.72,0,1);position:fixed;top:var(--header-h);left:64px;right:0;bottom:0;background:var(--color-background);z-index:60;overflow:auto;padding:24px}
+.present-overlay{position:fixed;inset:0;background:var(--color-background);z-index:80;overflow:auto;overscroll-behavior:contain;padding:24px}
 .present-top{display:flex;justify-content:space-between;align-items:flex-start;max-width:1600px;margin:0 auto 10px;gap:16px;flex-wrap:nowrap}
 .present-clock{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
 .present-time-info{text-align:right;margin-top:2px}
@@ -387,8 +386,6 @@ html.dark .theme-toggle .icon-moon{display:block}
   background:var(--header-bg);
   border-bottom:1px solid var(--color-border);
   z-index:55;
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
 }
 .header-wrap{
   display:flex;align-items:center;gap:16px;
@@ -722,3 +719,29 @@ body:has(.sheet) #assistant-toggle,body:has(.sheet) #assistant-wrap{display:none
 @media(prefers-reduced-motion:reduce){
  .side,.side *,.sheetbg,.sheet,.yr-bar i,.yr-line i{transition:none!important;animation:none!important}
 }
+
+/* ===================== БЛОКИРОВКА ПРОКРУТКИ И РЕЖИМ УРОКА ===================== */
+html.scroll-lock{overflow:hidden}
+.modalbg,.modal,.sheet-scroll,#present-layout-editor>div{overscroll-behavior:contain}
+
+/* В режиме урока рабочая область, панель, шапка и ассистент скрыты полностью.
+   visibility сохраняет позицию прокрутки страницы до возврата. */
+body.present-open .site-header,
+body.present-open .app,
+body.present-open #assistant-wrap,
+body.present-open #assistant-toggle{visibility:hidden}
+body.present-open{background:var(--color-background)}
+/* окна, открытые из режима урока, располагаются над ним и занимают весь экран */
+body.present-open .modalbg{top:0;left:0;z-index:90}
+@media(max-width:680px){
+ .present-overlay{padding:16px}
+ .present-top{flex-wrap:wrap}
+}
+.present-grid>div{min-width:0}
+@media(max-width:1050px){.present-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:680px){.present-top>div:first-child{flex:1 0 100%!important}}
+/* список сортировки учеников не обрезается */
+select[onchange^="setStudentSort"]{min-width:200px}
+/* крестик остаётся в углу и при длинном имени ученика */
+#quick-grade-popup .top{flex-wrap:nowrap;align-items:flex-start}
+#quick-grade-popup .top h2{min-width:0}

@@ -23,6 +23,26 @@ function studentSortSelect(onchangeFn){
 }
 function setStudentSort(key){S.studentSort=key;if(S.view==='students')renderStudentsList();else render()}
 
+/* Отметки 🏆 / ❗ рядом с учеником: сравнение со средней по списку, пропуски и замечания */
+function studentBadgeInfo(metrics,baseline){
+ let reasons=[];let top=false,attention=false;
+ let avgGrade=metrics.avgGrade,absences=metrics.absences||0,behaviorCount=metrics.behaviorCount||0;
+ if(avgGrade!==null&&baseline!==null){
+  if(avgGrade-baseline>=1){top=true;reasons.push('средняя выше группы на '+round2(avgGrade-baseline));}
+  if(baseline-avgGrade>=1){attention=true;reasons.push('средняя ниже группы на '+round2(baseline-avgGrade));}
+ }
+ if(absences>=3){attention=true;reasons.push('пропусков: '+absences);}
+ if(behaviorCount>=2){attention=true;reasons.push('замечаний о поведении: '+behaviorCount);}
+ return {top,attention,reasons};
+}
+function studentBadgeHtml(metrics,baseline){
+ let info=studentBadgeInfo(metrics,baseline);
+ let out='';
+ if(info.top)out+='<span class="stbadge" title="Высокий результат: '+e(info.reasons.join(', '))+'">🏆</span>';
+ if(info.attention)out+='<span class="stbadge" title="Стоит обратить внимание: '+e(info.reasons.join(', '))+'">❗</span>';
+ return out;
+}
+
 function studentTable(a,tableId){
  tableId=tableId||'student-table';
  if(!a.length)return '<div class="empty">Ученики не найдены.</div>';
