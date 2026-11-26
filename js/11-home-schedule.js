@@ -207,31 +207,29 @@ function openFormalScheduleModal(){
    });
   });
   let rows='';
-  dayNamesFull.forEach((dn,di)=>{
-    let clubsRow='';
-    let clubsItems=(clubsByDay[di]||[]);
-    if(clubsItems.length){
-      clubsRow='<tr><td style="font-weight:600;color:var(--color-text-secondary);width:70px">'+dn+' (кружки)</td>'+
-       LESSON_TIMES.map(t=>{
-        let items=clubsItems.filter(it=>it.startTime&&timeToMin(it.startTime)===timeToMin(LESSON_TIMES.find(x=>x.n===t.n).start));
-        if(!items.length)return '<td style="height:36px"></td>';
-        return '<td style="height:36px;font-size:12px;line-height:1.3;color:var(--color-accent-hover)">'+
-         items.map(it=>'<div style="padding:3px 5px;border-radius:4px;background:rgb(91 141 239 / .1);border:1px solid var(--color-accent);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🔸 '+e(it.className)+(it.endTime?' <span style="font-size:10px;color:var(--color-text-secondary)">'+it.startTime+'–'+it.endTime+'</span>':'')+'</div>').join('')+'</td>';
-       }).join('')+'</tr>';
-    }
-    rows+='<tr><td style="font-weight:600;color:var(--color-text-secondary);width:70px">'+dn+'</td>'+
-     LESSON_TIMES.map(t=>{
-      let key=di+'|'+t.n;
-      let items=(schedule[key]||[]);
-      if(!items.length)return '<td style="height:36px"></td>';
-      return '<td style="height:36px;font-size:12px;line-height:1.3">'+
-       items.map(it=>'<div style="padding:3px 5px;border-radius:4px;background:var(--color-surface-elevated);border:1px solid var(--color-border);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+e(it.className)+'</div>').join('')+'</td>';
-     }).join('')+'</tr>'+clubsRow;
+  LESSON_TIMES.forEach(t=>{
+   rows+='<tr><td style="font-weight:600;color:var(--color-text-secondary);width:90px">'+t.n+'‑й<br><span style="font-size:11px;color:var(--color-text-secondary);font-weight:400">'+t.start+'–'+t.end+'</span></td>'+
+    dayNamesFull.map((dn,di)=>{
+     let key=di+'|'+t.n;
+     let items=(schedule[key]||[]);
+     if(!items.length)return '<td style="height:36px"></td>';
+     return '<td style="height:36px;font-size:12px;line-height:1.3">'+
+      items.map(it=>'<div style="padding:3px 5px;border-radius:4px;background:var(--color-surface-elevated);border:1px solid var(--color-border);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+e(it.className)+'</div>').join('')+'</td>';
+    }).join('')+'</tr>';
   });
-  let head='<tr><th style="width:70px">День недели</th>'+LESSON_TIMES.map(t=>'<th style="text-align:center">'+t.n+'‑й<br><span style="font-size:11px;color:var(--color-text-secondary);font-weight:400">'+t.start+'–'+t.end+'</span></th>').join('')+'</tr>';
-  setModalHtml('Моё расписание (формальное)',
+  let clubsHtml='';
+  dayNamesFull.forEach((dn,di)=>{
+   let items=(clubsByDay[di]||[]);
+   if(items.length){
+    clubsHtml+='<div style="margin-top:8px"><div style="font-weight:600;color:var(--color-text-secondary);font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">'+dn+'</div>'+
+     items.map(it=>'<div style="padding:3px 6px;border-radius:4px;background:rgb(91 141 239 / .1);border:1px solid var(--color-accent);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;line-height:1.3">🔸 '+e(it.className)+(it.startTime?' <span style="font-size:10px;color:var(--color-text-secondary)">'+it.startTime+(it.endTime?'–'+it.endTime:'')+'</span>':'')+'</div>').join('')+'</div>';
+   }
+  });
+  let head='<tr><th style="width:90px">Урок</th>'+dayNamesFull.map(dn=>'<th style="text-align:center">'+dn+'</th>').join('')+'</tr>';
+  setModalHtml('Моё расписание',
    '<div style="max-height:70vh;overflow:auto">'+
    '<table class="table" style="font-size:13px">'+head+rows+'</table>'+
+   (clubsHtml?'<div style="margin-top:14px;border-top:1px solid var(--color-border);padding-top:12px">'+clubsHtml+'</div>':'')+
    '</div>'+
    '<div class="toolbar" style="margin-top:14px;gap:8px">'+
    '<button class="primary" onclick="createWeekLessonsFromFormal()">Проставить на неделю</button>'+
