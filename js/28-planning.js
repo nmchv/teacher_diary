@@ -577,19 +577,71 @@ function planningPage(){
 }
 
 /* ===================== ИМПОРТ ФЕДЕРАЛЬНЫХ ПРОГРАММ ИЗ РЕПОЗИТОРИЯ =====================
-   Программы хранятся в public/programs/ как JSON-файлы. Каталог — public/programs/index.json.
-   Добавление новой программы сводится к созданию нового JSON-файла, правки кода не требуют. */
-const FED_PROGRAMS_INDEX='public/programs/index.json';
+   Программы хранятся в public/programs/ как JSON-файлы. Код автоматически сканирует
+   репозиторий через GitHub API и подхватывает все JSON-файлы — добавление новой
+   программы сводится к созданию нового файла, правки кода не требуют. */
+const FED_REPO_OWNER='nmchv';
+const FED_REPO_NAME='teacher_diary';
+const FED_PROGRAMS_DIR='public/programs';
+
+async function fedListProgramFiles(){
+  let branches=['main','master'];
+  let lastErr;
+  for(let br of branches){
+    let url=`https://api.github.com/repos/${FED_REPO_OWNER}/${FED_REPO_NAME}/git/trees/${br}?recursive=1`;
+    let resp;
+    try{resp=await fetch(url);}
+    catch(err){lastErr=err;continue;}
+    if(!resp.ok){lastErr=new Error('HTTP '+resp.status);continue;}
+    let data;
+    try{data=await resp.json();}catch(err){lastErr=err;continue;}
+    let files=(data.tree||[]).filter(item=>
+      item.type==='blob'&&
+      item.path.startsWith(FED_PROGRAMS_DIR+'/')&&
+      item.path.toLowerCase().endsWith('.json')
+    );
+    return files.map(item=>item.path);
+  }
+  throw lastErr||new Error('Не удалось получить список файлов из репозитория.');
+}
 
 async function fedLoadIndex(){
-  let resp;
-  try{resp=await fetch(FED_PROGRAMS_INDEX+'?t='+Date.now());}
-  catch(err){throw new Error('Не удалось загрузить каталог федеральных программ.');}
-  if(!resp.ok)throw new Error('Каталог программ недоступен (HTTP '+resp.status+').');
-  let list;
-  try{list=await resp.json();}catch(err){throw new Error('Некорректный каталог программ.');}
-  if(!Array.isArray(list))throw new Error('Некорректный каталог программ.');
-  return list;
+  let files;
+  try{files=await fedListProgramFiles();}
+  catch(err){
+    // Fallback на index.json, если GitHub API недоступен
+    try{
+      let resp=await fetch('public/programs/index.json?t='+Date.now());
+      if(!resp.ok)throw err;
+      let list=await resp.json();
+      if(Array.isArray(list))return list;
+    }catch(e2){}
+    throw err;
+  }
+  if(!files.length)throw new Error('В репозитории не найдено файлов программ.');
+
+  let programs=[];
+  for(let file of files){
+    try{
+      let data=await fedLoadProgram(file);
+      let themes=data.themes||data.topics||[];
+      if(!Array.isArray(themes)||!themes.length)continue;
+      programs.push({
+        id:file.replace(/\//g,'-').replace('.json',''),
+        file:file,
+        name:data.name||'Без названия',
+        subject:data.subject||'Предмет',
+        grade:data.grade||null,
+        themeCount:themes.length,
+        hours:data.totals&&data.totals.practical_hours!=null?Math.round(data.totals.practical_hours):(data.hours||'—'),
+        themes:themes
+      });
+    }catch(e){
+      // пропускаем битые файлы
+    }
+  }
+  if(!programs.length)throw new Error('В репозитории не найдено корректных программ с темами.');
+  return programs;
 }
 
 async function fedLoadProgram(file){
@@ -695,10 +747,16 @@ async function fedSelectProgram(id){
   let s=S.federalImport||{};
   let prog=(s.programs||[]).find(p=>p.id===id);if(!prog)return;
   s.selectedProgramId=id;
+  if(prog.themes){
+    // Темы уже загружены при сканировании репозитория
+    s.selectedProgram={id:prog.id,name:prog.name,subject:prog.subject,grade:prog.grade,themes:prog.themes,themeCount:prog.themeCount,hours:prog.hours,source:prog.file};
+    renderFederalImportModal();
+    return;
+  }
   try{
     let data=await fedLoadProgram(prog.file);
     let themes=fedNormalizeThemes(data);
-    s.selectedProgram={id:prog.id,name:data.name||prog.name||'Без названия',subject:data.subject||prog.subject,grade:data.grade||prog.grade,themes:themes,source:prog.file};
+    s.selectedProgram={id:prog.id,name:data.name||prog.name||'Без названия',subject:data.subject||prog.subject,grade:data.grade||prog.grade,themes:themes,themeCount:prog.themeCount,hours:prog.hours,source:prog.file};
   }catch(err){
     alert(err.message);return;
   }
