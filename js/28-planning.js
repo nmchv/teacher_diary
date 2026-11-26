@@ -604,14 +604,18 @@ async function fedLoadProgram(file){
 
 function fedNormalizeThemes(p){
   if(!p||typeof p!=='object')throw new Error('Программа не содержит данных.');
-  let themes=p.themes;
+  let themes=p.themes||p.topics;
   if(!Array.isArray(themes)||!themes.length)throw new Error('В программе нет тем для импорта.');
   return themes.map((t,i)=>{
-    let name;
-    if(t&&typeof t==='object')name=String(t.theme||'').trim();
-    else name=String(t||'').trim();
+    let name,order;
+    if(t&&typeof t==='object'){
+      name=String(t.theme||t.title||'').trim();
+      order=t.order!=null?t.order:t.number!=null?t.number:i+1;
+    }else{
+      name=String(t||'').trim();order=i+1;
+    }
     if(!name)throw new Error('Тема №'+(i+1)+' задана без названия.');
-    return{order:(t&&typeof t==='object'&&t.order!=null)?Number(t.order):i+1,theme:name};
+    return{order:Number(order),theme:name};
   }).sort((a,b)=>a.order-b.order||a.theme.localeCompare(b.theme,'ru'));
 }
 
@@ -725,7 +729,7 @@ async function doFederalImport(){
     try{
       let data=await fedLoadProgram(prog.file);
       let themes=fedNormalizeThemes(data);
-      s.selectedProgram={id:prog.id,name:data.name||prog.name||'Без названия',subject:data.subject||prog.subject,grade:data.grade||prog.grade,themes:themes,source:prog.file};
+    s.selectedProgram={id:prog.id,name:data.name||prog.name||'Без названия',subject:data.subject||prog.subject,grade:data.grade||prog.grade,themes:themes,themeCount:prog.themeCount,hours:prog.hours,source:prog.file};
     }catch(err){
       alert(err.message);return;
     }

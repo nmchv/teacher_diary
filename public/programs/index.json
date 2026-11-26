@@ -1,11 +1,65 @@
 [
   {
     "id": "geography-5",
-    "file": "geography/grade-5.json",
+    "file": "geography/geography-grade-5.json",
     "subject": "География",
     "grade": 5,
     "name": "География · 5 класс",
+    "hours": 34,
+    "themeCount": 34
+  },
+  {
+    "id": "geography-6",
+    "file": "geography/geography-grade-6.json",
+    "subject": "География",
+    "grade": 6,
+    "name": "География · 6 класс",
+    "hours": 34,
+    "themeCount": 34
+  },
+  {
+    "id": "geography-7",
+    "file": "geography/geography-grade-7.json",
+    "subject": "География",
+    "grade": 7,
+    "name": "География · 7 класс",
     "hours": 68,
+    "themeCount": 68
+  },
+  {
+    "id": "geography-8",
+    "file": "geography/geography-grade-8.json",
+    "subject": "География",
+    "grade": 8,
+    "name": "География · 8 класс",
+    "hours": 68,
+    "themeCount": 68
+  },
+  {
+    "id": "geography-9",
+    "file": "geography/geography-grade-9.json",
+    "subject": "География",
+    "grade": 9,
+    "name": "География · 9 класс",
+    "hours": 68,
+    "themeCount": 68
+  },
+  {
+    "id": "geography-10",
+    "file": "geography/geography-grade-10.json",
+    "subject": "География",
+    "grade": 10,
+    "name": "География · 10 класс",
+    "hours": 34,
+    "themeCount": 34
+  },
+  {
+    "id": "geography-11",
+    "file": "geography/geography-grade-11.json",
+    "subject": "География",
+    "grade": 11,
+    "name": "География · 11 класс",
+    "hours": 34,
     "themeCount": 34
   },
   {
