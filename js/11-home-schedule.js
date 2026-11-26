@@ -209,27 +209,29 @@ function openFormalScheduleModal(){
     (clubsByDay[day]=clubsByDay[day]||[]).push({className:c.name,startTime:l.startTime,endTime:l.endTime});
    });
   });
-  let dayColW=Math.floor(860/days);
+  let dayColW=Math.floor(700/days);
   let rows='';
   LESSON_TIMES.forEach(t=>{
-   rows+='<tr><td style="font-weight:600;color:var(--color-text-secondary);width:90px">'+t.n+'‑й<br><span style="font-size:11px;color:var(--color-text-secondary);font-weight:400">'+t.start+'–'+t.end+'</span></td>'+
+   rows+='<tr>'+
+    '<td style="font-weight:600;color:var(--color-text-secondary);text-align:center;width:34px">'+t.n+'</td>'+
+    '<td style="font-size:11px;color:var(--color-text-secondary);text-align:center;width:74px"><div style="font-weight:600">'+t.start+'</div><div style="font-weight:400">'+t.end+'</div></td>'+
     dayNamesFull.map((dn,di)=>{
      let key=di+'|'+t.n;
      let items=(schedule[key]||[]);
-     if(!items.length)return '<td style="height:36px;width:'+dayColW+'px"></td>';
-     return '<td style="height:36px;font-size:12px;line-height:1.3;width:'+dayColW+'px">'+
-      items.map(it=>'<div style="padding:3px 5px;border-radius:4px;background:var(--color-surface-elevated);border:1px solid var(--color-border);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+e(it.className)+'</div>').join('')+'</td>';
+     if(!items.length)return '<td style="height:30px;width:'+dayColW+'px"></td>';
+     return '<td style="height:30px;font-size:11px;line-height:1.2;width:'+dayColW+'px">'+
+      items.map(it=>'<div style="padding:2px 4px;border-radius:4px;background:var(--color-surface-elevated);border:1px solid var(--color-border);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+e(it.className)+'</div>').join('')+'</td>';
     }).join('')+'</tr>';
   });
   let clubsHtml='';
-  dayNamesFull.forEach((dn,di)=>{
+  dayShort.forEach((dn,di)=>{
    let items=(clubsByDay[di]||[]);
    if(items.length){
     clubsHtml+='<div style="margin-top:8px"><div style="font-weight:600;color:var(--color-text-secondary);font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">'+dn+'</div>'+
      items.map(it=>'<div style="padding:3px 6px;border-radius:4px;background:rgb(91 141 239 / .1);border:1px solid var(--color-accent);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;line-height:1.3">🔸 '+e(it.className)+(it.startTime?' <span style="font-size:10px;color:var(--color-text-secondary)">'+it.startTime+(it.endTime?'–'+it.endTime:'')+'</span>':'')+'</div>').join('')+'</div>';
    }
   });
-  let head='<tr><th style="width:90px">Урок</th>'+dayNamesFull.map(dn=>'<th style="text-align:center;width:'+dayColW+'px">'+dn+'</th>').join('')+'</tr>';
+  let head='<tr><th style="width:34px">№</th><th style="text-align:center;width:74px">Время</th>'+dayShort.map(dn=>'<th style="text-align:center;width:'+dayColW+'px">'+dn+'</th>').join('')+'</tr>';
   setModalHtml('Моё расписание',
    '<div style="max-height:70vh;overflow:auto">'+
    '<table class="table" style="font-size:13px;table-layout:fixed;width:100%">'+head+rows+'</table>'+
