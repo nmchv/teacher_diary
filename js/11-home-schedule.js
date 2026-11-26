@@ -234,8 +234,9 @@ function openFormalScheduleModal(){
   let head='<tr><th style="width:34px">№</th><th style="text-align:center;width:74px">Время</th>'+dayShort.map(dn=>'<th style="text-align:center;width:'+dayColW+'px">'+dn+'</th>').join('')+'</tr>';
   setModalHtml('Моё расписание',
    '<div style="max-height:70vh;overflow:auto">'+
+   '<div style="margin-bottom:18px"><b style="color:var(--color-text-primary)">Уроки</b></div>'+
    '<table class="table" style="font-size:13px;table-layout:fixed;width:100%">'+head+rows+'</table>'+
-   (clubsHtml?'<div style="margin-top:14px;border-top:1px solid var(--color-border);padding-top:12px">'+clubsHtml+'</div>':'')+
+   (clubsHtml?'<div style="margin-top:18px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface)"><div style="padding:10px 14px"><b style="color:var(--color-text-primary)">Кружки / секции</b></div><div style="padding:0 14px 10px">'+clubsHtml+'</div></div>':'')+
    '</div>'+
    '<div class="toolbar" style="margin-top:14px;gap:8px">'+
    '<button class="primary" onclick="createWeekLessonsFromFormal()">Проставить на неделю</button>'+
