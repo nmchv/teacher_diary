@@ -94,7 +94,8 @@ function saveEditMaterial(mid){
 }
 function deleteMaterialConfirm(mid){
  if(!confirm('Удалить файл из библиотеки? Он также будет убран из всех уроков, где использовался.'))return;
- D.lessons.forEach(l=>{if(l.materialIds)l.materialIds=l.materialIds.filter(x=>x!==mid)});
+  D.lessons.forEach(l=>{if(l.materialIds)l.materialIds=l.materialIds.filter(x=>x!==mid)});
+  D.planLessons.forEach(l=>{if(l.materials)l.materials=l.materials.filter(x=>x!==mid)});
  D.materials=D.materials.filter(m=>m.id!==mid);
  fileStoreDelete(mid).catch(()=>{});
  save();render();

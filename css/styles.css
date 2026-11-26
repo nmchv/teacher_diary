@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 :root{
   --color-background:#f5f7fa;
   --color-surface:#ffffff;
@@ -45,7 +46,7 @@ html.dark{
 }
 *,::before,::after{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--header-h)+16px);-webkit-text-size-adjust:100%;background:var(--color-background)}
-body{margin:0;background:var(--color-background);color:var(--color-text-primary);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:var(--fs-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-x:clip}
+body{margin:0;background:var(--color-background);color:var(--color-text-primary);font-family:'Manrope',-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:var(--fs-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-x:clip}
 img,svg{display:block;max-width:100%}
 h1,h2,h3,p,ul,ol{margin:0;padding:0}
 ul,ol{list-style:none}
@@ -745,3 +746,77 @@ select[onchange^="setStudentSort"]{min-width:200px}
 /* крестик остаётся в углу и при длинном имени ученика */
 #quick-grade-popup .top{flex-wrap:nowrap;align-items:flex-start}
 #quick-grade-popup .top h2{min-width:0}
+
+/* ===================== ПЛАНИРОВАНИЕ УРОКОВ ===================== */
+.plan-wrap{display:flex;flex-direction:column;gap:14px}
+.plan-card h2{margin:0 0 10px}
+.plan-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.plan-bar-title{font-weight:700;font-size:13.5px;color:var(--color-text-secondary)}
+table.plan-ktp-table{width:100%;font-size:12.5px;border-collapse:collapse;table-layout:fixed}
+table.plan-ktp-table th{background:var(--color-surface-elevated);font-weight:700;text-align:left;position:sticky;top:0;z-index:2}
+table.plan-ktp-table th.plan-col-class{text-align:center}
+table.plan-ktp-table td{border-bottom:1px solid var(--color-border);padding:5px 7px;vertical-align:middle}
+table.plan-ktp-table tbody td{background:var(--color-surface)}
+table.plan-ktp-table tr.click td{background:var(--color-surface-elevated)}
+table.plan-ktp-table tr.click td:first-child{background:transparent}
+table.plan-ktp-table tfoot td{border-bottom:none;padding:6px 7px;font-size:12px;color:var(--color-text-secondary);background:var(--color-surface-elevated)}
+.ktp-foot{font-weight:600;color:var(--color-text-primary)}
+.ktp-lag{color:var(--color-bad)}
+.ktp-lag-text{font-size:10.5px}
+.ktp-add td{background:var(--color-surface-elevated)}
+.plan-parallel{padding:0;border:none;margin:0 0 8px;background:transparent}
+.plan-parallel > summary{padding:10px 14px}
+.plan-parallel-title{font-weight:700;font-size:14px}
+.plan-parallel-stats{font-size:12.5px;color:var(--color-text-secondary);margin-left:auto}
+.plan-parallel-body{padding:0 14px 12px}
+.plan-parallel-body table{margin-top:8px}
+.ktp-st{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-secondary);padding:0}
+.ktp-done{color:var(--color-ok);border-color:var(--color-ok);background:rgb(59 196 138 / .12)}
+.ktp-current{color:var(--color-accent);border-color:var(--color-accent);background:rgb(91 141 239 / .12)}
+.ktp-pending{color:var(--color-text-secondary)}
+.ktp-st:hover{border-color:var(--color-accent);background:var(--color-surface-elevated)}
+.plan-act{width:26px;height:26px;padding:0;border-radius:6px;font-size:14px;background:var(--color-surface-elevated);border:1px solid var(--color-border);color:var(--color-text-primary)}
+.plan-act:hover{background:var(--color-accent);color:#06080c;border-color:var(--color-accent)}
+.plan-act.primary{background:var(--color-accent);color:#06080c;border-color:var(--color-accent)}
+.plan-inline{width:100%;padding:5px 8px;border:1px solid var(--color-accent);border-radius:var(--radius-sm);background:var(--color-surface-elevated);font:inherit;font-size:inherit}
+table.plan-lessons-table{width:100%;font-size:13px;border-collapse:collapse;table-layout:fixed}
+table.plan-lessons-table th{background:var(--color-surface-elevated);font-weight:700;position:sticky;top:0;z-index:2}
+table.plan-lessons-table td{padding:7px 9px;border-bottom:1px solid var(--color-border);vertical-align:top}
+table.plan-lessons-table tr.plan-lesson-row{background:var(--color-surface)}
+table.plan-lessons-table tr.plan-lesson-row.nodate td{opacity:.9}
+table.plan-lessons-table tr.plan-lesson-row td.click{background:transparent}
+table.plan-lessons-table tr.plan-lesson-row td.click:active{background:var(--color-surface-elevated)}
+table.plan-lessons-table tr.plan-lesson-row td input{background:transparent;border:none;padding:4px 0;outline:2px solid var(--color-accent);outline-offset:-1px}
+.plan-table-wrap{overflow:auto}
+.plan-sep{background:var(--color-surface-elevated);color:var(--color-text-secondary);font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:5px 8px;border-bottom:1px solid var(--color-border)}
+.plan-mat{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:12px;background:var(--color-surface)}
+.plan-mat button{padding:1px 6px;font-size:11px}
+.plan-mat-cell{line-height:1.5}
+.plan-attach{font-size:12px;padding:3px 8px;border-radius:var(--radius-sm);border:1px dashed var(--color-border);color:var(--color-accent);background:transparent}
+.plan-attach:hover{background:var(--color-surface-elevated);border-color:var(--color-accent)}
+.plan-actions{display:flex;gap:5px}
+.plan-block{margin-bottom:4px}
+.plan-theme-text{display:block;white-space:normal;overflow-wrap:anywhere;word-break:break-word}
+table.plan-ktp-preview{width:100%;font-size:12.5px;border-collapse:collapse;margin-top:8px}
+table.plan-ktp-preview th{background:var(--color-surface-elevated);font-weight:700;text-align:left}
+table.plan-ktp-preview td{border-bottom:1px solid var(--color-border);padding:5px 8px;vertical-align:middle}
+table.plan-ktp-preview tbody td{background:var(--color-surface)}
+table.plan-ktp-settings-table{width:100%;font-size:12.5px;border-collapse:collapse;margin-top:6px}
+table.plan-ktp-settings-table th{background:var(--color-surface-elevated);font-weight:700;text-align:left}
+table.plan-ktp-settings-table td{border-bottom:1px solid var(--color-border);padding:5px 8px;vertical-align:middle}
+table.plan-ktp-settings-table tbody td{background:var(--color-surface)}
+@media(max-width:900px){table.plan-ktp-table td,table.plan-ktp-table th{padding:4px 6px}.ktp-st{width:26px;height:26px;font-size:13px}}
+
+/* ---- Федеральное КТП и настройки календаря ---- */
+table.plan-federal-table{width:100%;font-size:12.5px;border-collapse:collapse;margin-top:8px}
+table.plan-federal-table th{background:var(--color-surface-elevated);font-weight:700;text-align:left}
+table.plan-federal-table td{border-bottom:1px solid var(--color-border);padding:5px 8px;vertical-align:middle}
+table.plan-federal-table tbody td{background:var(--color-surface)}
+.plan-day-toggle{padding:4px 8px;border-radius:var(--radius-sm);border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-primary);font-size:12px}
+.plan-day-toggle.primary{background:var(--color-accent);color:#06080c;border-color:var(--color-accent)}
+.plan-day-toggle:hover{border-color:var(--color-accent);background:var(--color-surface-elevated)}
+table.plan-dates-preview{width:100%;font-size:12.5px;border-collapse:collapse;margin-top:8px}
+table.plan-dates-preview th{background:var(--color-surface-elevated);font-weight:700;text-align:left}
+table.plan-dates-preview td{border-bottom:1px solid var(--color-border);padding:5px 8px;vertical-align:middle}
+table.plan-dates-preview tbody td{background:var(--color-surface)}
+

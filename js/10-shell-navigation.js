@@ -6,7 +6,7 @@ let sideTimer=null;
    страница fullSchedulePage() и логика сохранены в коде */
 const NAV_ITEMS=[
  ['home','Главная'],['students','Ученики'],['search','Поиск'],['stats','Статистика'],['reports','Ведомости'],
- ['materials','Материалы'],['library','Библиотека уроков'],['announcements','Объявления'],['work','Работа'],
+ ['materials','Материалы'],['library','Библиотека уроков'],['planning','Планирование уроков'],['announcements','Объявления'],['work','Работа'],
  ['settings','Настройки'],['backup','Резервная копия']
 ];
 function toggleAltNav(){altNav=!altNav;syncSidebar();}
@@ -103,6 +103,7 @@ function page(){
  if(S.view==='reports')return reportsPage();
  if(S.view==='materials')return materialsPage();
  if(S.view==='library')return lessonLibraryPage();
+  if(S.view==='planning')return planningPage();
  if(S.view==='announcements')return announcementsPage();
  if(S.view==='fullschedule')return fullSchedulePage();
  if(S.view==='work')return workPage();

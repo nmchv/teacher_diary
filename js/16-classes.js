@@ -69,7 +69,9 @@ function saveEditClass(id){
 }
 function deleteClassConfirm(id){
  if(!confirm('Удалить класс и все его уроки? Ученики не удалятся — они просто отвяжутся от этого класса (если учатся ещё где-то, останутся там). Действие необратимо.'))return;
- D.lessons=D.lessons.filter(l=>l.classId!==id);
+  D.lessons=D.lessons.filter(l=>l.classId!==id);
+  D.planLessons=(D.planLessons||[]).filter(l=>l.classId!==id);
+  D.planStatus=(D.planStatus||[]).filter(s=>s.classId!==id);
  D.students.forEach(s=>{s.classIds=(s.classIds||[]).filter(cid=>cid!==id)});
  D.classes.forEach(c=>{if(c.parentClubId===id)c.parentClubId=null});
  D.classes=D.classes.filter(c=>c.id!==id);

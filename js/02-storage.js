@@ -2,9 +2,11 @@
 function defaultData(){
  return {version:3,classes:[],students:[],lessons:[],materials:[],scheduleBlocks:[],lessonTemplates:[],announcements:[],
   meetings:[],workTasks:[],colleagues:[],
+  planKtp:[],planStatus:[],planLessons:[],federalKtp:[],planCalendar:{},
   settings:{colorMode:'light',weatherCity:'Ростов-на-Дону',academicYear:'2026–2027',
    lastBackupAt:null,backupReminder:{lastShown:null},
    assistant:{enabled:true,character:'dog',freq:20,lastTipAt:null,peeked:false,motivation:true},
+   planSettings:{academicYear:'2026–2027',visible:{materials:true,note:true},widths:{num:56,date:130,topic:300,materials:200,note:220}},
    fields:{student:STUDENT_FIELDS_DEFAULT(),class:CLASS_FIELDS_DEFAULT(),lesson:LESSON_FIELDS_DEFAULT(),colleague:COLLEAGUE_FIELDS_DEFAULT()}}};
 }
 let D=null;
@@ -65,7 +67,13 @@ if(!D.settings.pointsThreshold)D.settings.pointsThreshold=5;
 if(!D.settings.assistant)D.settings.assistant={enabled:true,character:'dog',freq:20,lastTipAt:null,peeked:false,motivation:true};
  if(D.settings.assistant.peeked===undefined)D.settings.assistant.peeked=false;
  if(D.settings.assistant.motivation===undefined)D.settings.assistant.motivation=true;
- D.materials.forEach(m=>{if(m.gradeNumber===undefined)m.gradeNumber=null});
+  D.materials.forEach(m=>{if(m.gradeNumber===undefined)m.gradeNumber=null});
+  if(!D.planKtp)D.planKtp=[];
+  if(!D.planStatus)D.planStatus=[];
+  if(!D.planLessons)D.planLessons=[];
+  if(!D.federalKtp)D.federalKtp=[];
+  if(!D.planCalendar)D.planCalendar={};
+  if(!D.settings.planSettings)D.settings.planSettings={academicYear:D.settings.academicYear,visible:{materials:true,note:true},widths:{num:56,date:130,topic:300,materials:200,note:220}};
 }
 function save(){localStorage.setItem(LS_KEY,JSON.stringify(D))}
 
