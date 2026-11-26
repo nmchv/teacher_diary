@@ -192,43 +192,78 @@ function openSchoolYearDetail(){
 }
 function openFormalScheduleModal(){
   let days=D.settings.showSaturday?6:5;
-  let dayLabels=DAY_NAMES.slice(0,days);
   let dayNamesFull=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'].slice(0,days);
+  let dayShort=DAY_NAMES.slice(0,days);
   let schedule={};
   (D.settings.formalSchedule||[]).forEach(s=>{let key=s.day+'|'+s.lessonNum;(schedule[key]=schedule[key]||[]).push(s)});
+  let clubsByDay={};
   D.classes.filter(c=>c.type==='club').forEach(c=>{
    D.lessons.filter(l=>l.classId===c.id&&!l.lessonNumber).forEach(l=>{
     let d=new Date(l.date+'T12:00:00');
     if(isNaN(d))return;
     let day=dayIndexOfDate(l.date);
     if(day>=days)return;
-    let key=day+'|0';
-    (schedule[key]=schedule[key]||[]).push({classId:c.id,className:c.name,startTime:l.startTime,endTime:l.endTime,isClub:true});
+    (clubsByDay[day]=clubsByDay[day]||[]).push({className:c.name,startTime:l.startTime,endTime:l.endTime});
    });
   });
   let rows='';
-  dayLabels.forEach((dn,di)=>{
-   rows+='<tr><td style="font-weight:600;color:var(--color-text-secondary);width:70px">'+dayNamesFull[di]+'</td>'+
-    LESSON_TIMES.map(t=>{
-     let key=di+'|'+t.n;
-     let items=(schedule[key]||[]);
-     let clubKey=di+'|0';
-     let clubItems=(schedule[clubKey]||[]).filter(x=>x.isClub);
-     let allItems=[...items,...clubItems];
-     if(!allItems.length)return '<td style="height:44px"></td>';
-     return '<td style="height:44px;font-size:12px;line-height:1.3;position:relative">'+
-      allItems.map(it=>'<div style="padding:3px 5px;border-radius:4px;background:var(--color-surface-elevated);border:1px solid var(--color-border);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+
-       (it.isClub?'🔸 ':'')+e(it.className)+(it.startTime?' <span style="font-size:10px;color:var(--color-text-secondary)">'+it.startTime+(it.endTime?'–'+it.endTime:'')+'</span>':'')+
-      '</div>').join('')+'</td>';
-    }).join('')+'</tr>';
+  dayNamesFull.forEach((dn,di)=>{
+    let clubsRow='';
+    let clubsItems=(clubsByDay[di]||[]);
+    if(clubsItems.length){
+      clubsRow='<tr><td style="font-weight:600;color:var(--color-text-secondary);width:70px">'+dn+' (кружки)</td>'+
+       LESSON_TIMES.map(t=>{
+        let items=clubsItems.filter(it=>it.startTime&&timeToMin(it.startTime)===timeToMin(LESSON_TIMES.find(x=>x.n===t.n).start));
+        if(!items.length)return '<td style="height:36px"></td>';
+        return '<td style="height:36px;font-size:12px;line-height:1.3;color:var(--color-accent-hover)">'+
+         items.map(it=>'<div style="padding:3px 5px;border-radius:4px;background:rgb(91 141 239 / .1);border:1px solid var(--color-accent);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🔸 '+e(it.className)+(it.endTime?' <span style="font-size:10px;color:var(--color-text-secondary)">'+it.startTime+'–'+it.endTime+'</span>':'')+'</div>').join('')+'</td>';
+       }).join('')+'</tr>';
+    }
+    rows+='<tr><td style="font-weight:600;color:var(--color-text-secondary);width:70px">'+dn+'</td>'+
+     LESSON_TIMES.map(t=>{
+      let key=di+'|'+t.n;
+      let items=(schedule[key]||[]);
+      if(!items.length)return '<td style="height:36px"></td>';
+      return '<td style="height:36px;font-size:12px;line-height:1.3">'+
+       items.map(it=>'<div style="padding:3px 5px;border-radius:4px;background:var(--color-surface-elevated);border:1px solid var(--color-border);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+e(it.className)+'</div>').join('')+'</td>';
+     }).join('')+'</tr>'+clubsRow;
   });
-  let head='<tr><th style="width:70px">День</th>'+LESSON_TIMES.map(t=>'<th style="text-align:center">'+t.n+'‑й<br><span style="font-size:11px;color:var(--color-text-secondary);font-weight:400">'+t.start+'–'+t.end+'</span></th>').join('')+'</tr>';
+  let head='<tr><th style="width:70px">День недели</th>'+LESSON_TIMES.map(t=>'<th style="text-align:center">'+t.n+'‑й<br><span style="font-size:11px;color:var(--color-text-secondary);font-weight:400">'+t.start+'–'+t.end+'</span></th>').join('')+'</tr>';
   setModalHtml('Моё расписание (формальное)',
    '<div style="max-height:70vh;overflow:auto">'+
    '<table class="table" style="font-size:13px">'+head+rows+'</table>'+
    '</div>'+
-   '<p class="muted small" style="margin-top:10px">🔸 — кружок / секция. Настроить расписание можно в «Настройки → Расписание / блокировки → Формальное расписание».</p>'+
-   '<div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);
+   '<div class="toolbar" style="margin-top:14px;gap:8px">'+
+   '<button class="primary" onclick="createWeekLessonsFromFormal()">Проставить на неделю</button>'+
+   '<button onclick="closeModal()">Закрыть</button>'+
+   '</div>',true);
+}
+function createWeekLessonsFromFormal(){
+  let days=D.settings.showSaturday?6:5;
+  let now=new Date();
+  let todayStr=toISO(now);
+  let nowMinutes=now.getHours()*60+now.getMinutes();
+  let monday=mondayOf(todayStr);
+  let dates=weekDates(monday).filter((d,i)=>i<days);
+  let created=0,skipped=[];
+  dates.forEach(d=>{
+   let day=dayIndexOfDate(d);
+   if(day>=days)return;
+   LESSON_TIMES.forEach(t=>{
+    let key=day+'|'+t.n;
+    let slots=(D.settings.formalSchedule||[]).filter(s=>s.day===day&&s.lessonNum===t.n);
+    slots.forEach(s=>{
+     let blk=findBlock(d,t.n);
+     if(blk){skipped.push(fmtDate(d)+' '+t.n+'-й — заблокировано («'+blk.reason+'»)');return}
+     if(activeLessons().find(x=>x.date===d&&+x.lessonNumber===t.n)){skipped.push(fmtDate(d)+' '+t.n+'-й — слот занят');return}
+     D.lessons.push({id:uid(),date:d,lessonNumber:t.n,startTime:t.start,endTime:t.end,classId:s.classId,topic:'',customFields:{},attendance:{},grades:{},materialIds:[]});
+     created++;
+    });
+   });
+  });
+  save();closeModal();
+  alert('Создано уроков на будущую неделю: '+created+(skipped.length?'.\nПропущено:\n'+skipped.join('\n'):''));
+  render();
 }
 function widgetSchedule(){
  let dates=weekDates(S.weekStart);
