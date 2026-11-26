@@ -78,7 +78,7 @@ function widgetClock(){
   let progress=schoolYearProgress();
   return '<div class="card home-header-card" style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px">'+
    '<div class="weather-bg weather-'+condition+'" style="position:absolute;inset:0;z-index:0;pointer-events:none"></div>'+
-   '<div class="click" onclick="openSchoolYearDetail()" style="position:relative;z-index:2;flex:1;max-width:170px;text-align:left">'+
+   '<div class="home-progress-btn" role="button" tabindex="0" onkeydown="activateOnKey(event)" aria-label="Подробнее об учебном годе" onclick="openSchoolYearDetail()" style="position:relative;z-index:2;flex:1;max-width:170px;text-align:left">'+
     '<div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-hover);margin-bottom:6px">Учебный год</div>'+
     '<div style="font-size:20px;font-weight:700;color:var(--color-text-primary);margin-bottom:6px">'+progress+'%</div>'+
     '<div class="progress-track"><div class="progress-fill" style="width:'+progress+'%"></div></div>'+
@@ -87,12 +87,13 @@ function widgetClock(){
     '<div id="live-clock" style="font-size:44px;font-weight:700;letter-spacing:1px;font-variant-numeric:tabular-nums">'+fmtClockTime(new Date())+'</div>'+
     '<div class="muted" style="margin-top:4px">'+fmtClockDate(new Date())+'</div>'+
    '</div>'+
-   '<div class="home-weather click" onclick="openWeatherDetail()" style="position:relative;z-index:2;flex:1;max-width:260px;text-align:center">'+
+   '<div class="home-weather" role="button" tabindex="0" onkeydown="activateOnKey(event)" aria-label="Подробнее о погоде" onclick="openWeatherDetail()" style="position:relative;z-index:2;flex:1;max-width:260px;text-align:center">'+
     '<div style="font-size:20px;font-weight:700;color:var(--color-text-primary)">'+temp+'°</div>'+
     '<div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">'+e(city)+'</div>'+
    '</div>'+
   '</div>';
 }
+function activateOnKey(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();ev.currentTarget.click()}}
 function startClockTicker(){
  if(window._clockInterval){clearInterval(window._clockInterval);window._clockInterval=null}
  window._clockInterval=setInterval(()=>{
@@ -100,95 +101,6 @@ function startClockTicker(){
   if(!el){clearInterval(window._clockInterval);window._clockInterval=null;return}
   el.textContent=fmtClockTime(new Date());
  },30000);
-}
-function fetchWeather(){
- let city=D.settings.weatherCity||WEATHER_DEFAULT_CITY;
- let coords=WEATHER_CITY_COORDS[city]||WEATHER_CITY_COORDS[WEATHER_DEFAULT_CITY];
- let url='https://api.open-meteo.com/v1/forecast?latitude='+coords.lat+'&longitude='+coords.lon+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,pressure_msl,weather_code,wind_speed_10m&daily=precipitation_probability_max&timezone=auto';
- fetch(url).then(r=>r.json()).then(data=>{
-  if(data&&data.current){
-   let daily=data.daily&&data.daily.precipitation_probability_max?data.daily.precipitation_probability_max[0]:null;
-   S.weather={city:city,data:{...data.current,precipProb:daily}};
-   render();
-  }
- }).catch(e=>{console.warn('Weather fetch failed:',e)});
-}
-function initWeather(){
- fetchWeather();
- setInterval(fetchWeather,10*60*1000);
-}
-function openWeatherDetail(){
- let city=D.settings.weatherCity||WEATHER_DEFAULT_CITY;
- let w=S.weather&&S.weather.city===city?S.weather.data:null;
- if(!w){setModalHtml('Погода','<div class="empty">Данные о погоде ещё загружаются.</div><div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);return}
- let temp=Math.round(w.temperature_2m);
- let feels=Math.round(w.apparent_temperature||w.temperature_2m);
- let humidity=w.relative_humidity_2m||'–';
- let pressure=w.pressure_msl?Math.round(w.pressure_msl):'–';
- let wind=Math.round(w.wind_speed_10m||0);
- let precip=w.precipProb!==null?w.precipProb+'%':'–';
- let condition=weatherCondition(w.weather_code);
- let label=WEATHER_LABELS[condition];
- let emoji=WEATHER_EMOJI[condition];
- setModalHtml('Погода в '+e(city),
-  '<div class="grid" style="gap:16px">'+
-   '<div class="card" style="text-align:center;padding:24px">'+
-    '<div class="weather-anim weather-'+condition+'" style="font-size:56px;line-height:1;margin-bottom:8px">'+emoji+'</div>'+
-    '<div style="font-size:32px;font-weight:700">'+temp+'°</div>'+
-    '<div style="font-size:14px;color:var(--color-text-secondary);margin-top:2px">'+e(label)+' · '+e(city)+'</div>'+
-   '</div>'+
-   '<div class="card">'+
-    '<table class="table">'+
-     '<tr><td>Ощущается как</td><td><b>'+feels+'°</b></td></tr>'+
-     '<tr><td>Влажность</td><td><b>'+humidity+'%</b></td></tr>'+
-     '<tr><td>Давление</td><td><b>'+pressure+' гПа</b></td></tr>'+
-     '<tr><td>Ветер</td><td><b>'+wind+' м/с</b></td></tr>'+
-     '<tr><td>Вероятность осадков</td><td><b>'+precip+'</b></td></tr>'+
-    '</table>'+
-   '</div>'+
-  '</div>'+
-  '<div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);
-}
-function openSchoolYearDetail(){
-  let ay=D.settings.academicYear||'2026–2027';
-  let m=String(ay).match(/(\d{4})/g);
-  if(!m){setModalHtml('Учебный год','<div class="empty">Учебный год не задан.</div><div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);return}
-  let startY=+m[0];
-  let endY=m.length>1?+m[1]:startY+1;
-  let start=new Date(startY,8,1);
-  let end=new Date(endY,4,31);
-  let now=new Date();
-  let progress=schoolYearProgress();
-  let yearLessons=activeLessons().filter(l=>{
-    let d=new Date(l.date+'T12:00:00');
-    return !isNaN(d)&&d>=start&&d<=end;
-  });
-  let todayStr=toISO(now);
-  let passedLessons=yearLessons.filter(l=>l.date<=todayStr).length;
-  let remainingLessons=yearLessons.filter(l=>l.date>todayStr).length;
-  let totalWeeks=Math.ceil((end-start)/(7*24*60*60*1000));
-  let passedWeeks=Math.floor((now-start)/(7*24*60*60*1000));
-  let remainingWeeks=Math.ceil((end-now)/(7*24*60*60*1000));
-  let daysLeft=Math.ceil((end-now)/(24*60*60*1000));
-  setModalHtml('Учебный год '+ay,
-   '<div class="grid" style="gap:16px">'+
-   '<div class="card" style="text-align:center;padding:20px">'+
-   '<div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-hover);margin-bottom:6px">Прогресс учебного года</div>'+
-   '<div style="font-size:32px;font-weight:700;color:var(--color-text-primary);margin-bottom:6px">'+progress+'%</div>'+
-   '<div class="progress-track"><div class="progress-fill" style="width:'+progress+'%"></div></div>'+
-   '<div class="muted" style="margin-top:8px">'+fmtDate(start)+' — '+fmtDate(toISO(end))+'</div>'+
-   '</div>'+
-   '<div class="card">'+
-   '<div class="mgrid">'+
-   '<div class="mstat"><div class="mv">'+passedLessons+'</div><div class="ml">Уроков прошло</div></div>'+
-   '<div class="mstat"><div class="mv">'+remainingLessons+'</div><div class="ml">Уроков осталось</div></div>'+
-   '<div class="mstat"><div class="mv">'+passedWeeks+'</div><div class="ml">Недель прошло</div></div>'+
-   '<div class="mstat"><div class="mv">'+Math.max(0,remainingWeeks)+'</div><div class="ml">Недель осталось</div></div>'+
-   '<div class="mstat"><div class="mv">'+Math.max(0,daysLeft)+' дн.</div><div class="ml">До конца года</div></div>'+
-   '</div>'+
-   '</div>'+
-   '</div>'+
-   '<div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);
 }
 function openFormalScheduleModal(){
   let days=D.settings.showSaturday?6:5;

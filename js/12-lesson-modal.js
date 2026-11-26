@@ -76,6 +76,21 @@ function createLessonFull(){
 function setModalHtml(title,body,wide){
  document.getElementById('modal').innerHTML='<div class="modalbg" onclick="if(event.target===this){save();closeModal()}"><div class="modal'+(wide?' wide':'')+'"><div class="top"><h2>'+title+'</h2><button class="closebtn" onclick="closeModal()">×</button></div>'+body+'</div></div>';
 }
+/* Оформленное окно без стандартной шапки: прокручиваемое содержимое и закреплённый подвал.
+   refresh=true — тихое обновление открытого окна (без анимации и с сохранением прокрутки). */
+function openSheet(kind,label,body,foot,refresh){
+ let host=document.getElementById('modal');
+ let old=refresh?host.querySelector('.sheet-scroll'):null,top=old?old.scrollTop:0;
+ host.innerHTML='<div class="modalbg sheetbg'+(refresh?' no-anim':'')+'" onclick="if(event.target===this)closeModal()">'+
+  '<div class="modal sheet '+kind+'" role="dialog" aria-modal="true" aria-label="'+e(label)+'" tabindex="-1">'+
+  '<button type="button" class="sheet-close" onclick="closeModal()" aria-label="Закрыть" title="Закрыть">'+icon('close')+'</button>'+
+  '<div class="sheet-scroll">'+body+'</div>'+
+  (foot?'<footer class="sheet-foot">'+foot+'</footer>':'')+
+  '</div></div>';
+ if(top)host.querySelector('.sheet-scroll').scrollTop=top;
+ if(!refresh)host.querySelector('.sheet').focus({preventScroll:true});
+}
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&document.querySelector('.sheet'))closeModal()});
 function closeModal(){S.lessonModal=null;document.getElementById('modal').innerHTML=''}
 function renderModalOnly(){
  document.getElementById('modal').innerHTML='';
