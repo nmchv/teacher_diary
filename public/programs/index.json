@@ -1,0 +1,29 @@
+[
+  {
+    "id": "geography-5",
+    "file": "geography/grade-5.json",
+    "subject": "География",
+    "grade": 5,
+    "name": "География · 5 класс",
+    "hours": 68,
+    "themeCount": 34
+  },
+  {
+    "id": "history-5",
+    "file": "history/grade-5.json",
+    "subject": "История",
+    "grade": 5,
+    "name": "История · 5 класс",
+    "hours": 34,
+    "themeCount": 34
+  },
+  {
+    "id": "history-6",
+    "file": "history/grade-6.json",
+    "subject": "История",
+    "grade": 6,
+    "name": "История · 6 класс",
+    "hours": 34,
+    "themeCount": 34
+  }
+]

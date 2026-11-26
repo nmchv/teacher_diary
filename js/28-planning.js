@@ -242,7 +242,7 @@ function openFederalKtpImport(){
    '<label>Параллель</label><select id="fktp-grade" onchange="fktpChangeGrade()">'+gradeOpts+'</select>'+
    '<label>Предмет</label><select id="fktp-subject" onchange="fktpChangeSubject()">'+subjOpts+'</select>'+
    '<table class="table"><thead><tr><th>Название КТП</th><th class="numcol" style="width:80px">Часов</th><th class="numcol" style="width:80px">Тем</th><th style="width:200px"></th></tr></thead><tbody id="fktp-list">'+listHtml+'</tbody></table>'+
-   '<div class="toolbar" style="margin-top:14px"><button onclick="closeModal()">Закрыть</button></div>',true);
+   '<div class="toolbar" style="margin-top:14px"><button class="primary" onclick="openAddFederalKtp()">＋ Добавить своё КТП</button> <button onclick="closeModal()">Закрыть</button></div>',true);
 }
 function fktpChangeGrade(){
   let el=document.getElementById('fktp-grade');if(!el)return;
@@ -411,6 +411,7 @@ function planLessonsBlock(){
     '<button onclick="planAddEmptyRows(\''+c.id+'\')">＋ Пустые строки</button>'+
     '<button onclick="openPlanSettings()">Настройки таблицы</button>'+
     '<button onclick="openPlanDates(\''+c.id+'\')">Проставить даты</button>'+
+    '<button class="primary" onclick="openFederalProgramImport()">Импортировать федеральную программу</button>'+
    '</div></div>'+
    '<div class="plan-table-wrap"><table class="table plan-lessons-table">'+colHtml+headHtml+'<tbody>'+body+'</tbody></table></div>'+
    '<div class="muted small" style="margin-top:6px">Всего уроков: '+ls.length+'</div>'+
@@ -572,5 +573,171 @@ function planningPage(){
    '<div class="card plan-card"><h2>Обзор прохождения КТП по параллелям</h2>'+planKtpOverview()+'</div>'+
    '<div id="plan-anchor"></div>'+planLessonsBlock()+
    '</div>';
-  setTimeout(()=>{let el=document.getElementById('plan-anchor');if(el&&S.planClassId){el.scrollIntoView({behavior:'smooth',block:'start'})}},0);
+   setTimeout(()=>{let el=document.getElementById('plan-anchor');if(el&&S.planClassId){el.scrollIntoView({behavior:'smooth',block:'start'})}},0);
+}
+
+/* ===================== ИМПОРТ ФЕДЕРАЛЬНЫХ ПРОГРАММ ИЗ РЕПОЗИТОРИЯ =====================
+   Программы хранятся в public/programs/ как JSON-файлы. Каталог — public/programs/index.json.
+   Добавление новой программы сводится к созданию нового JSON-файла, правки кода не требуют. */
+const FED_PROGRAMS_INDEX='public/programs/index.json';
+
+async function fedLoadIndex(){
+  let resp;
+  try{resp=await fetch(FED_PROGRAMS_INDEX+'?t='+Date.now());}
+  catch(err){throw new Error('Не удалось загрузить каталог федеральных программ.');}
+  if(!resp.ok)throw new Error('Каталог программ недоступен (HTTP '+resp.status+').');
+  let list;
+  try{list=await resp.json();}catch(err){throw new Error('Некорректный каталог программ.');}
+  if(!Array.isArray(list))throw new Error('Некорректный каталог программ.');
+  return list;
+}
+
+async function fedLoadProgram(file){
+  let resp;
+  try{resp=await fetch('public/programs/'+file+'?t='+Date.now());}
+  catch(err){throw new Error('Не удалось загрузить файл программы.');}
+  if(!resp.ok)throw new Error('Файл программы не найден на сервере.');
+  let data;
+  try{data=await resp.json();}catch(err){throw new Error('Некорректный JSON в файле программы.');}
+  return data;
+}
+
+function fedNormalizeThemes(p){
+  if(!p||typeof p!=='object')throw new Error('Программа не содержит данных.');
+  let themes=p.themes;
+  if(!Array.isArray(themes)||!themes.length)throw new Error('В программе нет тем для импорта.');
+  return themes.map((t,i)=>{
+    let name;
+    if(t&&typeof t==='object')name=String(t.theme||'').trim();
+    else name=String(t||'').trim();
+    if(!name)throw new Error('Тема №'+(i+1)+' задана без названия.');
+    return{order:(t&&typeof t==='object'&&t.order!=null)?Number(t.order):i+1,theme:name};
+  }).sort((a,b)=>a.order-b.order||a.theme.localeCompare(b.theme,'ru'));
+}
+
+function openFederalProgramImport(){
+  S.federalImport={programs:[],subject:'',classId:null,selectedProgramId:null,selectedProgram:null};
+  fedLoadIndex().then(list=>{
+    S.federalImport.programs=list;
+    renderFederalImportModal();
+  }).catch(err=>{alert(err.message);closeModal();});
+}
+
+function renderFederalImportModal(){
+  if(!S.federalImport||!S.federalImport.programs){alert('Каталог программ не загружен. Откройте окно импорта снова.');closeModal();return}
+  let s=S.federalImport;
+  let programs=s.programs||[];
+  let subjects=[...new Set(programs.map(p=>p.subject))].sort();
+  let subj=s.subject||(subjects[0]||'');
+  if(!subjects.includes(subj))subj=subjects[0]||'';
+  s.subject=subj;
+  let subjOpts=subjects.map(sj=>'<option value="'+e(sj)+'"'+(sj===subj?' selected':'')+'>'+e(sj)+'</option>').join('');
+  let filtered=programs.filter(p=>p.subject===subj);
+  let grades=[...new Set(filtered.map(p=>p.grade))].sort((a,b)=>a-b);
+  let classes=planClasses().filter(c=>grades.includes(c.gradeNumber));
+  if(!s.classId&&classes.length)s.classId=classes[0].id;
+  let classOpts=classes.map(c=>'<option value="'+c.id+'"'+(s.classId===c.id?' selected':'')+'>'+e(c.name)+'</option>').join('');
+  let cls=C(s.classId);
+  let grade=cls?cls.gradeNumber:null;
+  if(!grade&&s.classId){
+    let m=String(cls?cls.name:'').match(/^(\d+)/);grade=m?+m[1]:null;
+  }
+  grade=grade?+grade:null;
+  let progs=filtered.filter(p=>p!=null&&p.grade!=null&&Number(p.grade)===grade);
+  let listHtml='';
+  if(!grades.length){
+    listHtml='<div class="empty small">Для выбранного предмета fédéralных программ нет в репозитории.</div>';
+  }else if(!progs.length){
+    listHtml='<div class="empty small">Для предмета «'+e(subj)+'» и '+e(cls?cls.name:('класс '+grade))+' федеральных программ не найдено.</div>';
+  }else{
+  if(progs.length===1&&!s.selectedProgramId){
+    s.selectedProgramId=progs[0].id;
+    fedSelectProgram(progs[0].id);
+  }
+    listHtml=progs.map(p=>{
+      let active=s.selectedProgramId===p.id;
+      return '<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--color-border);border-radius:var(--radius);margin:6px 0;background:'+(active?'rgb(91 141 239 / .08)':'var(--color-surface)')+';cursor:pointer"><input type="radio" name="fed-prog" value="'+p.id+'" '+(active?'checked':'')+' onchange="fedSelectProgram(\''+p.id+'\')" style="width:auto;margin-top:2px">'+
+       '<div style="flex:1;min-width:0"><div style="font-weight:600">'+e(p.name||'Без названия')+'</div><div class="muted small">'+e(p.subject||'')+' · '+p.grade+' класс · тем: '+(p.themeCount||'—')+' · часов: '+(p.hours||'—')+'</div></div></label>';
+    }).join('');
+  }
+  let chosen='';
+  if(s.selectedProgram){
+    let t=s.selectedProgram.themes||[];
+    chosen='<div class="notice">Выбрана программа: <b>'+e(s.selectedProgram.name||'')+'</b>. Тем для импорта: '+t.length+'.</div>';
+  }
+  setModalHtml('Импорт федеральной программы',
+   '<label>Предмет</label><select id="fed-subj" onchange="fedChangeSubj()">'+subjOpts+'</select>'+
+   '<label>Класс</label><select id="fed-class" onchange="fedChangeClass()">'+classOpts+'</select>'+
+   '<label>Программа</label>'+listHtml+
+   chosen+
+   '<div class="toolbar" style="margin-top:14px"><button class="primary" onclick="confirmFederalImport()">Импортировать выбранную программу</button> <button onclick="closeModal()">Закрыть</button></div>',true);
+}
+
+function fedChangeSubj(){
+  let el=document.getElementById('fed-subj');if(!el)return;
+  if(!S.federalImport)S.federalImport={programs:[],subject:'',classId:null,selectedProgramId:null,selectedProgram:null};
+  let s=S.federalImport;
+  s.subject=el.value;s.classId=null;s.selectedProgramId=null;s.selectedProgram=null;
+  renderFederalImportModal();
+}
+function fedChangeClass(){
+  let el=document.getElementById('fed-class');if(!el)return;
+  if(!S.federalImport)S.federalImport={programs:[],subject:'',classId:null,selectedProgramId:null,selectedProgram:null};
+  let s=S.federalImport;
+  s.classId=el.value;s.selectedProgramId=null;s.selectedProgram=null;
+  renderFederalImportModal();
+}
+async function fedSelectProgram(id){
+  let s=S.federalImport||{};
+  let prog=(s.programs||[]).find(p=>p.id===id);if(!prog)return;
+  s.selectedProgramId=id;
+  try{
+    let data=await fedLoadProgram(prog.file);
+    let themes=fedNormalizeThemes(data);
+    s.selectedProgram={id:prog.id,name:data.name||prog.name||'Без названия',subject:data.subject||prog.subject,grade:data.grade||prog.grade,themes:themes,source:prog.file};
+  }catch(err){
+    alert(err.message);return;
+  }
+  renderFederalImportModal();
+}
+function confirmFederalImport(){
+  let s=S.federalImport||{};
+  if(!s||!s.programs){alert('Окно импорта не инициализировано. Откройте его снова.');return}
+  if(!s.classId){
+    let el=document.getElementById('fed-class');if(el&&el.value)s.classId=el.value;
+  }
+  if(!s.classId){alert('Укажите класс.');return}
+  if(!s.selectedProgramId){
+    let el=document.querySelector('input[name="fed-prog"]:checked');if(el&&el.value)s.selectedProgramId=el.value;
+  }
+  if(!s.selectedProgramId){alert('Выберите программу.');return}
+  let cls=C(s.classId);
+  let existing=(D.planLessons||[]).filter(l=>l.classId===s.classId);
+  if(existing.length){
+    if(!confirm('В планировании класса «'+e(cls.name)+'» уже есть '+existing.length+' урок(ов). Импорт заменит их темами выбранной программы. Продолжить?'))return;
+  }
+  doFederalImport();
+}
+async function doFederalImport(){
+  let s=S.federalImport||{};
+  if(!s.selectedProgram){
+    let prog=(s.programs||[]).find(p=>p.id===s.selectedProgramId);if(!prog){alert('Программа не найдена.');return}
+    try{
+      let data=await fedLoadProgram(prog.file);
+      let themes=fedNormalizeThemes(data);
+      s.selectedProgram={id:prog.id,name:data.name||prog.name||'Без названия',subject:data.subject||prog.subject,grade:data.grade||prog.grade,themes:themes,source:prog.file};
+    }catch(err){
+      alert(err.message);return;
+    }
+  }
+  let themes=(s.selectedProgram&&s.selectedProgram.themes)||[];
+  if(!themes.length){alert('В программе нет тем для импорта.');return}
+  D.planLessons=(D.planLessons||[]).filter(l=>l.classId!==s.classId);
+  themes.forEach((t,i)=>{
+    D.planLessons.push({id:uid(),classId:s.classId,date:'',topic:t.theme,note:'',materials:[],order:i+1});
+  });
+  save();
+  closeModal();
+  render();
+  alert('Федеральная программа успешно импортирована. Добавлено тем: '+themes.length+'.');
 }
