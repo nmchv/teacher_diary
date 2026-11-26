@@ -645,8 +645,9 @@ async function fedLoadIndex(){
 }
 
 async function fedLoadProgram(file){
+  let url = file.startsWith('public/programs/') ? file : ('public/programs/'+file);
   let resp;
-  try{resp=await fetch('public/programs/'+file+'?t='+Date.now());}
+  try{resp=await fetch(url+'?t='+Date.now());}
   catch(err){throw new Error('Не удалось загрузить файл программы.');}
   if(!resp.ok)throw new Error('Файл программы не найден на сервере.');
   let data;
