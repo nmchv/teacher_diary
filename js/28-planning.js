@@ -673,11 +673,17 @@ function fedNormalizeThemes(p){
 }
 
 function openFederalProgramImport(){
-  S.federalImport={programs:[],subject:'',classId:null,selectedProgramId:null,selectedProgram:null};
+  S.federalImport={programs:[],subject:'',classId:null,selectedProgramId:null,selectedProgram:null,loading:true};
+  setModalHtml('Импорт федеральной программы',
+   '<div style="display:flex;align-items:center;gap:10px;padding:20px"><span style="font-size:20px">⟳</span><div class="muted small">Загрузка программ из репозитория…</div></div>',true);
   fedLoadIndex().then(list=>{
+    S.federalImport.loading=false;
     S.federalImport.programs=list;
     renderFederalImportModal();
-  }).catch(err=>{alert(err.message);closeModal();});
+  }).catch(err=>{
+    S.federalImport.loading=false;
+    alert(err.message);closeModal();
+  });
 }
 
 function renderFederalImportModal(){
