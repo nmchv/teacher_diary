@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+/* ===================== ТЕМА «WEB3» (RTFKT / CloneX) =====================
+   Включается классом html.web3 (вместе с html.dark).
+   Глубокий чёрный, стекло, голографические переливы, широкий гротеск Unbounded,
+   плавающие «ауры» на фоне, подсветка за курсором, мягкое появление экранов.
+*/
+html.web3{
+  --holo:linear-gradient(110deg,#ff7ad9 0%,#b38cff 18%,#7fd3ff 36%,#9dffd8 54%,#fff3a8 72%,#ff9b8a 86%,#ff7ad9 100%);
+  --chrome:linear-gradient(180deg,#ffffff 0%,#e4e6f0 38%,#8e93a8 62%,#f4f5fa 100%);
+  --cy-ease:cubic-bezier(.16,1,.3,1);
+  --cy-display:'Unbounded','Manrope',sans-serif;
+  --glass:rgb(255 255 255 / .035);
+  --glass-strong:rgb(255 255 255 / .06);
+  --hairline:rgb(255 255 255 / .08);
+
+  --color-background:#050507;
+  --color-surface:rgb(16 16 22 / .55);
+  --color-surface-elevated:rgb(255 255 255 / .06);
+  --color-text-primary:#f5f5f7;
+  --color-text-secondary:#9a9cad;
+  --color-accent:#b9a4ff;
+  --color-accent-hover:#ff8ade;
+  --color-border:var(--hairline);
+  --color-ok:#8dffc4;
+  --color-bad:#ff6b8b;
+  --color-warn:#ffd77a;
+  --header-bg:rgb(5 5 7 / .55);
+  --shadow-card:0 30px 80px -20px rgb(0 0 0 / .8),0 0 60px -10px rgb(185 164 255 / .25);
+  --radius:22px;
+  --radius-sm:14px;
+  --accent:#b9a4ff;
+  --border:var(--hairline);
+  --mx:50vw;--my:30vh;
+  color-scheme:dark;
+  background:var(--color-background);
+}
+
+/* ---- Фон: плавающие ауры + зерно + свет за курсором ---- */
+html.web3 body{
+  background:transparent;
+  font-family:'Manrope',-apple-system,"Segoe UI",Roboto,sans-serif;
+  line-height:1.65;
+}
+html.web3 body::before{
+  content:'';position:fixed;inset:-25%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(28% 32% at 24% 26%,rgb(179 140 255 / .22),transparent),
+    radial-gradient(24% 28% at 80% 16%,rgb(255 122 217 / .16),transparent),
+    radial-gradient(26% 30% at 72% 80%,rgb(127 211 255 / .14),transparent),
+    radial-gradient(22% 26% at 16% 84%,rgb(157 255 216 / .08),transparent);
+  animation:cyAura 28s var(--cy-ease) infinite alternate;
+}
+html.web3 body::after{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(600px circle at var(--mx) var(--my),rgb(185 164 255 / .1),transparent 60%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.035'/></svg>");
+}
+@keyframes cyAura{
+  0%{transform:translate3d(0,0,0) rotate(0deg) scale(1)}
+  50%{transform:translate3d(4%,-3%,0) rotate(8deg) scale(1.08)}
+  100%{transform:translate3d(-4%,3%,0) rotate(-6deg) scale(1.02)}
+}
+@keyframes cyHolo{to{background-position:300% 50%}}
+@keyframes cyRise{from{opacity:0;transform:translateY(22px) scale(.985);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes cyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes cyPulse{0%,100%{box-shadow:0 0 0 0 rgb(255 138 222 / .5)}50%{box-shadow:0 0 0 6px rgb(255 138 222 / 0)}}
+
+html.web3 ::selection{background:#ff8ade;color:#050507}
+html.web3 :focus-visible{outline:2px solid #b9a4ff;outline-offset:3px;border-radius:12px}
+html.web3 *{scrollbar-color:rgb(255 255 255 / .18) transparent;scrollbar-width:thin}
+html.web3 ::-webkit-scrollbar{width:8px;height:8px}
+html.web3 ::-webkit-scrollbar-thumb{background:rgb(255 255 255 / .15);border-radius:8px}
+
+/* ---- Типографика ---- */
+html.web3 h1,html.web3 h2,html.web3 .stat,html.web3 .mstat .mv,html.web3 .present-clock,html.web3 .brand-name,html.web3 .weeknav .wk-title{font-family:var(--cy-display)}
+html.web3 h1{
+  font-size:clamp(30px,2.2rem + 1vw,46px);font-weight:600;letter-spacing:-.02em;line-height:1.05;margin-bottom:10px;
+  background:var(--holo);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:cyHolo 14s linear infinite;
+}
+html.web3 h2{font-size:15px;font-weight:500;letter-spacing:.02em;text-transform:uppercase;color:var(--color-text-primary)}
+html.web3 h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--color-text-secondary)}
+html.web3 label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--color-text-secondary)}
+html.web3 .top{margin-bottom:34px;align-items:flex-end}
+html.web3 .top .muted{font-size:15px}
+html.web3 .stat,html.web3 .mstat .mv{font-weight:500;letter-spacing:-.02em}
+html.web3 .present-clock{
+  font-size:56px;font-weight:500;letter-spacing:-.04em;
+  background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+html.web3 mark{background:#ffd77a;color:#050507;border-radius:6px}
+
+/* ---- Больше воздуха ---- */
+html.web3 .main{padding:40px clamp(24px,4vw,64px) 80px calc(clamp(24px,4vw,64px))}
+html.web3 .card{padding:28px;margin-bottom:24px}
+html.web3 details.card.collapsible{padding:0}
+html.web3 details.card.collapsible>summary{padding:24px 28px}
+html.web3 details.card.collapsible>.cbody{padding:0 28px 28px}
+html.web3 .grid{gap:20px}
+html.web3 .mgrid{gap:14px}
+html.web3 .toolbar{gap:10px}
+html.web3 .table th,html.web3 .table td{padding:14px 12px}
+html.web3 .attrow,html.web3 .fieldrow{padding:12px 10px}
+html.web3 .modal{padding:34px}
+html.web3 input,html.web3 textarea,html.web3 select,html.web3 .richtext-edit{padding:12px 16px}
+
+/* ---- Шапка ---- */
+html.web3 .site-header{
+  background:var(--header-bg);
+  backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
+  border-bottom:1px solid var(--hairline);
+}
+html.web3 .brand-name{
+  font-weight:600;letter-spacing:-.01em;font-size:16px;
+  background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+html.web3 .brand-icon{transition:transform .8s var(--cy-ease);filter:drop-shadow(0 0 10px rgb(185 164 255 / .6))}
+html.web3 .brand:hover .brand-icon{transform:rotate(-12deg) scale(1.12)}
+html.web3 .header-btn{
+  border-radius:999px;background:transparent;border-color:transparent;font-weight:600;
+  transition:background-color .4s var(--cy-ease),border-color .4s var(--cy-ease),color .4s var(--cy-ease);
+}
+html.web3 .header-btn:hover:not(:disabled){background:var(--glass-strong);border-color:var(--hairline);color:#fff}
+
+/* ---- Переключатель темы ---- */
+.theme-toggle .icon-web3{display:none}
+html.web3 .theme-toggle .icon-moon,html.web3 .theme-toggle .icon-sun{display:none}
+html.web3 .theme-toggle .icon-web3{display:block;fill:currentColor;stroke:none}
+html.web3 .theme-toggle{position:relative;border:0;color:#050507;background:var(--holo);background-size:300% 100%;animation:cyHolo 6s linear infinite;box-shadow:0 0 24px -4px rgb(255 138 222 / .7)}
+html.web3 .theme-toggle:hover{color:#050507;transform:rotate(18deg) scale(1.06)}
+html.web3 .theme-toggle,html.web3 .week-arrow{padding:0}
+html.web3 .theme-toggle{transition:transform .6s var(--cy-ease)}
+html.web3 .header-btn{padding:8px 16px}
+
+/* ---- Боковая панель ---- */
+html.web3 .side{background:rgb(8 8 12 / .55);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);border-right:1px solid var(--hairline)}
+html.web3 .side.side-open{box-shadow:40px 0 80px -20px rgb(0 0 0 / .8)}
+html.web3 .side-rail{gap:6px}
+html.web3 .side .nav,html.web3 table.classtable button.label{background:transparent;box-shadow:none}
+html.web3 .side .nav{border-radius:14px;transition:background-color .4s var(--cy-ease),color .4s var(--cy-ease)}
+html.web3 .side .nav .ic{transition:transform .5s var(--cy-ease)}
+html.web3 .side .nav:hover:not(:disabled){background:var(--glass-strong);color:#fff}
+html.web3 .side .nav:hover:not(:disabled) .ic{transform:scale(1.15)}
+html.web3 .side .nav.active,html.web3 .side .nav.active:hover:not(:disabled),html.web3 .side .navmode.on{
+  color:#fff;background:linear-gradient(135deg,rgb(179 140 255 / .28),rgb(127 211 255 / .14));
+  box-shadow:inset 0 0 0 1px rgb(255 255 255 / .12),0 8px 24px -8px rgb(179 140 255 / .6)
+}
+html.web3 .side .nav.active .ic{filter:drop-shadow(0 0 6px rgb(185 164 255 / .9))}
+html.web3 .classes-head{text-transform:uppercase;letter-spacing:.16em;font-size:10.5px}
+html.web3 table.classtable td{border-radius:0}
+html.web3 table.classtable td:first-child{border-radius:12px 0 0 12px}
+html.web3 table.classtable td:last-child{border-radius:0 12px 12px 0}
+html.web3 table.classtable tr:hover td{background:var(--glass-strong)}
+html.web3 table.classtable button.label:hover{background:transparent!important}
+
+/* ---- Карточки: стекло, голографическая рамка и свет за курсором ---- */
+html.web3 .card,html.web3 .modal{
+  position:relative;isolation:isolate;
+  background:linear-gradient(160deg,rgb(255 255 255 / .06),rgb(255 255 255 / .015) 60%);
+  border:1px solid var(--hairline);border-radius:var(--radius);
+  backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
+  box-shadow:inset 0 1px 0 rgb(255 255 255 / .06);
+  transition:transform .7s var(--cy-ease),box-shadow .7s var(--cy-ease),border-color .7s var(--cy-ease);
+}
+html.web3 .card::before,html.web3 .modal::before{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;z-index:1;
+  background:var(--holo);background-size:300% 100%;animation:cyHolo 8s linear infinite;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  opacity:0;transition:opacity .7s var(--cy-ease);
+}
+html.web3 .card::after,html.web3 .modal::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+  background:radial-gradient(420px circle at var(--cx,50%) var(--cy,-30%),rgb(255 255 255 / .07),transparent 45%);
+  opacity:0;transition:opacity .5s var(--cy-ease);
+}
+html.web3 .card:hover{transform:translateY(-4px);border-color:transparent;box-shadow:var(--shadow-card)}
+html.web3 .card:hover::before,html.web3 .modal::before{opacity:1}
+html.web3 .card:hover::after,html.web3 .modal:hover::after{opacity:1}
+html.web3 details.card.collapsible>summary:hover{background:transparent}
+html.web3 details.card.collapsible>summary::after,html.web3 details.dblock>summary::after{color:var(--color-text-secondary)}
+html.web3 .modal{border-radius:30px;background:linear-gradient(160deg,rgb(30 28 40 / .85),rgb(12 12 18 / .9));box-shadow:0 40px 120px -20px rgb(0 0 0 / .9),0 0 80px -20px rgb(179 140 255 / .35)}
+html.web3 .modalbg{background:rgb(3 3 6 / .6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+html.web3 .mstat,html.web3 .insight-item,html.web3 .checks,html.web3 details.dblock,html.web3 .materials-list .m,html.web3 .gbulk{border-color:var(--hairline);background-color:var(--glass);border-radius:var(--radius-sm)}
+html.web3 .mstat{transition:transform .6s var(--cy-ease),background-color .6s var(--cy-ease)}
+html.web3 .mstat:hover{transform:translateY(-3px);background-color:var(--glass-strong)}
+html.web3 .mstat .ml{text-transform:uppercase;letter-spacing:.08em;font-size:9.5px;font-weight:700}
+html.web3 details.dblock>summary{background:transparent;padding:16px 18px}
+html.web3 .insight-icon{background:var(--glass-strong);box-shadow:inset 0 0 0 1px var(--hairline)}
+
+/* ---- Появление экрана при переходе ---- */
+html.web3.cy-enter .main>*,html.web3.cy-enter .main .card{animation:cyRise 1s var(--cy-ease) both}
+html.web3.cy-enter .main .card:nth-of-type(2){animation-delay:.07s}
+html.web3.cy-enter .main .card:nth-of-type(3){animation-delay:.14s}
+html.web3.cy-enter .main .card:nth-of-type(4){animation-delay:.21s}
+html.web3.cy-enter .main .card:nth-of-type(5){animation-delay:.28s}
+html.web3.cy-enter .main .card:nth-of-type(n+6){animation-delay:.35s}
+html.web3 .modal{animation:cyRise .7s var(--cy-ease) both}
+
+/* ---- Кнопки ---- */
+html.web3 button{
+  border-radius:999px;padding:10px 18px;font-weight:600;
+  background:var(--glass-strong);color:var(--color-text-primary);
+  box-shadow:inset 0 0 0 1px var(--hairline);
+  transition:background-color .5s var(--cy-ease),color .5s var(--cy-ease),box-shadow .5s var(--cy-ease),transform .5s var(--cy-ease);
+}
+html.web3 button:hover:not(:disabled){background:rgb(255 255 255 / .12);color:#fff;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .2)}
+html.web3 button:active:not(:disabled){transform:scale(.96)}
+html.web3 button.primary,html.web3 .tabs button.active,html.web3 .richtext-toolbar button.active,html.web3 .ple-tab-active{
+  color:#050507;font-weight:700;letter-spacing:.01em;
+  background:var(--holo);background-size:300% 100%;animation:cyHolo 9s linear infinite;
+  box-shadow:0 10px 30px -10px rgb(255 138 222 / .7),inset 0 1px 0 rgb(255 255 255 / .6);
+}
+html.web3 button.primary:hover:not(:disabled),html.web3 .tabs button.active:hover:not(:disabled){
+  color:#050507;background:var(--holo);background-size:300% 100%;transform:translateY(-2px);
+  box-shadow:0 18px 40px -10px rgb(179 140 255 / .9),inset 0 1px 0 rgb(255 255 255 / .7);
+}
+html.web3 button.primary::after{background:rgb(255 255 255 / .5)}
+html.web3 button.danger{background:rgb(255 107 139 / .1);color:var(--color-bad);box-shadow:inset 0 0 0 1px rgb(255 107 139 / .3)}
+html.web3 button.danger:hover:not(:disabled){background:rgb(255 107 139 / .2);color:#ffb3c4}
+html.web3 button.ghost,html.web3 .closebtn,html.web3 .ple-remove{background:transparent;box-shadow:none}
+html.web3 .closebtn{width:40px;height:40px;padding:0;display:inline-grid;place-items:center}
+html.web3 .closebtn:hover:not(:disabled){background:var(--glass-strong)!important;transform:rotate(90deg)}
+html.web3 .week-arrow{border-radius:999px;width:40px;height:40px;border-color:var(--hairline);background:var(--glass);color:#fff;box-shadow:none}
+html.web3 .week-arrow:hover{background:#fff;border-color:#fff;color:#050507;box-shadow:0 0 30px -6px rgb(255 255 255 / .6)}
+html.web3 .weeknav .wk-title{font-size:14px;font-weight:500}
+html.web3 .classes-head button,html.web3 table.classtable td:last-child button{box-shadow:none;padding:0;border-radius:10px}
+
+/* ---- Поля ввода ---- */
+html.web3 input,html.web3 textarea,html.web3 select,html.web3 .richtext-edit{
+  border-radius:14px;background:rgb(255 255 255 / .04);border-color:var(--hairline);caret-color:#ff8ade;
+}
+html.web3 input::placeholder,html.web3 textarea::placeholder{color:#5d5f70}
+html.web3 input:hover,html.web3 textarea:hover,html.web3 select:hover{border-color:rgb(255 255 255 / .16)}
+html.web3 input:focus,html.web3 textarea:focus,html.web3 select:focus{
+  border-color:rgb(185 164 255 / .7);background:rgb(255 255 255 / .06);
+  box-shadow:0 0 0 4px rgb(185 164 255 / .15),0 0 30px -6px rgb(185 164 255 / .5)
+}
+html.web3 input[type=checkbox],html.web3 input[type=radio]{accent-color:#b9a4ff}
+html.web3 select option{background:#111117}
+
+/* ---- Таблицы ---- */
+html.web3 .table th{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--color-text-secondary);border-bottom:1px solid var(--hairline)}
+html.web3 .table td{border-bottom-color:rgb(255 255 255 / .05)}
+html.web3 .table tr{transition:background-color .4s var(--cy-ease)}
+html.web3 .table tbody tr:hover{background:rgb(255 255 255 / .03)}
+html.web3 th.today-col,html.web3 td.today-col{background:rgb(185 164 255 / .08)}
+html.web3 .now-line{background:var(--holo);background-size:300% 100%;animation:cyHolo 4s linear infinite;box-shadow:0 0 14px rgb(255 138 222 / .8)}
+
+/* ---- Бейджи и чипы ---- */
+html.web3 .badge{background:var(--glass-strong);box-shadow:inset 0 0 0 1px var(--hairline);font-weight:700;letter-spacing:.02em}
+html.web3 .badge.blue{background:rgb(127 211 255 / .1);color:#a8e2ff}
+html.web3 .badge.green{background:rgb(141 255 196 / .1);color:var(--color-ok)}
+html.web3 .badge.red{background:rgb(255 107 139 / .1);color:var(--color-bad)}
+html.web3 .badge.yellow{background:rgb(255 215 122 / .1);color:var(--color-warn)}
+html.web3 .chip-link{background:var(--glass);border-color:var(--hairline);transition:all .5s var(--cy-ease)}
+html.web3 .chip-link:hover{background:#fff;color:#050507;border-color:#fff}
+html.web3 .notice{border-radius:var(--radius-sm);background:linear-gradient(110deg,rgb(255 215 122 / .1),rgb(255 138 222 / .08));border:1px solid rgb(255 215 122 / .25);color:var(--color-text-primary);padding:16px 20px}
+html.web3 .attbtn.present{background:rgb(141 255 196 / .12)}
+html.web3 .attbtn.absent{background:rgb(255 107 139 / .12)}
+html.web3 .rank-avatar{background:var(--holo);background-size:300% 100%;animation:cyHolo 10s linear infinite;color:#050507}
+html.web3 .rank-row{border-radius:16px;padding:12px 14px;transition:background-color .5s var(--cy-ease),transform .5s var(--cy-ease)}
+html.web3 .rank-row:hover{background:var(--glass-strong);border-color:var(--hairline);transform:translateX(4px)}
+
+/* ---- Расписание ---- */
+html.web3 .sched-wrap,html.web3 .sched-day-col,html.web3 .sched-time-col{gap:10px}
+html.web3 .sched-time-cell,html.web3 .sched-cell{border-color:var(--hairline);background:var(--glass);border-radius:16px}
+html.web3 .sched-time-col.sched-time-head-col{background:transparent}
+html.web3 .sched-day-head{border-radius:16px;background:transparent;border-color:transparent;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+html.web3 .sched-day-head.sched-today{position:relative;background:linear-gradient(135deg,rgb(179 140 255 / .25),rgb(255 122 217 / .12));border-color:rgb(255 255 255 / .14);box-shadow:0 10px 30px -12px rgb(179 140 255 / .8)}
+html.web3 .sched-today-badge{background:#ff8ade;color:#050507;border-radius:999px;animation:cyPulse 2.4s ease-in-out infinite}
+html.web3 .sched-cell{transition:transform .5s var(--cy-ease),background-color .5s var(--cy-ease),border-color .5s var(--cy-ease),box-shadow .5s var(--cy-ease)}
+html.web3 .sched-cell:hover{background:rgb(255 255 255 / .08)!important;border-color:rgb(255 255 255 / .22);transform:translateY(-2px);box-shadow:0 16px 30px -14px rgb(179 140 255 / .7)}
+html.web3 .sched-cell.sched-today-cell{border-color:rgb(185 164 255 / .35);background:rgb(185 164 255 / .05)}
+html.web3 .sched-cell.sched-empty{background:transparent;border:1px dashed rgb(255 255 255 / .08);color:#4e5060}
+html.web3 .sched-cell.sched-empty:hover{color:#fff}
+html.web3 .sched-st-blue{background:rgb(127 211 255 / .1)}
+html.web3 .sched-st-green{background:rgb(141 255 196 / .09)}
+html.web3 .sched-st-red{background:rgb(255 107 139 / .1)}
+html.web3 .sched-st-yellow{background:rgb(255 215 122 / .09)}
+html.web3 .sched-meeting-chip,html.web3 .meeting-chip{border-radius:10px}
+
+/* ---- Рассадка, ассистент, прочее ---- */
+html.web3 .seat-desk{border-color:var(--hairline);background:var(--glass);border-radius:18px;padding:6px}
+html.web3 .seat-box{background:rgb(255 255 255 / .03);border-radius:12px;transition:transform .5s var(--cy-ease),background-color .5s var(--cy-ease)}
+html.web3 .seat-box:hover{transform:translateY(-2px);filter:none;background:rgb(255 255 255 / .08)}
+html.web3 .seat-box.filled{background:linear-gradient(135deg,rgb(179 140 255 / .22),rgb(127 211 255 / .12));color:#fff}
+html.web3 .present-overlay{background:transparent;backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
+html.web3 .assistant-bubble{border-color:var(--hairline);background:rgb(20 20 28 / .85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:20px}
+html.web3 .assistant-bubble:after{border-top-color:rgb(20 20 28 / .85)}
+html.web3 .assistant-char{animation:cyFloat 4s var(--cy-ease) infinite;filter:drop-shadow(0 10px 24px rgb(179 140 255 / .6))}
+html.web3 #assistant-toggle{background:var(--holo);background-size:300% 100%;animation:cyHolo 6s linear infinite}
+html.web3 .ple-slots{border-color:var(--hairline);background:var(--glass);border-radius:var(--radius-sm)}
+html.web3 .ple-card{border-color:var(--hairline);border-radius:12px}
+html.web3 .section-sep{border-top-color:var(--hairline);margin:24px 0}
+html.web3 .progress-track{background:rgb(255 255 255 / .06);border-radius:999px;overflow:hidden}
+html.web3 .home-weather,html.web3 .home-progress-btn{border-radius:18px;transition:background-color .5s var(--cy-ease),transform .5s var(--cy-ease)}
+html.web3 .home-weather:hover,html.web3 .home-progress-btn:hover{background:var(--glass-strong);transform:translateY(-2px)}
+html.web3 .progress-track>*{background:var(--holo)!important;background-size:300% 100%!important;animation:cyHolo 6s linear infinite;border-radius:999px}
+
+@media (prefers-reduced-motion:reduce){
+  html.web3 *,html.web3 *::before,html.web3 *::after,html.web3 body::before{animation:none!important;transition-duration:.01ms!important}
+}
+@media (max-width:900px){
+  html.web3 .main{padding:24px 18px 60px}
+  html.web3 .card{padding:20px}
+}
+@media print{
+  html.web3 body::before,html.web3 body::after{display:none}
+}

@@ -66,11 +66,9 @@ function settingsAppearanceTab(){
   '<div class="checks" style="max-height:none">'+(D.settings.gradeCommentTemplates||[]).map((g,i)=>'<div class="attrow"><span class="toolbar" style="flex:0"><button '+(i===0?'disabled':'')+' onclick="moveCommentTemplate('+i+',-1)">↑</button><button '+(i===(D.settings.gradeCommentTemplates.length-1)?'disabled':'')+' onclick="moveCommentTemplate('+i+',1)">↓</button></span><span>'+e(g)+'</span><button class="danger" onclick="removeCommentTemplate('+i+')">✕</button></div>').join('')+'</div>'+
   '<div class="toolbar" style="margin-top:10px"><input id="new-comment-template" placeholder="например, Не сдал(а) работу" style="max-width:260px"><button onclick="addCommentTemplate()">＋ Добавить вариант</button></div>')+
   sCard('Накопительная система баллов','<label>Порог обмена баллов на оценку</label><input type="number" min="1" value="'+(D.settings.pointsThreshold||5)+'" style="max-width:120px" onchange="setPointsThreshold(this.value)"><p class="muted small">Используется в режиме «Начать урок» — баллы можно ставить за короткие ответы, а по достижении порога обменять на полноценную оценку.</p>')+
-  sCard('Тёмная / светлая тема','<div class="toolbar">'+
-   '<button class="theme-toggle" data-theme-toggle type="button" onclick="TeacherDiaryTheme.toggle()" aria-label="Переключить тему">'+
-   (D.settings.colorMode==='dark'?'🌙 К светлой':'☀ К тёмной')+'</button>'+
-   '<span class="muted small" style="margin-left:10px">Текущая: '+(D.settings.colorMode==='dark'?'тёмная':'светлая')+'</span>'+
-  '</div>')+
+  sCard('Тема оформления','<div class="toolbar" role="group" aria-label="Тема оформления">'+
+   [['light','☀ Светлая'],['dark','🌙 Тёмная'],['cyber','⚡ Киберпанк'],['web3','✦ Web3']].map(o=>'<button type="button" class="'+(D.settings.colorMode===o[0]?'primary':'')+'" aria-pressed="'+(D.settings.colorMode===o[0])+'" onclick="TeacherDiaryTheme.set(\''+o[0]+'\');save();render()">'+o[1]+'</button>').join('')+
+  '</div><p class="muted small">Кнопка в шапке переключает темы по кругу.</p>')+
   sCard('Город для погоды','<label>Город, по которому показывать погоду на главной</label><select id="weather-city" style="width:100%;padding:9px;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-surface);color:var(--color-text-primary)" onchange="setWeatherCity(this.value)">'+
    Object.keys(WEATHER_CITY_COORDS).map(c=>'<option value="'+e(c)+'"'+(D.settings.weatherCity===c?' selected':'')+'>'+e(c)+'</option>').join('')+
   '</select><p class="muted small">Погода обновляется каждые 10 минут через сервис Open-Meteo.</p>')+
