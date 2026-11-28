@@ -124,11 +124,9 @@ html.web3 .header-btn{
 html.web3 .header-btn:hover:not(:disabled){background:var(--glass-strong);border-color:var(--hairline);color:#fff}
 
 /* ---- Переключатель темы ---- */
-.theme-toggle .icon-web3{display:none}
-html.web3 .theme-toggle .icon-moon,html.web3 .theme-toggle .icon-sun{display:none}
-html.web3 .theme-toggle .icon-web3{display:block;fill:currentColor;stroke:none}
 html.web3 .theme-toggle{position:relative;border:0;color:#050507;background:var(--holo);background-size:300% 100%;animation:cyHolo 6s linear infinite;box-shadow:0 0 24px -4px rgb(255 138 222 / .7)}
-html.web3 .theme-toggle:hover{color:#050507;transform:rotate(18deg) scale(1.06)}
+html.web3 .theme-toggle:hover{color:#050507;transform:scale(1.06)}
+html.web3{--menu-bg:#121219}
 html.web3 .theme-toggle,html.web3 .week-arrow{padding:0}
 html.web3 .theme-toggle{transition:transform .6s var(--cy-ease)}
 html.web3 .header-btn{padding:8px 16px}

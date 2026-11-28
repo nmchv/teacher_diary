@@ -67,8 +67,8 @@ function settingsAppearanceTab(){
   '<div class="toolbar" style="margin-top:10px"><input id="new-comment-template" placeholder="например, Не сдал(а) работу" style="max-width:260px"><button onclick="addCommentTemplate()">＋ Добавить вариант</button></div>')+
   sCard('Накопительная система баллов','<label>Порог обмена баллов на оценку</label><input type="number" min="1" value="'+(D.settings.pointsThreshold||5)+'" style="max-width:120px" onchange="setPointsThreshold(this.value)"><p class="muted small">Используется в режиме «Начать урок» — баллы можно ставить за короткие ответы, а по достижении порога обменять на полноценную оценку.</p>')+
   sCard('Тема оформления','<div class="toolbar" role="group" aria-label="Тема оформления">'+
-   [['light','☀ Светлая'],['dark','🌙 Тёмная'],['cyber','⚡ Киберпанк'],['web3','✦ Web3']].map(o=>'<button type="button" class="'+(D.settings.colorMode===o[0]?'primary':'')+'" aria-pressed="'+(D.settings.colorMode===o[0])+'" onclick="TeacherDiaryTheme.set(\''+o[0]+'\');save();render()">'+o[1]+'</button>').join('')+
-  '</div><p class="muted small">Кнопка в шапке переключает темы по кругу.</p>')+
+   TeacherDiaryTheme.list.map(t=>'<button type="button" class="'+(D.settings.colorMode===t.id?'primary':'')+'" aria-pressed="'+(D.settings.colorMode===t.id)+'" onclick="TeacherDiaryTheme.choose(\''+t.id+'\')">'+t.name+'</button>').join('')+
+  '</div><p class="muted small">Тему можно выбрать и из списка в шапке.</p>')+
   sCard('Город для погоды','<label>Город, по которому показывать погоду на главной</label><select id="weather-city" style="width:100%;padding:9px;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-surface);color:var(--color-text-primary)" onchange="setWeatherCity(this.value)">'+
    Object.keys(WEATHER_CITY_COORDS).map(c=>'<option value="'+e(c)+'"'+(D.settings.weatherCity===c?' selected':'')+'>'+e(c)+'</option>').join('')+
   '</select><p class="muted small">Погода обновляется каждые 10 минут через сервис Open-Meteo.</p>')+

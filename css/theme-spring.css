@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+/* ===================== ТЕМА «ВЕСЕННЯЯ» =====================
+   Включается классом html.spring (поверх светлой темы).
+   Пастель: пудрово-розовый, лаванда, мята, персик. Цветущая ветка и букет по углам,
+   мягкие скруглённые формы. Летящие лепестки — в js/08b-theme-fx.js.
+*/
+html.spring{
+  --sp-rose:#b83d6e;
+  --sp-plum:#4a2c43;
+  --sp-pink:#ffd3e2;
+  --sp-lilac:#e6dbff;
+  --sp-mint:#d5f2e1;
+  --sp-peach:#ffe2cf;
+  --sp-butter:#fff3c9;
+  --sp-sky:#dcecff;
+  --sp-ease:cubic-bezier(.34,1.4,.5,1);
+  --sp-gradient:linear-gradient(120deg,#ffc6da,#ecd3ff 55%,#ffd9c4);
+
+  --color-background:#fff8f6;
+  --color-surface:#ffffff;
+  --color-surface-elevated:#fdeef3;
+  --color-text-primary:#4a2c43;
+  --color-text-secondary:#7d5f76;
+  --color-accent:#b83d6e;
+  --color-accent-hover:#8f2b55;
+  --color-border:#f1d9e4;
+  --color-ok:#1f7f5c;
+  --color-bad:#c2364f;
+  --color-warn:#8f5f00;
+  --header-bg:rgb(255 247 249 / .86);
+  --menu-bg:#fffafb;
+  --shadow-card:0 18px 40px -16px rgb(184 61 110 / .28);
+  --radius:22px;
+  --radius-sm:14px;
+  --accent:#d9608e;
+  --border:#f1d9e4;
+  color-scheme:light;
+}
+
+/* ---- Фон: пастельные пятна и цветы по углам ---- */
+html.spring body{background:transparent;font-family:'Nunito','Manrope',-apple-system,"Segoe UI",Roboto,sans-serif}
+html.spring::before{
+  content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(42% 45% at 8% 12%,rgb(255 205 223 / .75),transparent 70%),
+    radial-gradient(38% 42% at 92% 22%,rgb(226 212 255 / .7),transparent 70%),
+    radial-gradient(45% 45% at 18% 96%,rgb(206 240 221 / .75),transparent 70%),
+    radial-gradient(40% 40% at 86% 90%,rgb(255 222 200 / .75),transparent 70%),
+    radial-gradient(30% 30% at 52% 48%,rgb(255 243 201 / .5),transparent 70%);
+}
+html.spring body::before,html.spring body::after{content:'';position:fixed;z-index:-1;pointer-events:none;background:no-repeat center/contain}
+html.spring body::before{
+  top:calc(var(--header-h) - 6px);right:-8px;width:min(430px,46vw);aspect-ratio:430/240;
+  background-image:url("../assets/spring/branch.svg");
+  transform-origin:100% 0;animation:spSway 9s ease-in-out infinite;
+}
+html.spring body::after{
+  right:-10px;bottom:-10px;width:min(430px,48vw);aspect-ratio:430/300;
+  background-image:url("../assets/spring/bouquet.svg");opacity:.9;
+}
+@keyframes spSway{0%,100%{transform:rotate(0)}50%{transform:rotate(-1.8deg)}}
+@keyframes spBloom{from{transform:rotate(-120deg) scale(.2);opacity:0}to{transform:none;opacity:1}}
+@keyframes spRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes spBreeze{to{background-position:200% 50%}}
+
+html.spring ::selection{background:#ffc6da;color:#3b2035}
+html.spring :focus-visible{outline-color:#b83d6e;border-radius:10px}
+html.spring *{scrollbar-color:#f0bdd0 transparent;scrollbar-width:thin}
+
+/* ---- Типографика ---- */
+html.spring h1,html.spring h2,html.spring .brand-name,html.spring .stat,html.spring .mstat .mv,html.spring .present-clock,html.spring .weeknav .wk-title,html.spring .ws-title{font-family:'Comfortaa','Nunito',sans-serif}
+html.spring h1{font-weight:700;letter-spacing:-.01em;color:#8f2b55}
+html.spring h2{font-weight:700;font-size:18px}
+html.spring .main h2::before,html.spring .modal h2::before{
+  content:'';display:inline-block;width:18px;height:18px;margin-right:8px;vertical-align:-2px;
+  background:url("../assets/spring/blossom.svg") center/contain no-repeat;
+}
+html.spring .sheet h2::before,html.spring .wx-place h2::before{content:none}
+html.spring .card:hover>h2::before,html.spring .card:hover>.top h2::before{animation:spBloom .8s var(--sp-ease)}
+html.spring details.card.collapsible>summary h2{display:grid;grid-template-columns:auto 1fr;align-items:center;justify-items:start}
+html.spring details.card.collapsible>summary h2 .sc-sub{grid-column:2}
+html.spring .stat,html.spring .mstat .mv{color:#8f2b55}
+html.spring .present-clock{color:#8f2b55}
+
+/* ---- Шапка с цветочной гирляндой ---- */
+html.spring .site-header{background:var(--header-bg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:0}
+html.spring .site-header::after{
+  content:'';position:absolute;left:0;right:0;top:calc(100% - 7px);height:24px;pointer-events:none;
+  background:url("../assets/spring/garland.svg") repeat-x left top/240px 24px;
+}
+html.spring .brand-name{color:#8f2b55}
+html.spring .brand-icon{filter:hue-rotate(110deg) saturate(.8) brightness(1.1)}
+html.spring .header-btn{border-radius:999px;background:rgb(255 255 255 / .75)}
+html.spring .header-btn-empty{background:transparent}
+html.spring .header-btn:hover:not(:disabled){background:var(--sp-pink);border-color:#f5a9c3;color:#7a1f48}
+html.spring .site-header .theme-menu .theme-toggle{background:var(--sp-gradient);border-color:#fff;color:#7a1f48;box-shadow:0 6px 16px -8px rgb(184 61 110 / .6)}
+
+/* ---- Боковая панель ---- */
+html.spring .side{background:rgb(255 255 255 / .82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-right-color:#f5dde8}
+html.spring .side.side-open{background:rgb(255 252 253 / .97);box-shadow:20px 0 44px -16px rgb(184 61 110 / .25)}
+html.spring .side .nav{border-radius:16px}
+html.spring .side .nav .ic{transition:transform .4s var(--sp-ease)}
+html.spring .side .nav:hover .ic{transform:rotate(-8deg) scale(1.14)}
+html.spring .side .nav:hover:not(:disabled){background:#fdeef3;color:#7a1f48}
+html.spring .side .nav.active,html.spring .side .navmode.on,html.spring .side .nav.active:hover:not(:disabled){background:var(--sp-gradient);color:#6e1a40}
+
+/* ---- Карточки ---- */
+html.spring .card{
+  background:rgb(255 255 255 / .82);border:1px solid #fff;
+  box-shadow:0 0 0 1px rgb(241 205 220 / .7),0 10px 30px -18px rgb(184 61 110 / .3);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:transform .5s var(--sp-ease),box-shadow .35s var(--ease);
+}
+html.spring .card:hover{border-color:#fff;transform:translateY(-3px);box-shadow:0 0 0 1px #f5b8cd,var(--shadow-card)}
+html.spring .grid>.card:nth-child(4n+1){background:linear-gradient(160deg,#ffe7ef,rgb(255 255 255 / .9) 75%)}
+html.spring .grid>.card:nth-child(4n+2){background:linear-gradient(160deg,#eee6ff,rgb(255 255 255 / .9) 75%)}
+html.spring .grid>.card:nth-child(4n+3){background:linear-gradient(160deg,#e2f6ea,rgb(255 255 255 / .9) 75%)}
+html.spring .grid>.card:nth-child(4n){background:linear-gradient(160deg,#ffeadc,rgb(255 255 255 / .9) 75%)}
+html.spring details.card.collapsible>summary:hover{background:#fff5f8;border-radius:var(--radius)}
+html.spring .modal{background:#fffafb;box-shadow:0 30px 80px -20px rgb(110 40 80 / .4);border:1px solid #fff}
+html.spring .modalbg{background:rgb(255 214 229 / .45);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+html.spring .mstat{border-color:#fff;background:#fdf0f5}
+html.spring .mgrid>.mstat:nth-child(5n+2){background:#f2edff}
+html.spring .mgrid>.mstat:nth-child(5n+3){background:#e9f8ef}
+html.spring .mgrid>.mstat:nth-child(5n+4){background:#fff0e6}
+html.spring .mgrid>.mstat:nth-child(5n){background:#ebf4ff}
+
+/* ---- Кнопки и поля ---- */
+html.spring button{border-radius:999px}
+html.spring button.primary,html.spring .tabs button.active,html.spring .richtext-toolbar button.active,html.spring .ple-tab-active,html.spring .plan-act.primary,html.spring .plan-day-toggle.primary{
+  background:var(--sp-gradient);background-size:200% 100%;color:#5e1537;font-weight:800;box-shadow:0 8px 18px -10px rgb(184 61 110 / .7);
+}
+html.spring button.primary:hover:not(:disabled){animation:spBreeze 2.4s linear infinite alternate;box-shadow:0 12px 24px -10px rgb(184 61 110 / .75)}
+html.spring button.danger{background:#ffe3e7;color:#a8233d}
+html.spring button.ghost,html.spring .closebtn{background:transparent}
+html.spring .ktp-st,html.spring .plan-act,html.spring .classes-head button,html.spring table.classtable td:last-child button,html.spring table.classtable button.label{border-radius:10px}
+html.spring table.classtable button.label{background:transparent}
+html.spring .richtext-toolbar button{border-radius:10px 10px 0 0}
+html.spring input,html.spring textarea,html.spring select,html.spring .richtext-edit{border-radius:14px;background:#fff;border-color:#efd3df}
+html.spring input:focus,html.spring textarea:focus,html.spring select:focus{border-color:#d9608e;background:#fffafc;box-shadow:0 0 0 4px rgb(255 198 218 / .55)}
+html.spring input[type=checkbox],html.spring input[type=radio]{accent-color:#d9608e}
+html.spring .week-arrow:hover,html.spring .ws-arrow:hover{background:var(--sp-pink);border-color:#f5a9c3;color:#6e1a40;box-shadow:none}
+html.spring .plan-act:hover{background:var(--sp-pink);border-color:#f5a9c3;color:#6e1a40}
+
+/* ---- Таблицы, бейджи ---- */
+html.spring .table th{color:#8f2b55;border-bottom:2px solid #f6cbdb}
+html.spring .table td{border-bottom-color:#f7e4ec}
+html.spring .badge.blue{background:var(--sp-sky);color:#2d5c99}
+html.spring .badge.green{background:var(--sp-mint);color:#176246}
+html.spring .badge.red{background:#ffdbe1;color:#a8233d}
+html.spring .badge.yellow{background:var(--sp-butter);color:#7a5100}
+html.spring .rank-avatar{background:var(--sp-gradient);color:#5e1537}
+html.spring .notice{background:linear-gradient(110deg,#fff3c9,#ffe8d8);border-color:#f2d58c}
+html.spring mark{background:#ffe28a}
+
+/* ---- Расписание ---- */
+html.spring .sched-time-cell,html.spring .sched-cell,html.spring .sched-day-head,html.spring .ws-cell,html.spring .ws-time,html.spring .ws-dayhead,html.spring .ws-extra-item{border-radius:14px}
+html.spring .sched-day-head,html.spring .ws-dayhead,html.spring .ws-headcell{background:#f4eeff;border-color:#e6dbff}
+html.spring .sched-day-head.sched-today,html.spring .ws-dayhead.ws-today{background:var(--sp-gradient);border-color:#fff;color:#5e1537}
+html.spring .ws-today .ws-daydate,html.spring .ws-today .ws-today-label{color:#6e1a40}
+html.spring .ws-today-label{background:rgb(255 255 255 / .7)}
+html.spring .sched-today-badge{background:#b83d6e;color:#fff}
+html.spring .sched-cell:hover,html.spring .ws-cell.click:hover,html.spring .ws-extra-item:hover,html.spring .ws-meeting-item:hover,html.spring .sched-club-cell:hover{background:#ffe9f1!important;border-color:#ee9ab8}
+html.spring .ws-cell.ws-empty,html.spring .sched-cell.sched-empty{background:rgb(255 255 255 / .45)}
+html.spring .sched-cell.sched-today-cell,html.spring .ws-cell.ws-today-cell{border-color:#ee9ab8;background:#fff3f7}
+html.spring .sched-st-blue,html.spring .ws-st-blue{background:var(--sp-sky)}
+html.spring .sched-st-green,html.spring .ws-st-green{background:var(--sp-mint)}
+html.spring .sched-st-red,html.spring .ws-st-red{background:#ffdde3}
+html.spring .sched-st-yellow{background:var(--sp-butter)}
+html.spring th.today-col,html.spring td.today-col{background:#fff0f5}
+
+/* ---- Прочее ---- */
+html.spring .seat-desk{background:#f3fbf6;border-color:#cfeadb;border-radius:16px}
+html.spring .seat-box.filled{background:#ffe3ed}
+html.spring .progress-fill{background:linear-gradient(90deg,#f58bb0,#bfa6f5)}
+html.spring .present-overlay{background:linear-gradient(160deg,#fff8f6,#fdf0f7 55%,#f3f9f4)}
+html.spring body.present-open{background:#fff8f6}
+html.spring .assistant-bubble{border-color:#f5b8cd;border-radius:20px}
+html.spring #assistant-toggle{background:var(--sp-gradient)}
+html.spring.sp-enter .main>*{animation:spRise .6s var(--ease) both}
+html.spring.sp-enter .main>*:nth-child(2){animation-delay:.06s}
+html.spring.sp-enter .main>*:nth-child(3){animation-delay:.12s}
+html.spring.sp-enter .main>*:nth-child(n+4){animation-delay:.18s}
+
+.spring-petals{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:65}
+body.present-open .spring-petals{display:none}
+
+@media (max-width:680px){
+  html.spring body::before{width:62vw;opacity:.7}
+  html.spring body::after{width:60vw;opacity:.55}
+}
+@media (prefers-reduced-motion:reduce){
+  html.spring *,html.spring body::before{animation:none!important}
+  .spring-petals{display:none}
+}
+@media print{
+  html.spring::before,html.spring body::before,html.spring body::after,.spring-petals{display:none}
+}
